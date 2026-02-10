@@ -25,7 +25,6 @@ Features and improvements in v2.1.3:
   - Blockquotes, lists, and table cells are hardened to wrap content cleanly without overflow.
   - Toggle via toolbar button (#btn-wordwrap) or keyboard shortcut (Ctrl+Alt+W / Ctrl+Shift+W).
   - Preference persists in localStorage under md-word-wrap.
-  - Credits: feature made by LoserFan2020 with contributions from Phuc and Hung.
 - Misc: reordered blockquote/header parsing so headings inside blockquotes render correctly, fixed related JavaScript and CSS syntax issues encountered during development, and applied small UX polish to dialogs and controls.
 #### v2.2.0-beta-1 (28/10/2025)
 
