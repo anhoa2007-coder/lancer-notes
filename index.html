@@ -7,7 +7,7 @@
     <title>Lancer Notes</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 
@@ -30,8 +30,16 @@
                 <button type="button" class="menu-dropdown-item" id="menu-edit-undo" role="menuitem">Undo</button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-redo" role="menuitem">Redo</button>
                 <div class="menu-divider"></div>
+                <button type="button" class="menu-dropdown-item" id="menu-edit-clear-format" role="menuitem">Clear
+                    Formatting</button>
+                <div class="menu-divider"></div>
+                <button type="button" class="menu-dropdown-item" id="menu-edit-date-time" role="menuitem">Insert
+                    Date/Time</button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-find"
                     role="menuitem">Find/Replace</button>
+                <div class="menu-divider"></div>
+                <button type="button" class="menu-dropdown-item" id="menu-edit-search-google" role="menuitem">Search
+                    with Google</button>
             </div>
         </div>
         <div class="menu-item dropdown" id="menu-view" role="menuitem" tabindex="0" aria-haspopup="true"
@@ -41,8 +49,13 @@
                 <button type="button" class="menu-dropdown-item" id="menu-view-editor" role="menuitem">Editor</button>
                 <button type="button" class="menu-dropdown-item" id="menu-view-preview" role="menuitem">Preview</button>
                 <div class="menu-divider"></div>
-                <button type="button" class="menu-dropdown-item" id="menu-view-darkmode" role="menuitem">Toggle Dark
+                <button type="button" class="menu-dropdown-item" id="menu-view-darkmode" role="menuitem">Dark
                     Mode</button>
+                <div class="menu-divider"></div>
+                <button type="button" class="menu-dropdown-item" id="menu-view-statusbar" role="menuitem">Status
+                    Bar</button>
+                <button type="button" class="menu-dropdown-item" id="menu-view-wordwrap" role="menuitem">Word
+                    Wrap</button>
             </div>
         </div>
         <div class="menu-item dropdown" id="menu-help" role="menuitem" tabindex="0" aria-haspopup="true"
@@ -55,55 +68,89 @@
                 <button type="button" class="menu-dropdown-item" id="menu-help-about" role="menuitem">About</button>
             </div>
         </div>
-    </div>
 
-    <div class="toolbar">
+        <div class="menu-separator"></div>
 
+        <div class="toolbar-container">
+            <div class="toolbar-group">
+                <button class="toolbar-btn icon-only" id="btn-bold" title="Bold"><span
+                        class="material-symbols-outlined">format_bold</span></button>
+                <button class="toolbar-btn icon-only" id="btn-italic" title="Italic"><span
+                        class="material-symbols-outlined">format_italic</span></button>
+                <button class="toolbar-btn icon-only" id="btn-code" title="Code"><span
+                        class="material-symbols-outlined">code</span></button>
+                <button class="toolbar-btn icon-only" id="btn-clear-format" title="Clear Formatting"><span
+                        class="material-symbols-outlined">format_clear</span></button>
+                <button class="toolbar-btn" id="btn-hr" title="Horizontal Rule"><span
+                        class="material-symbols-outlined">horizontal_rule</span> HR</button>
+            </div>
 
+            <div class="toolbar-group">
+                <div class="menu-item dropdown" id="menu-headings" role="menuitem" tabindex="0" aria-haspopup="true"
+                    aria-expanded="false" style="padding: 0;">
+                    <button class="toolbar-btn" id="btn-headings-dropdown" title="Headings"
+                        style="display: flex; align-items: center; gap: 2px;">
+                        <span id="current-heading-icon" class="material-symbols-outlined"
+                            style="font-size: 18px;">format_h1</span>
+                        <span style="margin-left: 2px;">▾</span>
+                    </button>
+                    <div class="menu-dropdown" role="menu" aria-label="Headings menu">
+                        <button type="button" class="menu-dropdown-item" id="btn-h1" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; margin-right:4px;">format_h1</span> Title</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h2" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; margin-right:4px;">format_h2</span> Subtitle</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h3" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; margin-right:4px;">format_h3</span> Section</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h4" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; margin-right:4px;">format_h4</span> Subsection</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h5" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; margin-right:4px;">format_h5</span> Paragraph</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h6" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; margin-right:4px;">format_h6</span> Note</button>
+                    </div>
+                </div>
+            </div>
 
-        <div class="toolbar-group">
-            <button class="toolbar-btn icon-only" id="btn-bold" title="Bold"><span
-                    class="material-symbols-outlined">format_bold</span></button>
-            <button class="toolbar-btn icon-only" id="btn-italic" title="Italic"><span
-                    class="material-symbols-outlined">format_italic</span></button>
-            <button class="toolbar-btn icon-only" id="btn-code" title="Code"><span
-                    class="material-symbols-outlined">code</span></button>
-            <button class="toolbar-btn" id="btn-hr" title="Horizontal Rule"><span
-                    class="material-symbols-outlined">horizontal_rule</span> HR</button>
-        </div>
+            <div class="toolbar-group">
+                <div class="menu-item dropdown" id="menu-list" role="menuitem" tabindex="0" aria-haspopup="true"
+                    aria-expanded="false" style="padding: 0;">
+                    <button class="toolbar-btn" id="btn-list-dropdown" title="Lists">
+                        <span class="material-symbols-outlined">format_list_bulleted</span> List ▾
+                    </button>
+                    <div class="menu-dropdown" role="menu" aria-label="List menu">
+                        <button type="button" class="menu-dropdown-item" id="btn-bullet-list" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_list_bulleted</span>
+                            Bullet List</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-number-list" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_list_numbered</span>
+                            Numbered List</button>
+                    </div>
+                </div>
+                <button class="toolbar-btn" id="btn-quote" title="Quote"><span
+                        class="material-symbols-outlined">format_quote</span> Quote</button>
+            </div>
 
-        <div class="toolbar-group">
-            <button class="toolbar-btn icon-only" id="btn-h1" title="Heading 1"><span
-                    class="material-symbols-outlined">format_h1</span></button>
-            <button class="toolbar-btn icon-only" id="btn-h2" title="Heading 2"><span
-                    class="material-symbols-outlined">format_h2</span></button>
-            <button class="toolbar-btn icon-only" id="btn-h3" title="Heading 3"><span
-                    class="material-symbols-outlined">format_h3</span></button>
-        </div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="btn-link" title="Insert Link"><span
+                        class="material-symbols-outlined">link</span> Link</button>
+                <button class="toolbar-btn" id="btn-image" title="Insert Image"><span
+                        class="material-symbols-outlined">image</span> Image</button>
+            </div>
 
-
-
-        <div class="toolbar-group">
-            <button class="toolbar-btn" id="btn-bullet-list" title="Bullet List"><span
-                    class="material-symbols-outlined">format_list_bulleted</span> List</button>
-            <button class="toolbar-btn" id="btn-number-list" title="Numbered List"><span
-                    class="material-symbols-outlined">format_list_numbered</span> List</button>
-            <button class="toolbar-btn" id="btn-quote" title="Quote"><span
-                    class="material-symbols-outlined">format_quote</span> Quote</button>
-        </div>
-
-        <div class="toolbar-group">
-            <button class="toolbar-btn" id="btn-link" title="Insert Link"><span
-                    class="material-symbols-outlined">link</span> Link</button>
-            <button class="toolbar-btn" id="btn-image" title="Insert Image"><span
-                    class="material-symbols-outlined">image</span> Image</button>
-        </div>
-        <!-- Removed duplicate dark mode button -->
-        <div class="toolbar-group">
-            <div class="view-toggle">
-                <button class="active" id="split-btn">Split</button>
-                <button id="editor-btn">Editor</button>
-                <button id="preview-btn">Preview</button>
+            <div class="toolbar-group">
+                <div class="view-toggle">
+                    <button class="active" id="split-btn">Split</button>
+                    <button id="editor-btn">Editor</button>
+                    <button id="preview-btn">Preview</button>
+                </div>
             </div>
         </div>
 
@@ -112,10 +159,10 @@
 
     <div class="main-container" id="main-container">
         <div class="editor-pane" id="editor-pane">
-            <div class="pane-header">Editor</div>
+            <div class="pane-header">Markdown Editor</div>
             <textarea class="editor-textarea" id="editor" placeholder="Start typing your markdown here...
 
-# Welcome to Lancer Notes!
+# Welcome to Markdown Editor
 
 This is a **bold** text and this is *italic* text.
 
@@ -129,7 +176,8 @@ This is a **bold** text and this is *italic* text.
 ```javascript
 function hello() {
     console.log('Hello, World!');
-}```
+}
+```
 > This is a blockquote.
 
 Happy writing!"></textarea>
@@ -160,27 +208,55 @@ Happy writing!"></textarea>
             <button id="btn-find-next" class="fr-btn" title="Next">▶</button>
             <span id="match-count" class="fr-count" aria-live="polite">0 / 0</span>
             <button id="fr-compact-toggle" class="fr-btn fr-compact-toggle" aria-pressed="false"
-                title="Toggle compact mode">⋯</button>
+                title="Toggle compact mode"><span class="material-symbols-outlined">collapse_content</span></button>
             <button id="find-close" class="fr-close" aria-label="Close">✕</button>
         </div>
         <div class="fr-row" style="margin-top:8px;">
             <input id="replace-input" class="fr-input" placeholder="Replace" aria-label="Replace" />
             <button id="btn-replace" class="fr-btn">Replace</button>
             <button id="btn-replace-all" class="fr-btn">Replace All</button>
-            <label class="fr-checkbox"><input type="checkbox" id="case-sensitive" /> Case</label>
-            <label class="fr-checkbox"><input type="checkbox" id="use-regex" /> Regex</label>
             <div class="fr-flag-dropdown" id="fr-flag-dropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
-                <button class="fr-btn fr-flag-btn" id="fr-flag-btn" aria-label="Regex Flags">Flags ▾</button>
+                <button class="fr-btn fr-flag-btn" id="fr-flag-btn" aria-label="Search Options"
+                    title="Search Options"><span class="material-symbols-outlined"
+                        style="font-size: 18px;">tune</span></button>
                 <div class="fr-flag-menu" id="fr-flag-menu" role="menu" aria-hidden="true">
+                    <label class="fr-checkbox"><input type="checkbox" id="case-sensitive" /> Case Sensitive</label>
+                    <label class="fr-checkbox"><input type="checkbox" id="use-regex" /> Regular Expression</label>
+                    <div class="menu-divider"></div>
+                    <div style="padding: 4px 8px; font-weight:bold; color:#666; font-size:11px;">Regex Flags</div>
                     <label class="fr-checkbox"><input type="checkbox" id="flag-m" data-flag="m" class="flag-checkbox" />
-                        m</label>
+                        Multiline (m)</label>
                     <label class="fr-checkbox"><input type="checkbox" id="flag-s" data-flag="s" class="flag-checkbox" />
-                        s</label>
+                        Dot matches newline (s)</label>
                 </div>
             </div>
-            <select id="search-history" class="fr-history">
-                <option value="">Recent searches...</option>
-            </select>
+
+        </div>
+    </div>
+
+    <!-- Date/Time Dialog -->
+    <div id="date-time-dialog" style="display:none; width: 300px;">
+        <h3 style="margin-top:0;">Insert Date/Time</h3>
+        <div style="margin-bottom:15px;">
+            <div style="margin-bottom:5px; font-weight:bold;">Format</div>
+            <label style="display:block; margin-bottom:5px;">
+                <input type="radio" name="dt-type" value="datetime" checked> Date & Time
+            </label>
+            <label style="display:block; margin-bottom:5px;">
+                <input type="radio" name="dt-type" value="date"> Date Only
+            </label>
+            <label style="display:block; margin-bottom:5px;">
+                <input type="radio" name="dt-type" value="time"> Time Only
+            </label>
+        </div>
+        <div style="margin-bottom:15px;">
+            <label style="display:flex; align-items:center; cursor:pointer;">
+                <input type="checkbox" id="dt-24h" style="margin-right:8px;"> Use 24-hour format
+            </label>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+            <button id="dt-cancel">Cancel</button>
+            <button id="dt-insert">Insert</button>
         </div>
     </div>
 
@@ -203,6 +279,7 @@ Happy writing!"></textarea>
             <button id="dialog-ok">OK</button>
         </div>
     </div>
+
 
 
     <!-- Custom Alert Dialog -->
@@ -228,44 +305,55 @@ Happy writing!"></textarea>
             <span style="font-weight:bold;">Changelogs</span>
             <button id="changelog-popup-close">&times;</button>
         </div>
-        <iframe src="https://objectpresents.github.io/lancer-notes/"></iframe>
+        <iframe src="https://github.com/anhoa2007-coder/lancer-notes"></iframe>
     </div>
 
     <input type="file" id="file-input" class="hidden-file-input" accept=".md,.txt,.text" />
 
+    <!-- Load main functions from external JS file -->
+    <script src="function.js"></script>
+
     <script>
         // Global variables for state management
-
         let editor = document.getElementById('editor');
         let preview = document.getElementById('preview');
         let currentFile = null;
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = 'split';
-        let BUILD_NUMBER = '4418';
+        let BUILD_NUMBER = '4817';
 
-        // Toggle dark mode
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            // Optionally persist mode
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('markdown-dark-mode', '1');
-            } else {
-                localStorage.removeItem('markdown-dark-mode');
-            }
+        // Find/Replace state
+        let findState = {
+            lastQuery: '',
+            matches: [],
+            currentIndex: -1
+        };
+
+        // Check if main-mdfunction.js is loaded
+        if (!window.MAIN_MD_FUNCTION_LOADED) {
+            alert('ERROR: main-mdfunction.js is missing!\n\nPlease ensure main-mdfunction.js is in the same directory as this HTML file.\nThe editor will not function without it.');
         }
 
         // Initialize the editor
         function initEditor() {
-
+            // Check if functions are loaded
+            if (typeof parseMarkdown === 'undefined') {
+                alert('CRITICAL ERROR: main-mdfunction.js failed to load!\n\nThe markdown editor requires main-mdfunction.js to function.\nPlease check:\n1. main-mdfunction.js exists in: ' + window.location.pathname.replace('markdown_editor.html', '') + '\n2. The file is not blocked by browser security\n3. Check browser console for errors');
+                return;
+            }
 
             // Restore dark mode if previously set
             if (localStorage.getItem('markdown-dark-mode')) {
                 document.body.classList.add('dark-mode');
+                if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-darkmode', true, false);
+            } else {
+                if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-darkmode', false, false);
             }
+
             // Set build number display and document title
-            try { document.getElementById('build-number').textContent = 'Build ' + BUILD_NUMBER; } catch (e) { }
             document.title = document.title + ' - Build ' + BUILD_NUMBER;
+
             // Set up event listeners
             editor.addEventListener('input', function () {
                 updatePreview();
@@ -284,12 +372,16 @@ Happy writing!"></textarea>
             document.getElementById('btn-bold').addEventListener('click', function () { insertMarkdown('**', '**'); });
             document.getElementById('btn-italic').addEventListener('click', function () { insertMarkdown('*', '*'); });
             document.getElementById('btn-code').addEventListener('click', function () { insertMarkdown('`', '`'); });
+            document.getElementById('btn-clear-format').addEventListener('click', removeFormatting);
             document.getElementById('btn-hr').addEventListener('click', insertHorizontalRule);
-            document.getElementById('btn-h1').addEventListener('click', function () { insertHeading(1); });
-            document.getElementById('btn-h2').addEventListener('click', function () { insertHeading(2); });
-            document.getElementById('btn-h3').addEventListener('click', function () { insertHeading(3); });
-            document.getElementById('btn-bullet-list').addEventListener('click', function () { insertList('- '); });
-            document.getElementById('btn-number-list').addEventListener('click', function () { insertList('1. '); });
+            document.getElementById('btn-h1').addEventListener('click', function () { insertHeading(1); closeAllMenus(); });
+            document.getElementById('btn-h2').addEventListener('click', function () { insertHeading(2); closeAllMenus(); });
+            document.getElementById('btn-h3').addEventListener('click', function () { insertHeading(3); closeAllMenus(); });
+            document.getElementById('btn-h4').addEventListener('click', function () { insertHeading(4); closeAllMenus(); });
+            document.getElementById('btn-h5').addEventListener('click', function () { insertHeading(5); closeAllMenus(); });
+            document.getElementById('btn-h6').addEventListener('click', function () { insertHeading(6); closeAllMenus(); });
+            document.getElementById('btn-bullet-list').addEventListener('click', function () { insertList('- '); closeAllMenus(); });
+            document.getElementById('btn-number-list').addEventListener('click', function () { insertList('1. '); closeAllMenus(); });
             document.getElementById('btn-quote').addEventListener('click', function () { insertMarkdown('> ', ''); });
             document.getElementById('btn-link').addEventListener('click', insertLink);
             document.getElementById('btn-image').addEventListener('click', insertImage);
@@ -332,18 +424,46 @@ Happy writing!"></textarea>
 
             document.getElementById('menu-edit-undo').addEventListener('click', function () { undo(); closeAllMenus(); });
             document.getElementById('menu-edit-redo').addEventListener('click', function () { redo(); closeAllMenus(); });
+            document.getElementById('menu-edit-clear-format').addEventListener('click', function () { removeFormatting(); closeAllMenus(); });
+            document.getElementById('menu-edit-date-time').addEventListener('click', function () { showDateTimeDialog(); closeAllMenus(); });
             document.getElementById('menu-edit-find').addEventListener('click', function () { toggleFindReplace(); closeAllMenus(); });
+            document.getElementById('menu-edit-search-google').addEventListener('click', function () {
+                if (!this.hasAttribute('disabled')) {
+                    searchWithGoogle(); closeAllMenus();
+                }
+            });
+
+            // Enable/disable Search with Google based on selection
+            const editMenu = document.getElementById('menu-edit');
+            if (editMenu) {
+                editMenu.addEventListener('mouseenter', updateSearchGoogleState); // For hover opening? No, current menu is click to open.
+                editMenu.addEventListener('click', updateSearchGoogleState);
+                editMenu.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') updateSearchGoogleState();
+                });
+            }
+
+            function updateSearchGoogleState() {
+                const btn = document.getElementById('menu-edit-search-google');
+                if (btn) {
+                    if (editor.selectionStart !== editor.selectionEnd) {
+                        btn.removeAttribute('disabled');
+                    } else {
+                        btn.setAttribute('disabled', 'true');
+                    }
+                }
+            }
 
             document.getElementById('menu-view-split').addEventListener('click', function () { setViewMode('split'); closeAllMenus(); });
             document.getElementById('menu-view-editor').addEventListener('click', function () { setViewMode('editor'); closeAllMenus(); });
             document.getElementById('menu-view-preview').addEventListener('click', function () { setViewMode('preview'); closeAllMenus(); });
             document.getElementById('menu-view-darkmode').addEventListener('click', function () { toggleDarkMode(); closeAllMenus(); });
+            document.getElementById('menu-view-statusbar').addEventListener('click', function () { toggleStatusBar(); closeAllMenus(); });
+            document.getElementById('menu-view-wordwrap').addEventListener('click', function () { toggleWordWrap(); closeAllMenus(); });
 
             document.getElementById('menu-help-guide').addEventListener('click', function () { showHelp(); closeAllMenus(); });
             document.getElementById('menu-help-changelog').addEventListener('click', function () { showAbout(); closeAllMenus(); });
-            document.getElementById('menu-help-about').addEventListener('click', function () { customAlert('Lancer Notes\nVersion: 1.0.1 (Build ' + BUILD_NUMBER + ')'); closeAllMenus(); });
-
-
+            document.getElementById('menu-help-about').addEventListener('click', function () { customAlert('Markdown Editor \nVersion: 1.1.0 (Build ' + BUILD_NUMBER + ')'); closeAllMenus(); });
 
             // Set up splitter functionality
             setupSplitter();
@@ -351,324 +471,50 @@ Happy writing!"></textarea>
             // Initial preview update
             updatePreview();
             updateStatusBar();
-        }
 
-        // Find & Replace functionality
-        let findState = {
-            lastQuery: '',
-            matches: [],
-            currentIndex: -1
-        };
-        let searchHistory = [];
-
-        function toggleFindReplace(openReplace) {
-            const bar = document.getElementById('find-replace-bar');
-            if (bar.style.display === 'none' || bar.style.display === '') {
-                // Ensure centered position and accessibility attributes
-                bar.style.left = '50%'; bar.style.right = 'auto'; bar.style.transform = 'translateX(-50%)';
-                bar.style.display = 'block';
-                bar.setAttribute('aria-hidden', 'false');
-                bar.setAttribute('aria-controls', 'editor');
-                document.getElementById('find-input').focus();
-                updateMatches(document.getElementById('find-input').value || '');
+            // Initialize status bar visibility
+            if (typeof toggleStatusBar === 'function') {
+                // Check local storage directly to set initial state without toggling default
+                const stored = localStorage.getItem('markdown-show-statusbar');
+                if (stored === '0') {
+                    // If explicitely hidden, hide it (default is shown)
+                    toggleStatusBar();
+                }
+            }
+            // Initial check for status bar preference
+            const showStatus = localStorage.getItem('markdown-show-statusbar');
+            if (showStatus === '0') {
+                document.querySelector('.status-bar').style.display = 'none';
+                if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-statusbar', false, false);
             } else {
-                bar.style.display = 'none';
-                bar.setAttribute('aria-hidden', 'true');
-                editor.focus();
+                // Default is shown
+                if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-statusbar', true, false);
             }
-        }
 
-        // Close on Escape when bar is open
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                const bar = document.getElementById('find-replace-bar');
-                if (bar && bar.style.display === 'block') { bar.style.display = 'none'; bar.setAttribute('aria-hidden', 'true'); editor.focus(); }
-            }
-        });
-
-        function updateMatches(query) {
-            findState.matches = [];
-            findState.currentIndex = -1;
-            const cs = document.getElementById('case-sensitive') && document.getElementById('case-sensitive').checked;
-            const useRegex = document.getElementById('use-regex') && document.getElementById('use-regex').checked;
-            if (!query) { updateMatchCount(); return; }
-            const text = editor.value;
-            if (useRegex) {
-                // build flags string from flag checkboxes
-                let flags = 'g';
-                if (!cs) flags += 'i';
-                document.querySelectorAll('.flag-checkbox:checked').forEach(b => { const f = b.getAttribute('data-flag'); if (f && !flags.includes(f)) flags += f; });
-                let re;
-                try {
-                    re = new RegExp(query, flags);
-                } catch (err) {
-                    const el = document.getElementById('match-count'); if (el) el.textContent = 'Invalid regex';
-                    return;
-                }
-                let m;
-                while ((m = re.exec(text)) !== null) {
-                    findState.matches.push({ start: m.index, end: m.index + m[0].length });
-                    if (m.index === re.lastIndex) re.lastIndex++; // avoid infinite loop on zero-length matches
-                }
-                updateMatchCount();
-                // Highlight matches in preview for regex mode as well
-                highlightMatches();
-                return;
-            }
-            // plain substring search
-            let hay = text;
-            let needle = query;
-            if (!cs) { hay = text.toLowerCase(); needle = query.toLowerCase(); }
-            let startIndex = 0;
-            while (true) {
-                const idx = hay.indexOf(needle, startIndex);
-                if (idx === -1) break;
-                findState.matches.push({ start: idx, end: idx + query.length });
-                startIndex = idx + query.length;
-            }
-            updateMatchCount();
-            highlightMatches();
-        }
-
-        function escapeHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-        // Highlight matches in preview pane (best-effort): we'll replace preview innerHTML with highlighted content
-        function highlightMatches() {
-            try {
-                const text = editor.value;
-                const useRegex = document.getElementById('use-regex') && document.getElementById('use-regex').checked;
-                const cs = document.getElementById('case-sensitive') && document.getElementById('case-sensitive').checked;
-                const flagM = document.getElementById('flag-m') && document.getElementById('flag-m').checked;
-                const flagS = document.getElementById('flag-s') && document.getElementById('flag-s').checked;
-                const q = document.getElementById('find-input').value;
-                if (!q) { updatePreview(); return; }
-                // Build regex or literal
-                let re;
-                if (useRegex) {
-                    // build flags from flag checkboxes
-                    let flags = 'g'; if (!cs) flags += 'i';
-                    document.querySelectorAll('.flag-checkbox:checked').forEach(b => { const f = b.getAttribute('data-flag'); if (f && !flags.includes(f)) flags += f; });
-                    try { re = new RegExp(q, flags); } catch (err) { const el = document.getElementById('match-count'); if (el) el.textContent = 'Invalid regex'; return; }
-                } else {
-                    const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-                    let flags = 'g'; if (!cs) flags += 'i'; if (flagM) flags += 'm'; if (flagS) flags += 's';
-                    // also include other checked flags
-                    document.querySelectorAll('.flag-checkbox:checked').forEach(b => { const f = b.getAttribute('data-flag'); if (f && !flags.includes(f)) flags += f; });
-                    re = new RegExp(esc, flags);
-                }
-
-                // Use preview HTML from markdown, but we will operate on text only: highlight in preview by work-around — simple replace on escaped text
-                const escaped = escapeHtml(text);
-                let idx = 0; let out = ''; let m; let lastEnd = 0; let matchIndex = 0;
-                while ((m = re.exec(text)) !== null) {
-                    const start = m.index; const end = m.index + m[0].length;
-                    out += escapeHtml(text.substring(lastEnd, start));
-                    const cls = (findState.currentIndex === matchIndex) ? 'md-match-current find-transition' : 'md-match find-transition';
-                    out += `<span class="${cls}">` + escapeHtml(m[0]) + `</span>`;
-                    lastEnd = end;
-                    matchIndex++;
-                    if (m.index === re.lastIndex) re.lastIndex++; // avoid zero-length match infinite loop
-                }
-                out += escapeHtml(text.substring(lastEnd));
-                // Convert newlines to <br> to mimic preview
-                out = out.replace(/\n/g, '<br>');
-                preview.innerHTML = out;
-            } catch (err) {
-                // on error, fallback to normal preview
-                updatePreview();
-            }
-        }
-
-        function highlightMatch(index) {
-            if (index < 0 || index >= findState.matches.length) return;
-            const m = findState.matches[index];
-            editor.selectionStart = m.start;
-            editor.selectionEnd = m.end;
-            editor.focus();
-            updateMatchCount();
-        }
-
-        function updateMatchCount() {
-            const el = document.getElementById('match-count');
-            const total = findState.matches.length;
-            const current = (findState.currentIndex >= 0 && total > 0) ? (findState.currentIndex + 1) : 0;
-            if (el) el.textContent = `${current} / ${total}`;
-        }
-
-        function findNext() {
-            const q = document.getElementById('find-input').value;
-            if (q !== findState.lastQuery) {
-                findState.lastQuery = q;
-                updateMatches(q);
-            }
-            if (findState.matches.length === 0) return;
-            findState.currentIndex = (findState.currentIndex + 1) % findState.matches.length;
-            highlightMatch(findState.currentIndex);
-            highlightMatches();
-        }
-
-        function findPrev() {
-            const q = document.getElementById('find-input').value;
-            if (q !== findState.lastQuery) {
-                findState.lastQuery = q;
-                updateMatches(q);
-            }
-            if (findState.matches.length === 0) return;
-            findState.currentIndex = (findState.currentIndex - 1 + findState.matches.length) % findState.matches.length;
-            highlightMatch(findState.currentIndex);
-            highlightMatches();
-        }
-
-        function replaceOne() {
-            const q = document.getElementById('find-input').value;
-            const r = document.getElementById('replace-input').value;
-            if (!q) return;
-            // If regex mode, use regex replace semantics
-            const cs = document.getElementById('case-sensitive') && document.getElementById('case-sensitive').checked;
-            const useRegex = document.getElementById('use-regex') && document.getElementById('use-regex').checked;
-            if (useRegex) {
-                try {
-                    const flags = cs ? '' : 'i';
-                    const re = new RegExp(q, flags);
-                    const selected = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-                    if (selected && re.test(selected)) {
-                        saveToUndoStack();
-                        const replaced = selected.replace(re, r);
-                        editor.setRangeText(replaced, editor.selectionStart, editor.selectionEnd, 'end');
-                        updatePreview(); updateStatusBar(); updateMatches(q); return;
-                    }
-                    findNext();
-                    const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-                    if (sel && re.test(sel)) {
-                        saveToUndoStack();
-                        const replaced2 = sel.replace(re, r);
-                        editor.setRangeText(replaced2, editor.selectionStart, editor.selectionEnd, 'end');
-                        updatePreview(); updateStatusBar(); updateMatches(q);
-                    }
-                } catch (err) {
-                    const el = document.getElementById('match-count'); if (el) el.textContent = 'Invalid regex';
-                }
-                return;
-            }
-            // plain substring replace
-            const selected = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-            const matchesSelected = selected && ((cs && selected === q) || (!cs && selected.toLowerCase() === q.toLowerCase()));
-            if (matchesSelected) {
-                saveToUndoStack();
-                editor.setRangeText(r, editor.selectionStart, editor.selectionEnd, 'end');
-                updatePreview();
-                updateStatusBar();
-                updateMatches(q);
+            // Initial check for word wrap preference
+            const noWrap = localStorage.getItem('markdown-no-wrap');
+            if (noWrap === '1') {
+                document.getElementById('editor').classList.add('no-wrap');
+                if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-wordwrap', false, false);
             } else {
-                findNext();
-                const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-                const selMatches = sel && ((cs && sel === q) || (!cs && sel.toLowerCase() === q.toLowerCase()));
-                if (selMatches) {
-                    saveToUndoStack();
-                    editor.setRangeText(r, editor.selectionStart, editor.selectionEnd, 'end');
-                    updatePreview();
-                    updateStatusBar();
-                    updateMatches(q);
-                }
+                if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-wordwrap', true, false);
             }
-        }
-
-        function replaceAll() {
-            const q = document.getElementById('find-input').value;
-            const r = document.getElementById('replace-input').value;
-            if (!q) return;
-            const cs = document.getElementById('case-sensitive') && document.getElementById('case-sensitive').checked;
-            const useRegex = document.getElementById('use-regex') && document.getElementById('use-regex').checked;
-            const text = editor.value;
-            if (useRegex) {
-                let flags = 'g'; if (!cs) flags += 'i';
-                // include any checked flag checkboxes
-                document.querySelectorAll('.flag-checkbox:checked').forEach(b => { const f = b.getAttribute('data-flag'); if (f && !flags.includes(f)) flags += f; });
-                try {
-                    const re = new RegExp(q, flags);
-                    if (!re.test(text)) return;
-                    saveToUndoStack();
-                    editor.value = text.replace(re, r);
-                    updatePreview(); updateStatusBar(); updateMatches(q);
-                } catch (err) {
-                    const el = document.getElementById('match-count'); if (el) el.textContent = 'Invalid regex';
-                }
-                return;
-            }
-            const hay = cs ? text : text.toLowerCase();
-            const needle = cs ? q : q.toLowerCase();
-            if (hay.indexOf(needle) === -1) return;
-            saveToUndoStack();
-            if (cs) {
-                editor.value = text.split(q).join(r);
-            } else {
-                // Case-insensitive replace: do a simple global replace
-                let result = '';
-                let idx = 0;
-                while (idx < text.length) {
-                    const segment = text.substring(idx);
-                    const pos = segment.toLowerCase().indexOf(needle);
-                    if (pos === -1) { result += segment; break; }
-                    result += segment.substring(0, pos) + r;
-                    idx += pos + q.length;
-                }
-                editor.value = result;
-            }
-            updatePreview(); updateStatusBar(); updateMatches(q);
         }
 
         // Wire up find/replace bar buttons
         document.addEventListener('DOMContentLoaded', function () {
-            // Because our initEditor runs on window.load, also ensure these buttons exist by waiting DOMContentLoaded
             const findNextBtn = document.getElementById('btn-find-next');
             const findPrevBtn = document.getElementById('btn-find-prev');
             const replaceBtn = document.getElementById('btn-replace');
             const replaceAllBtn = document.getElementById('btn-replace-all');
             const closeBtn = document.getElementById('find-close');
 
-            // Search history helper function (defined early so button handlers can use it)
-            const historyEl = document.getElementById('search-history');
-            try {
-                const stored = localStorage.getItem('md-search-history');
-                if (stored) searchHistory = JSON.parse(stored);
-            } catch (e) { searchHistory = []; }
-            function refreshHistory() {
-                historyEl.innerHTML = '<option value="">Recent searches...</option>' + searchHistory.map(s => `<option>${s}</option>`).join('');
-            }
-            refreshHistory();
-            historyEl.addEventListener('change', function () { if (historyEl.value) { document.getElementById('find-input').value = historyEl.value; updateMatches(historyEl.value); } });
+            // Wire up buttons
+            if (findNextBtn) findNextBtn.addEventListener('click', findNext);
+            if (findPrevBtn) findPrevBtn.addEventListener('click', findPrev);
+            if (replaceBtn) replaceBtn.addEventListener('click', replaceOne);
+            if (replaceAllBtn) replaceAllBtn.addEventListener('click', replaceAll);
 
-            function pushHistory(q) {
-                if (!q) return;
-                const idx = searchHistory.indexOf(q);
-                if (idx !== -1) searchHistory.splice(idx, 1);
-                searchHistory.unshift(q);
-                if (searchHistory.length > 20) searchHistory.pop();
-                try { localStorage.setItem('md-search-history', JSON.stringify(searchHistory)); } catch (e) { }
-                refreshHistory();
-            }
-
-            // Wire up buttons with integrated history push
-            if (findNextBtn) findNextBtn.addEventListener('click', function () {
-                const q = document.getElementById('find-input').value;
-                if (q) pushHistory(q);
-                findNext();
-            });
-            if (findPrevBtn) findPrevBtn.addEventListener('click', function () {
-                const q = document.getElementById('find-input').value;
-                if (q) pushHistory(q);
-                findPrev();
-            });
-            if (replaceBtn) replaceBtn.addEventListener('click', function () {
-                const q = document.getElementById('find-input').value;
-                if (q) pushHistory(q);
-                replaceOne();
-            });
-            if (replaceAllBtn) replaceAllBtn.addEventListener('click', function () {
-                const q = document.getElementById('find-input').value;
-                if (q) pushHistory(q);
-                replaceAll();
-            });
             if (closeBtn) closeBtn.addEventListener('click', function () { const bar = document.getElementById('find-replace-bar'); if (bar) { bar.style.display = 'none'; bar.setAttribute('aria-hidden', 'true'); } editor.focus(); });
 
             // Update matches as user types
@@ -733,10 +579,10 @@ Happy writing!"></textarea>
                 if (!findBar) return;
                 if (state) {
                     findBar.classList.add('compact');
-                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'true'); compactToggle.textContent = '▴'; }
+                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'true'); compactToggle.innerHTML = '<span class="material-symbols-outlined">expand_content</span>'; }
                 } else {
                     findBar.classList.remove('compact');
-                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'false'); compactToggle.textContent = '⋯'; }
+                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'false'); compactToggle.innerHTML = '<span class="material-symbols-outlined">collapse_content</span>'; }
                 }
                 try { localStorage.setItem('md-fr-compact', state ? '1' : '0'); } catch (e) { }
             }
@@ -744,565 +590,10 @@ Happy writing!"></textarea>
                 compactToggle.addEventListener('click', function () { setCompactMode(!document.getElementById('find-replace-bar').classList.contains('compact')); });
                 try { const storedCompact = localStorage.getItem('md-fr-compact'); if (storedCompact === '1') setCompactMode(true); } catch (e) { }
             }
-        });
 
-        // Extend keyboard shortcuts
-        function handleKeyboardShortcuts(e) {
-            if (e.ctrlKey || e.metaKey) {
-                switch (e.key) {
-                    case 'n':
-                        e.preventDefault();
-                        newFile();
-                        break;
-                    case 'o':
-                        e.preventDefault();
-                        openFile();
-                        break;
-                    case 's':
-                        e.preventDefault();
-                        saveFile();
-                        break;
-                    case 'z':
-                        e.preventDefault();
-                        if (e.shiftKey) {
-                            redo();
-                        } else {
-                            undo();
-                        }
-                        break;
-                    case 'b':
-                        e.preventDefault();
-                        insertMarkdown('**', '**');
-                        break;
-                    case 'i':
-                        e.preventDefault();
-                        insertMarkdown('*', '*');
-                        break;
-                    case 'f':
-                        e.preventDefault();
-                        toggleFindReplace();
-                        break;
-                    case 'h':
-                        e.preventDefault();
-                        // open and focus replace field
-                        toggleFindReplace();
-                        document.getElementById('replace-input').focus();
-                        break;
-                }
-            }
-        }
-
-        // Markdown parsing function - converts markdown to HTML
-        function parseMarkdown(markdown) {
-            let html = markdown;
-
-
-
-            // Handle escaped characters first
-            html = html.replace(/\\([\\`\*_{}\[\]()#+\-.!|])/g, function (match, p1) { return '@@ESCAPED:' + p1.charCodeAt(0).toString(16) + '@@'; });
-
-
-
-            // Blockquotes: support nested blockquotes using multiple > at line start
-            function parseBlockquotes(text) {
-                const lines = text.split(/\r?\n/);
-                let result = [];
-                let buffer = [];
-                let lastLevel = 0;
-                function flush(level) {
-                    if (buffer.length === 0) return;
-                    let content = buffer.join('\n');
-                    if (lastLevel > 0) {
-                        content = parseBlockquotes(content);
-                        for (let i = 0; i < lastLevel; i++) {
-                            content = `<blockquote>${content}</blockquote>`;
-                        }
-                    }
-                    result.push(content);
-                    buffer = [];
-                }
-                for (let line of lines) {
-                    const match = line.match(/^(>+)( ?)(.*)$/);
-                    if (match) {
-                        const level = match[1].length;
-                        if (lastLevel !== 0 && level !== lastLevel) {
-                            flush(lastLevel);
-                        }
-                        buffer.push(match[3]);
-                        lastLevel = level;
-                    } else {
-                        flush(lastLevel);
-                        result.push(line);
-                        lastLevel = 0;
-                    }
-                }
-                flush(lastLevel);
-                return result.join('\n');
-            }
-            html = parseBlockquotes(html);
-
-            // Original parsing logic continues here...
-            html = html
-                // Headers
-                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-                // Horizontal rules (---, ***, ___ on their own line)
-                .replace(/^(?:---|\*\*\*|___)\s*$/gm, '<hr>')
-
-                // Bold and italic only
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-
-                // Code blocks
-                .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => `<pre><code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`)
-                .replace(/`([^`]+)`/g, '<code>$1</code>')
-
-                // Links & Images
-                .replace(/!\[([^\]]*)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g, function (match, alt, url, title) {
-                    let info = (alt && alt.trim()) || (title && title.trim());
-                    let imgTag = `<img src="${url}" alt="${alt || ''}"${title ? ` title="${title}"` : ''}>`;
-                    if (info) {
-                        return `<span class="md-img-info-wrap">${imgTag}<span class="md-img-info-badge" title="Image info">i</span></span>`;
-                    } else {
-                        return imgTag;
-                    }
-                })
-                .replace(/\[([^\]]+)\]\(([^)]+?)(?:\s+"([^"]*)")?\)/g, function (match, text, url, title) {
-                    const t = title ? ` title="${title}"` : '';
-                    return `<a href="${url}"${t}>${text}</a>`;
-                })
-                // Autolink bare URLs
-                .replace(/(^|[^"'=])(https?:\/\/[\w\-._~:\/?#\[\]@!$&'()*+,;=%]+)/g, function (m, lead, url) {
-                    return `${lead}<a href="${url}">${url}</a>`;
-                })
-                // Autolink emails
-                .replace(/(^|\s)([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/g, function (m, lead, email) {
-                    return `${lead}<a href="mailto:${email}">${email}</a>`;
-                });
-
-
-
-
-
-            // Basic unordered list processing (no task lists)
-            html = html.replace(/((?:^[\*\-\+] .*$\r?\n?)+)/gm, (match) => {
-                const items = match.trim().split('\n').map(line => `<li>${line.substring(2)}</li>`).join('');
-                return `<ul>${items}</ul>`;
-            });
-
-            // Ordered lists
-            html = html.replace(/((?:^\d+\. .*$\r?\n?)+)/gm, (match) => {
-                const items = match.trim().split('\n').map(line => `<li>${line.replace(/^\d+\.\s*/, '')}</li>`).join('');
-                return `<ol>${items}</ol>`;
-            });
-
-            // Line breaks and paragraphs
-            html = html.replace(/\n\n/g, '</p><p>')
-                .replace(/\n/g, '<br>');
-
-            // Wrap in paragraphs and fix lists
-            html = '<p>' + html.trim() + '</p>';
-
-            // Cleanup: Remove <p> tags that incorrectly wrap block elements like tables or hr
-            html = html.replace(/<p>\s*(<(table|ul|ol|pre|blockquote|h[1-6]|hr))/g, '$1');
-            html = html.replace(/(<\/(table|ul|ol|pre|blockquote|h[1-6])>|<hr>)\s*<\/p>/g, '$1');
-
-            html = html.replace(/<\/p><p>(<li>.*?<\/li>)<\/p><p>/g, '<ul>$1</ul>');
-            html = html.replace(/<\/li><br><li>/g, '</li><li>');
-
-            // Fix empty paragraphs
-            html = html.replace(/<p>\s*<\/p>/g, '');
-            html = html.replace(/<p><br><\/p>/g, '');
-
-
-
-            // Restore escaped characters
-            html = html.replace(/@@ESCAPED:([0-9a-f]+)@@/gi, function (match, p1) { return String.fromCharCode(parseInt(p1, 16)); });
-
-            return html;
-        }
-        // Update the preview pane with parsed markdown
-        function updatePreview() {
-            const markdownText = editor.value;
-            const htmlContent = parseMarkdown(markdownText);
-            preview.innerHTML = htmlContent;
-        }
-
-        // Update the status bar with current document stats
-        function updateStatusBar() {
-            const text = editor.value;
-            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
-            const charCount = text.length;
-            const lineCount = text.split('\n').length;
-
-            document.getElementById('word-count').textContent = `Words: ${wordCount}`;
-            document.getElementById('char-count').textContent = `Characters: ${charCount}`;
-            document.getElementById('line-count').textContent = `Lines: ${lineCount}`;
-        }
-
-        // Handle keyboard shortcuts
-        function handleKeyboardShortcuts(e) {
-            if (e.ctrlKey || e.metaKey) {
-                switch (e.key) {
-                    case 'n':
-                        e.preventDefault();
-                        newFile();
-                        break;
-                    case 'o':
-                        e.preventDefault();
-                        openFile();
-                        break;
-                    case 's':
-                        e.preventDefault();
-                        saveFile();
-                        break;
-                    case 'z':
-                        e.preventDefault();
-                        if (e.shiftKey) {
-                            redo();
-                        } else {
-                            undo();
-                        }
-                        break;
-                    case 'b':
-                        e.preventDefault();
-                        insertMarkdown('**', '**');
-                        break;
-                    case 'i':
-                        e.preventDefault();
-                        insertMarkdown('*', '*');
-                        break;
-                    case 'f':
-                        e.preventDefault();
-                        toggleFindReplace();
-                        break;
-                    case 'h':
-                        e.preventDefault();
-                        toggleFindReplace();
-                        document.getElementById('replace-input').focus();
-                        break;
-                }
-            }
-        }
-
-        // File operations
-        function newFile() {
-            if (editor.value.trim() && !confirm('Are you sure you want to create a new file? Unsaved changes will be lost.')) {
-                return;
-            }
-            editor.value = '';
-            currentFile = null;
-            updatePreview();
-            updateStatusBar();
-            updateStatus('New file created');
-        }
-
-        function openFile() {
-            document.getElementById('file-input').click();
-        }
-
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    editor.value = event.target.result;
-                    currentFile = file.name;
-                    updatePreview();
-                    updateStatusBar();
-                    updateStatus(`Opened: ${file.name}`);
-                };
-                reader.readAsText(file);
-            }
-        }
-
-        function saveFile() {
-            const content = editor.value;
-            let filename = currentFile || 'document.md';
-            // If the filename has no extension, default to .md
-            if (!/\.(md|markdown|txt|text)$/i.test(filename)) {
-                filename += '.md';
-            }
-            // Use text/plain for .txt/.text, text/markdown for .md
-            let type = 'text/markdown';
-            if (/\.(txt|text)$/i.test(filename)) {
-                type = 'text/plain';
-            }
-            const blob = new Blob([content], { type });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            updateStatus(`Saved: ${filename}`);
-        }
-
-        // Undo/Redo functionality
-        function saveToUndoStack() {
-            undoStack.push(editor.value);
-            if (undoStack.length > 50) {
-                undoStack.shift();
-            }
-            redoStack = [];
-        }
-
-        function undo() {
-            if (undoStack.length > 1) {
-                redoStack.push(undoStack.pop());
-                editor.value = undoStack[undoStack.length - 1] || '';
-                updatePreview();
-                updateStatusBar();
-            }
-        }
-
-        function redo() {
-            if (redoStack.length > 0) {
-                const redoValue = redoStack.pop();
-                undoStack.push(redoValue);
-                editor.value = redoValue;
-                updatePreview();
-                updateStatusBar();
-            }
-        }
-
-        // Markdown insertion helpers
-        function insertMarkdown(before, after) {
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            const selectedText = editor.value.substring(start, end);
-
-            const newText = before + selectedText + after;
-            editor.value = editor.value.substring(0, start) + newText + editor.value.substring(end);
-
-            // Position cursor appropriately
-            if (selectedText) {
-                editor.selectionStart = start;
-                editor.selectionEnd = start + newText.length;
-            } else {
-                editor.selectionStart = editor.selectionEnd = start + before.length;
-            }
-
-            editor.focus();
-            updatePreview();
-            updateStatusBar();
-        }
-
-        function insertHeading(level) {
-            const start = editor.selectionStart;
-            const lineStart = editor.value.lastIndexOf('\n', start - 1) + 1;
-            const hashes = '#'.repeat(level) + ' ';
-
-            editor.value = editor.value.substring(0, lineStart) + hashes + editor.value.substring(lineStart);
-            editor.selectionStart = editor.selectionEnd = lineStart + hashes.length;
-            editor.focus();
-            updatePreview();
-            updateStatusBar();
-        }
-
-        function insertList(prefix) {
-            const start = editor.selectionStart;
-            const lineStart = editor.value.lastIndexOf('\n', start - 1) + 1;
-
-            editor.value = editor.value.substring(0, lineStart) + prefix + editor.value.substring(lineStart);
-            editor.selectionStart = editor.selectionEnd = lineStart + prefix.length;
-            editor.focus();
-            updatePreview();
-            updateStatusBar();
-        }
-
-        function insertLink() {
-            showLinkImageDialog('link');
-        }
-
-        function insertImage() {
-            showLinkImageDialog('image');
-        }
-
-
-
-        function showLinkImageDialog(type) {
-            const dialog = document.getElementById('link-image-dialog');
-            const overlay = document.getElementById('popup-overlay');
-            const title = document.getElementById('dialog-title');
-            const textLabel = document.getElementById('dialog-text-label');
-            const urlInput = document.getElementById('dialog-url');
-            const textInput = document.getElementById('dialog-text');
-            const okBtn = document.getElementById('dialog-ok');
-            const cancelBtn = document.getElementById('dialog-cancel');
-
-            title.textContent = type === 'link' ? 'Insert Link' : 'Insert Image';
-            textLabel.textContent = type === 'link' ? 'Text' : 'Alt Text';
-            urlInput.value = '';
-            textInput.value = editor.value.substring(editor.selectionStart, editor.selectionEnd);
-
-            overlay.style.display = 'block';
-            dialog.style.display = 'block';
-            urlInput.focus();
-
-            const handleOk = () => {
-                const url = urlInput.value;
-                const text = textInput.value;
-                if (url) {
-                    const markdown = type === 'link' ? `[${text || url}](${url})` : `![${text || 'Image'}](${url})`;
-                    insertMarkdown(markdown, '');
-                }
-                closeDialog();
-            };
-
-            const handleCancel = () => {
-                closeDialog();
-            };
-
-            const closeDialog = () => {
-                overlay.style.display = 'none';
-                dialog.style.display = 'none';
-                okBtn.removeEventListener('click', handleOk);
-                cancelBtn.removeEventListener('click', handleCancel);
-                editor.focus();
-            };
-
-            okBtn.addEventListener('click', handleOk);
-            cancelBtn.addEventListener('click', handleCancel);
-        }
-
-
-
-
-
-
-
-
-
-
-
-        // Insert a horizontal rule line
-        function insertHorizontalRule() {
-            const start = editor.selectionStart;
-            const ls = editor.value.lastIndexOf('\n', start - 1) + 1;
-            const prefix = ls === start ? '' : '\n';
-            const snippet = `${prefix}---\n`;
-            editor.setRangeText(snippet, start, start, 'end');
-            updatePreview();
-            updateStatusBar();
-        }
-
-        // View mode management
-        function setViewMode(mode) {
-            currentViewMode = mode;
-            const container = document.getElementById('main-container');
-            // Remove all view classes
-            container.classList.remove('editor-only', 'preview-only', 'single-pane');
-
-            // Remove 'active' from all view toggle buttons
-            document.getElementById('split-btn').classList.remove('active');
-            document.getElementById('editor-btn').classList.remove('active');
-            document.getElementById('preview-btn').classList.remove('active');
-
-            // Always reset flex to 50/50 when switching to split view
-            if (mode === 'split') {
-                document.getElementById('editor-pane').style.flex = '1';
-                document.getElementById('preview-pane').style.flex = '1';
-                document.getElementById('split-btn').classList.add('active');
-            } else if (mode === 'editor') {
-                document.getElementById('editor-pane').style.flex = '';
-                document.getElementById('preview-pane').style.flex = '';
-                container.classList.add('editor-only', 'single-pane');
-                document.getElementById('editor-btn').classList.add('active');
-            } else if (mode === 'preview') {
-                document.getElementById('editor-pane').style.flex = '';
-                document.getElementById('preview-pane').style.flex = '';
-                container.classList.add('preview-only', 'single-pane');
-                document.getElementById('preview-btn').classList.add('active');
-            }
-        }
-
-        // Splitter functionality for resizing panes
-        function setupSplitter() {
-            const splitter = document.getElementById('splitter');
-            let isResizing = false;
-
-            splitter.addEventListener('mousedown', function (e) {
-                isResizing = true;
-                document.addEventListener('mousemove', handleMouseMove);
-                document.addEventListener('mouseup', handleMouseUp);
-                e.preventDefault();
-            });
-
-            function handleMouseMove(e) {
-                if (!isResizing) return;
-
-                const container = document.getElementById('main-container');
-                const containerRect = container.getBoundingClientRect();
-                const percentage = ((e.clientX - containerRect.left) / containerRect.width) * 100;
-
-                if (percentage > 20 && percentage < 80) {
-                    document.getElementById('editor-pane').style.flex = `0 1 ${percentage}%`;
-                    document.getElementById('preview-pane').style.flex = `1 1 ${100 - percentage}%`;
-                }
-            }
-
-            function handleMouseUp() {
-                isResizing = false;
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', handleMouseUp);
-            }
-        }
-
-        // Utility functions
-        function updateStatus(message) {
-            document.getElementById('status-left').textContent = message;
-            setTimeout(() => {
-                document.getElementById('status-left').textContent = 'Ready';
-            }, 3000);
-        }
-
-        // Custom alert function
-        function customAlert(message, callback) {
-            const alertBox = document.getElementById('custom-alert');
-            const overlay = document.getElementById('popup-overlay');
-            const msgEl = document.getElementById('custom-alert-message');
-            const okBtn = document.getElementById('custom-alert-ok');
-
-            msgEl.textContent = message;
-            overlay.style.display = 'block';
-            alertBox.style.display = 'block';
-
-            const closeAlert = () => {
-                alertBox.style.display = 'none';
-                overlay.style.display = 'none';
-                okBtn.removeEventListener('click', closeAlert);
-                if (callback) callback();
-            };
-            okBtn.addEventListener('click', closeAlert);
-        }
-
-        // Menu functions (placeholder implementations)
-        function showAbout() {
-            document.getElementById('changelog-popup').style.display = 'block';
-            document.getElementById('popup-overlay').style.display = 'block';
-        }
-
-
-        function showEditMenu() {
-            customAlert('Edit menu - Use Ctrl+Z/Ctrl+Y for undo/redo, or the toolbar buttons.');
-        }
-
-        function showViewMenu() {
-            customAlert('View menu - Use the view toggle buttons to switch between Editor, Preview, and Split view.');
-        }
-
-        function showHelp() {
-            document.getElementById('help-popup').style.display = 'block';
-            document.getElementById('popup-overlay').style.display = 'block';
-        }
-        // Hide help popup
-        document.addEventListener('DOMContentLoaded', function () {
-            var closeBtn = document.getElementById('help-popup-close');
-            if (closeBtn) closeBtn.onclick = function () {
+            // Hide help popup
+            var helpCloseBtn = document.getElementById('help-popup-close');
+            if (helpCloseBtn) helpCloseBtn.onclick = function () {
                 document.getElementById('help-popup').style.display = 'none';
                 document.getElementById('popup-overlay').style.display = 'none';
             };
@@ -1310,8 +601,24 @@ Happy writing!"></textarea>
             var overlay = document.getElementById('popup-overlay');
             if (overlay) overlay.addEventListener('click', function () {
                 document.getElementById('help-popup').style.display = 'none';
+                document.getElementById('changelog-popup').style.display = 'none';
                 overlay.style.display = 'none';
             });
+
+            // Close on Escape when bar is open
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    const bar = document.getElementById('find-replace-bar');
+                    if (bar && bar.style.display === 'block') { bar.style.display = 'none'; bar.setAttribute('aria-hidden', 'true'); editor.focus(); }
+                }
+            });
+
+            // Close changelog popup
+            var changelogCloseBtn = document.getElementById('changelog-popup-close');
+            if (changelogCloseBtn) changelogCloseBtn.onclick = function () {
+                document.getElementById('changelog-popup').style.display = 'none';
+                document.getElementById('popup-overlay').style.display = 'none';
+            };
         });
 
         // Handle image info badge clicks
