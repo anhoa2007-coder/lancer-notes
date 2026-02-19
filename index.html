@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lancer Notes</title>
+	<meta name="description" content="A Markdown notes app that's heavily inspired from WordPad, with Spilt view feature.">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="styles.css" />
@@ -19,6 +20,8 @@
                 <button type="button" class="menu-dropdown-item" id="menu-file-new" role="menuitem">New</button>
                 <button type="button" class="menu-dropdown-item" id="menu-file-open" role="menuitem">Open</button>
                 <button type="button" class="menu-dropdown-item" id="menu-file-save" role="menuitem">Save</button>
+                <div class="menu-divider"></div>
+                <button type="button" class="menu-dropdown-item" id="menu-file-print" role="menuitem">Print</button>
                 <div class="menu-divider"></div>
                 <button type="button" class="menu-dropdown-item" id="menu-file-export" role="menuitem">Export
                     HTML</button>
@@ -79,10 +82,9 @@
                         class="material-symbols-outlined">format_italic</span></button>
                 <button class="toolbar-btn icon-only" id="btn-code" title="Code"><span
                         class="material-symbols-outlined">code</span></button>
-                <button class="toolbar-btn icon-only" id="btn-clear-format" title="Clear Formatting"><span
-                        class="material-symbols-outlined">format_clear</span></button>
-                <button class="toolbar-btn" id="btn-hr" title="Horizontal Rule"><span
-                        class="material-symbols-outlined">horizontal_rule</span> HR</button>
+
+                <button class="toolbar-btn icon-only" id="btn-hr" title="Horizontal Rule"><span
+                        class="material-symbols-outlined">horizontal_rule</span></button>
             </div>
 
             <div class="toolbar-group">
@@ -121,7 +123,7 @@
                 <div class="menu-item dropdown" id="menu-list" role="menuitem" tabindex="0" aria-haspopup="true"
                     aria-expanded="false" style="padding: 0;">
                     <button class="toolbar-btn" id="btn-list-dropdown" title="Lists">
-                        <span class="material-symbols-outlined">format_list_bulleted</span> List ▾
+                        <span class="material-symbols-outlined">format_list_bulleted</span> ▾
                     </button>
                     <div class="menu-dropdown" role="menu" aria-label="List menu">
                         <button type="button" class="menu-dropdown-item" id="btn-bullet-list" role="menuitem"><span
@@ -132,17 +134,26 @@
                                 class="material-symbols-outlined"
                                 style="font-size:16px; vertical-align:middle; margin-right:4px;">format_list_numbered</span>
                             Numbered List</button>
+                        <div class="menu-divider"></div>
+                        <button type="button" class="menu-dropdown-item" id="btn-indent-increase" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_indent_increase</span>
+                            Increase Indent</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-indent-decrease" role="menuitem"><span
+                                class="material-symbols-outlined"
+                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_indent_decrease</span>
+                            Decrease Indent</button>
                     </div>
                 </div>
-                <button class="toolbar-btn" id="btn-quote" title="Quote"><span
-                        class="material-symbols-outlined">format_quote</span> Quote</button>
+                <button class="toolbar-btn icon-only" id="btn-quote" title="Quote"><span
+                        class="material-symbols-outlined">format_quote</span></button>
             </div>
 
             <div class="toolbar-group">
-                <button class="toolbar-btn" id="btn-link" title="Insert Link"><span
-                        class="material-symbols-outlined">link</span> Link</button>
-                <button class="toolbar-btn" id="btn-image" title="Insert Image"><span
-                        class="material-symbols-outlined">image</span> Image</button>
+                <button class="toolbar-btn icon-only" id="btn-link" title="Insert Link"><span
+                        class="material-symbols-outlined">link</span></button>
+                <button class="toolbar-btn icon-only" id="btn-image" title="Insert Image"><span
+                        class="material-symbols-outlined">image</span></button>
             </div>
 
             <div class="toolbar-group">
@@ -162,14 +173,14 @@
             <div class="pane-header">Markdown Editor</div>
             <textarea class="editor-textarea" id="editor" placeholder="Start typing your markdown here...
 
-# Welcome to Markdown Editor
+# Welcome to Lancer Notes!
 
 This is a **bold** text and this is *italic* text.
 
 ## Features
 - Real-time preview
 - Syntax highlighting
-- WordPad-like interface
+- WordPad-like interface, but cleaner.
 - File operations
 
 ### Code Example
@@ -203,18 +214,12 @@ Happy writing!"></textarea>
     <div id="find-replace-bar" class="find-replace-bar" aria-hidden="true" role="dialog" aria-label="Find and Replace"
         style="display:none;">
         <div class="fr-row">
-            <input id="find-input" class="fr-input" placeholder="Find" aria-label="Find" />
+            <div class="input-wrapper">
+                <input id="find-input" class="fr-input" placeholder="Find" aria-label="Find" autocomplete="off" />
+                <div id="find-history" class="history-dropdown"></div>
+            </div>
             <button id="btn-find-prev" class="fr-btn" title="Previous">◀</button>
             <button id="btn-find-next" class="fr-btn" title="Next">▶</button>
-            <span id="match-count" class="fr-count" aria-live="polite">0 / 0</span>
-            <button id="fr-compact-toggle" class="fr-btn fr-compact-toggle" aria-pressed="false"
-                title="Toggle compact mode"><span class="material-symbols-outlined">collapse_content</span></button>
-            <button id="find-close" class="fr-close" aria-label="Close">✕</button>
-        </div>
-        <div class="fr-row" style="margin-top:8px;">
-            <input id="replace-input" class="fr-input" placeholder="Replace" aria-label="Replace" />
-            <button id="btn-replace" class="fr-btn">Replace</button>
-            <button id="btn-replace-all" class="fr-btn">Replace All</button>
             <div class="fr-flag-dropdown" id="fr-flag-dropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
                 <button class="fr-btn fr-flag-btn" id="fr-flag-btn" aria-label="Search Options"
                     title="Search Options"><span class="material-symbols-outlined"
@@ -222,6 +227,7 @@ Happy writing!"></textarea>
                 <div class="fr-flag-menu" id="fr-flag-menu" role="menu" aria-hidden="true">
                     <label class="fr-checkbox"><input type="checkbox" id="case-sensitive" /> Case Sensitive</label>
                     <label class="fr-checkbox"><input type="checkbox" id="use-regex" /> Regular Expression</label>
+                    <label class="fr-checkbox"><input type="checkbox" id="wrap-around" checked /> Wrap Around</label>
                     <div class="menu-divider"></div>
                     <div style="padding: 4px 8px; font-weight:bold; color:#666; font-size:11px;">Regex Flags</div>
                     <label class="fr-checkbox"><input type="checkbox" id="flag-m" data-flag="m" class="flag-checkbox" />
@@ -230,6 +236,19 @@ Happy writing!"></textarea>
                         Dot matches newline (s)</label>
                 </div>
             </div>
+            <span id="match-count" class="fr-count" aria-live="polite">0 / 0</span>
+            <button id="fr-compact-toggle" class="fr-btn fr-compact-toggle" aria-pressed="false"
+                title="Toggle compact mode"><span class="material-symbols-outlined">collapse_content</span></button>
+            <button id="find-close" class="fr-close" aria-label="Close">✕</button>
+        </div>
+        <div class="fr-row" style="margin-top:8px;">
+            <div class="input-wrapper">
+                <input id="replace-input" class="fr-input" placeholder="Replace" aria-label="Replace"
+                    autocomplete="off" />
+                <div id="replace-history" class="history-dropdown"></div>
+            </div>
+            <button id="btn-replace" class="fr-btn">Replace</button>
+            <button id="btn-replace-all" class="fr-btn">Replace All</button>
 
         </div>
     </div>
@@ -288,25 +307,9 @@ Happy writing!"></textarea>
         <button id="custom-alert-ok">OK</button>
     </div>
 
-    <!-- Markdown Guide Help Popup -->
-    <div id="help-popup" style="display:none;">
-        <div
-            style="background:#007acc;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-weight:bold;">Markdown Guide</span>
-            <button id="help-popup-close">&times;</button>
-        </div>
-        <iframe src="https://www.markdownguide.org/basic-syntax/"></iframe>
-    </div>
 
-    <!-- Changelog Popup -->
-    <div id="changelog-popup" style="display:none;">
-        <div
-            style="background:#007acc;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-weight:bold;">Changelogs</span>
-            <button id="changelog-popup-close">&times;</button>
-        </div>
-        <iframe src="https://github.com/anhoa2007-coder/lancer-notes"></iframe>
-    </div>
+
+
 
     <input type="file" id="file-input" class="hidden-file-input" accept=".md,.txt,.text" />
 
@@ -321,7 +324,7 @@ Happy writing!"></textarea>
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = 'split';
-        let BUILD_NUMBER = '4817';
+        let BUILD_NUMBER = '5112';
 
         // Find/Replace state
         let findState = {
@@ -330,16 +333,16 @@ Happy writing!"></textarea>
             currentIndex: -1
         };
 
-        // Check if main-mdfunction.js is loaded
+        // Check if function.js is loaded
         if (!window.MAIN_MD_FUNCTION_LOADED) {
-            alert('ERROR: main-mdfunction.js is missing!\n\nPlease ensure main-mdfunction.js is in the same directory as this HTML file.\nThe editor will not function without it.');
+            alert('ERROR: function.js is missing!\n\nPlease ensure function.js is in the same directory as this HTML file.\nThe editor will not function without it.');
         }
 
         // Initialize the editor
         function initEditor() {
             // Check if functions are loaded
             if (typeof parseMarkdown === 'undefined') {
-                alert('CRITICAL ERROR: main-mdfunction.js failed to load!\n\nThe markdown editor requires main-mdfunction.js to function.\nPlease check:\n1. main-mdfunction.js exists in: ' + window.location.pathname.replace('markdown_editor.html', '') + '\n2. The file is not blocked by browser security\n3. Check browser console for errors');
+                alert('CRITICAL ERROR: function.js failed to load!\n\nThe markdown editor requires function.js to function.\nPlease check:\n1. function.js exists in: ' + window.location.pathname.replace('index.html', '') + '\n2. The file is not blocked by browser security\n3. Check browser console for errors');
                 return;
             }
 
@@ -350,9 +353,6 @@ Happy writing!"></textarea>
             } else {
                 if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-darkmode', false, false);
             }
-
-            // Set build number display and document title
-            document.title = document.title + ' - Build ' + BUILD_NUMBER;
 
             // Set up event listeners
             editor.addEventListener('input', function () {
@@ -372,7 +372,7 @@ Happy writing!"></textarea>
             document.getElementById('btn-bold').addEventListener('click', function () { insertMarkdown('**', '**'); });
             document.getElementById('btn-italic').addEventListener('click', function () { insertMarkdown('*', '*'); });
             document.getElementById('btn-code').addEventListener('click', function () { insertMarkdown('`', '`'); });
-            document.getElementById('btn-clear-format').addEventListener('click', removeFormatting);
+
             document.getElementById('btn-hr').addEventListener('click', insertHorizontalRule);
             document.getElementById('btn-h1').addEventListener('click', function () { insertHeading(1); closeAllMenus(); });
             document.getElementById('btn-h2').addEventListener('click', function () { insertHeading(2); closeAllMenus(); });
@@ -381,7 +381,10 @@ Happy writing!"></textarea>
             document.getElementById('btn-h5').addEventListener('click', function () { insertHeading(5); closeAllMenus(); });
             document.getElementById('btn-h6').addEventListener('click', function () { insertHeading(6); closeAllMenus(); });
             document.getElementById('btn-bullet-list').addEventListener('click', function () { insertList('- '); closeAllMenus(); });
+            document.getElementById('btn-bullet-list').addEventListener('click', function () { insertList('- '); closeAllMenus(); });
             document.getElementById('btn-number-list').addEventListener('click', function () { insertList('1. '); closeAllMenus(); });
+            document.getElementById('btn-indent-increase').addEventListener('click', function () { indentText(); closeAllMenus(); });
+            document.getElementById('btn-indent-decrease').addEventListener('click', function () { outdentText(); closeAllMenus(); });
             document.getElementById('btn-quote').addEventListener('click', function () { insertMarkdown('> ', ''); });
             document.getElementById('btn-link').addEventListener('click', insertLink);
             document.getElementById('btn-image').addEventListener('click', insertImage);
@@ -415,6 +418,7 @@ Happy writing!"></textarea>
             document.getElementById('menu-file-new').addEventListener('click', function (e) { newFile(); closeAllMenus(); });
             document.getElementById('menu-file-open').addEventListener('click', function (e) { openFile(); closeAllMenus(); });
             document.getElementById('menu-file-save').addEventListener('click', function (e) { saveFile(); closeAllMenus(); });
+            document.getElementById('menu-file-print').addEventListener('click', function (e) { printDocument(); closeAllMenus(); });
             document.getElementById('menu-file-export').addEventListener('click', function (e) {
                 const blob = new Blob([preview.innerHTML], { type: 'text/html' });
                 const url = URL.createObjectURL(blob);
@@ -463,7 +467,7 @@ Happy writing!"></textarea>
 
             document.getElementById('menu-help-guide').addEventListener('click', function () { showHelp(); closeAllMenus(); });
             document.getElementById('menu-help-changelog').addEventListener('click', function () { showAbout(); closeAllMenus(); });
-            document.getElementById('menu-help-about').addEventListener('click', function () { customAlert('Markdown Editor \nVersion: 1.1.0 (Build ' + BUILD_NUMBER + ')'); closeAllMenus(); });
+            document.getElementById('menu-help-about').addEventListener('click', function () { customAlert('Markdown Editor \nVersion: 3.0 (Build ' + BUILD_NUMBER + ')'); closeAllMenus(); });
 
             // Set up splitter functionality
             setupSplitter();
@@ -510,12 +514,13 @@ Happy writing!"></textarea>
             const closeBtn = document.getElementById('find-close');
 
             // Wire up buttons
+            setupFindReplaceHistory();
             if (findNextBtn) findNextBtn.addEventListener('click', findNext);
             if (findPrevBtn) findPrevBtn.addEventListener('click', findPrev);
             if (replaceBtn) replaceBtn.addEventListener('click', replaceOne);
             if (replaceAllBtn) replaceAllBtn.addEventListener('click', replaceAll);
 
-            if (closeBtn) closeBtn.addEventListener('click', function () { const bar = document.getElementById('find-replace-bar'); if (bar) { bar.style.display = 'none'; bar.setAttribute('aria-hidden', 'true'); } editor.focus(); });
+            if (closeBtn) closeBtn.addEventListener('click', closeFindReplace);
 
             // Update matches as user types
             const findInput = document.getElementById('find-input');
@@ -568,7 +573,7 @@ Happy writing!"></textarea>
 
             // Close find bar when pressing Escape while focused inside
             const findBar = document.getElementById('find-replace-bar');
-            findBar && findBar.addEventListener('keydown', function (e) { if (e.key === 'Escape') { findBar.style.display = 'none'; findBar.setAttribute('aria-hidden', 'true'); editor.focus(); } });
+            findBar && findBar.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeFindReplace(); } });
             // Prevent clicks inside the find bar from bubbling and closing menus
             findBar && findBar.addEventListener('click', function (e) { e.stopPropagation(); });
 
@@ -591,17 +596,9 @@ Happy writing!"></textarea>
                 try { const storedCompact = localStorage.getItem('md-fr-compact'); if (storedCompact === '1') setCompactMode(true); } catch (e) { }
             }
 
-            // Hide help popup
-            var helpCloseBtn = document.getElementById('help-popup-close');
-            if (helpCloseBtn) helpCloseBtn.onclick = function () {
-                document.getElementById('help-popup').style.display = 'none';
-                document.getElementById('popup-overlay').style.display = 'none';
-            };
             // Also close when clicking overlay
             var overlay = document.getElementById('popup-overlay');
             if (overlay) overlay.addEventListener('click', function () {
-                document.getElementById('help-popup').style.display = 'none';
-                document.getElementById('changelog-popup').style.display = 'none';
                 overlay.style.display = 'none';
             });
 
@@ -609,16 +606,11 @@ Happy writing!"></textarea>
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     const bar = document.getElementById('find-replace-bar');
-                    if (bar && bar.style.display === 'block') { bar.style.display = 'none'; bar.setAttribute('aria-hidden', 'true'); editor.focus(); }
+                    if (bar && bar.style.display !== 'none') { closeFindReplace(); }
                 }
             });
 
-            // Close changelog popup
-            var changelogCloseBtn = document.getElementById('changelog-popup-close');
-            if (changelogCloseBtn) changelogCloseBtn.onclick = function () {
-                document.getElementById('changelog-popup').style.display = 'none';
-                document.getElementById('popup-overlay').style.display = 'none';
-            };
+
         });
 
         // Handle image info badge clicks
