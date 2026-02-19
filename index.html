@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lancer Notes</title>
-	<meta name="description" content="A Markdown notes app that's heavily inspired from WordPad, with Spilt view feature.">
+    <meta name="description"
+        content="A Markdown notes app that's heavily inspired from WordPad, with Spilt view feature.">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=5113" />
 </head>
 
 
@@ -314,7 +315,7 @@ Happy writing!"></textarea>
     <input type="file" id="file-input" class="hidden-file-input" accept=".md,.txt,.text" />
 
     <!-- Load main functions from external JS file -->
-    <script src="function.js"></script>
+    <script src="function.js?v=5113"></script>
 
     <script>
         // Global variables for state management
@@ -324,7 +325,7 @@ Happy writing!"></textarea>
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = 'split';
-        let BUILD_NUMBER = '5112';
+        let BUILD_NUMBER = '5113';
 
         // Find/Replace state
         let findState = {
@@ -467,7 +468,7 @@ Happy writing!"></textarea>
 
             document.getElementById('menu-help-guide').addEventListener('click', function () { showHelp(); closeAllMenus(); });
             document.getElementById('menu-help-changelog').addEventListener('click', function () { showAbout(); closeAllMenus(); });
-            document.getElementById('menu-help-about').addEventListener('click', function () { customAlert('Markdown Editor \nVersion: 1.1.1 (Build ' + BUILD_NUMBER + ')'); closeAllMenus(); });
+            document.getElementById('menu-help-about').addEventListener('click', function () { customAlert('Markdown Editor \nVersion: 1.1.2 (Build ' + BUILD_NUMBER + ')'); closeAllMenus(); });
 
             // Set up splitter functionality
             setupSplitter();
@@ -514,7 +515,12 @@ Happy writing!"></textarea>
             const closeBtn = document.getElementById('find-close');
 
             // Wire up buttons
-            setupFindReplaceHistory();
+            if (typeof setupFindReplaceHistory === 'function') {
+                setupFindReplaceHistory();
+            } else {
+                console.error('setupFindReplaceHistory is NOT defined. Type:', typeof setupFindReplaceHistory);
+                console.log('Available window keys:', Object.keys(window).filter(k => k.toLowerCase().includes('setup')));
+            }
             if (findNextBtn) findNextBtn.addEventListener('click', findNext);
             if (findPrevBtn) findPrevBtn.addEventListener('click', findPrev);
             if (replaceBtn) replaceBtn.addEventListener('click', replaceOne);
