@@ -1,4 +1,4 @@
-# lancer-notes
+# Lancer Notes
 A Markdown notes app that's heavily forked from orginial Lancer Notes.\
 With markdown and text editing support\
 And easy to use UI, you can use it like other text editors.
