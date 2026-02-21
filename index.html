@@ -5,13 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lancer Notes</title>
-    <meta name="description"
-        content="A Markdown notes app that's heavily inspired from WordPad, with Spilt view feature.">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link rel="stylesheet" href="styles.css?v=5114" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://unpkg.com/prismjs@latest/themes/prism.css" />
 </head>
-
 
 <body>
     <div class="menu-bar" role="menubar" aria-label="Application menu">
@@ -41,6 +39,7 @@
                     Date/Time</button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-find"
                     role="menuitem">Find/Replace</button>
+                <button type="button" class="menu-dropdown-item" id="menu-edit-goto" role="menuitem">Go To Line</button>
                 <div class="menu-divider"></div>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-search-google" role="menuitem">Search
                     with Google</button>
@@ -55,6 +54,8 @@
                 <div class="menu-divider"></div>
                 <button type="button" class="menu-dropdown-item" id="menu-view-darkmode" role="menuitem">Dark
                     Mode</button>
+                <button type="button" class="menu-dropdown-item" id="menu-view-scrollsync" role="menuitem">Scroll
+                    Sync</button>
                 <div class="menu-divider"></div>
                 <button type="button" class="menu-dropdown-item" id="menu-view-statusbar" role="menuitem">Status
                     Bar</button>
@@ -83,66 +84,55 @@
                         class="material-symbols-outlined">format_italic</span></button>
                 <button class="toolbar-btn icon-only" id="btn-code" title="Code"><span
                         class="material-symbols-outlined">code</span></button>
+                <button class="toolbar-btn icon-only" id="btn-strikethrough" title="Strikethrough"><span
+                        class="material-symbols-outlined">strikethrough_s</span></button>
+            </div>
 
+            <div class="toolbar-group">
+                <div class="menu-item dropdown menu-item-no-padding" id="menu-headings" role="menuitem" tabindex="0"
+                    aria-haspopup="true" aria-expanded="false">
+                    <button class="toolbar-btn heading-dropdown-btn" id="btn-headings-dropdown" title="Headings">
+                        <span id="current-heading-icon" class="material-symbols-outlined icon-18">format_h1</span>
+                        <span class="dropdown-arrow">▾</span>
+                    </button>
+                    <div class="menu-dropdown" role="menu" aria-label="Headings menu">
+                        <button type="button" class="menu-dropdown-item" id="btn-h1" role="menuitem"><span
+                                class="material-symbols-outlined menu-icon">format_h1</span> Title</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h2" role="menuitem"><span
+                                class="material-symbols-outlined menu-icon">format_h2</span> Subtitle</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h3" role="menuitem"><span
+                                class="material-symbols-outlined menu-icon">format_h3</span> Section</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h4" role="menuitem"><span
+                                class="material-symbols-outlined menu-icon">format_h4</span> Subsection</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h5" role="menuitem"><span
+                                class="material-symbols-outlined menu-icon">format_h5</span> Paragraph</button>
+                        <button type="button" class="menu-dropdown-item" id="btn-h6" role="menuitem"><span
+                                class="material-symbols-outlined menu-icon">format_h6</span> Note</button>
+                    </div>
+                </div>
                 <button class="toolbar-btn icon-only" id="btn-hr" title="Horizontal Rule"><span
                         class="material-symbols-outlined">horizontal_rule</span></button>
             </div>
 
             <div class="toolbar-group">
-                <div class="menu-item dropdown" id="menu-headings" role="menuitem" tabindex="0" aria-haspopup="true"
-                    aria-expanded="false" style="padding: 0;">
-                    <button class="toolbar-btn" id="btn-headings-dropdown" title="Headings"
-                        style="display: flex; align-items: center; gap: 2px;">
-                        <span id="current-heading-icon" class="material-symbols-outlined"
-                            style="font-size: 18px;">format_h1</span>
-                        <span style="margin-left: 2px;">▾</span>
-                    </button>
-                    <div class="menu-dropdown" role="menu" aria-label="Headings menu">
-                        <button type="button" class="menu-dropdown-item" id="btn-h1" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; margin-right:4px;">format_h1</span> Title</button>
-                        <button type="button" class="menu-dropdown-item" id="btn-h2" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; margin-right:4px;">format_h2</span> Subtitle</button>
-                        <button type="button" class="menu-dropdown-item" id="btn-h3" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; margin-right:4px;">format_h3</span> Section</button>
-                        <button type="button" class="menu-dropdown-item" id="btn-h4" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; margin-right:4px;">format_h4</span> Subsection</button>
-                        <button type="button" class="menu-dropdown-item" id="btn-h5" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; margin-right:4px;">format_h5</span> Paragraph</button>
-                        <button type="button" class="menu-dropdown-item" id="btn-h6" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; margin-right:4px;">format_h6</span> Note</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="toolbar-group">
-                <div class="menu-item dropdown" id="menu-list" role="menuitem" tabindex="0" aria-haspopup="true"
-                    aria-expanded="false" style="padding: 0;">
+                <div class="menu-item dropdown menu-item-no-padding" id="menu-list" role="menuitem" tabindex="0"
+                    aria-haspopup="true" aria-expanded="false">
                     <button class="toolbar-btn" id="btn-list-dropdown" title="Lists">
                         <span class="material-symbols-outlined">format_list_bulleted</span> ▾
                     </button>
                     <div class="menu-dropdown" role="menu" aria-label="List menu">
                         <button type="button" class="menu-dropdown-item" id="btn-bullet-list" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_list_bulleted</span>
+                                class="material-symbols-outlined menu-icon">format_list_bulleted</span>
                             Bullet List</button>
                         <button type="button" class="menu-dropdown-item" id="btn-number-list" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_list_numbered</span>
+                                class="material-symbols-outlined menu-icon">format_list_numbered</span>
                             Numbered List</button>
                         <div class="menu-divider"></div>
                         <button type="button" class="menu-dropdown-item" id="btn-indent-increase" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_indent_increase</span>
+                                class="material-symbols-outlined menu-icon">format_indent_increase</span>
                             Increase Indent</button>
                         <button type="button" class="menu-dropdown-item" id="btn-indent-decrease" role="menuitem"><span
-                                class="material-symbols-outlined"
-                                style="font-size:16px; vertical-align:middle; margin-right:4px;">format_indent_decrease</span>
+                                class="material-symbols-outlined menu-icon">format_indent_decrease</span>
                             Decrease Indent</button>
                     </div>
                 </div>
@@ -155,6 +145,23 @@
                         class="material-symbols-outlined">link</span></button>
                 <button class="toolbar-btn icon-only" id="btn-image" title="Insert Image"><span
                         class="material-symbols-outlined">image</span></button>
+
+                <div class="menu-item dropdown menu-item-no-padding" id="menu-table" role="menuitem" tabindex="0"
+                    aria-haspopup="true" aria-expanded="false">
+                    <button class="toolbar-btn" id="btn-table" title="Insert Table">
+                        <span class="material-symbols-outlined">table_chart</span>
+                        <span class="dropdown-arrow">▾</span>
+                    </button>
+                    <div class="menu-dropdown table-dropdown" role="menu" aria-label="Table menu">
+                        <div class="table-grid-container">
+                            <div class="table-grid-preview" id="table-grid-preview">1 x 1</div>
+                            <div class="table-grid" id="table-grid">
+                                <!-- Grid cells will be generated by JavaScript -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
             <div class="toolbar-group">
@@ -171,17 +178,17 @@
 
     <div class="main-container" id="main-container">
         <div class="editor-pane" id="editor-pane">
-            <div class="pane-header">Markdown Editor</div>
+            <div class="pane-header">Editor</div>
             <textarea class="editor-textarea" id="editor" placeholder="Start typing your markdown here...
 
-# Welcome to Lancer Notes!
+# Welcome to Markdown Editor
 
 This is a **bold** text and this is *italic* text.
 
 ## Features
 - Real-time preview
 - Syntax highlighting
-- WordPad-like interface, but cleaner.
+- WordPad-like interface
 - File operations
 
 ### Code Example
@@ -189,8 +196,7 @@ This is a **bold** text and this is *italic* text.
 function hello() {
     console.log('Hello, World!');
 }
-```
-> This is a blockquote.
+This is a blockquote.
 
 Happy writing!"></textarea>
         </div>
@@ -206,8 +212,8 @@ Happy writing!"></textarea>
         <div id="status-left">Ready</div>
         <div id="status-right">
             <span id="word-count">Words: 0</span>
-            <span style="margin-left: 20px;" id="char-count">Characters: 0</span>
-            <span style="margin-left: 20px;" id="line-count">Lines: 1</span>
+            <span class="status-item" id="char-count">Characters: 0</span>
+            <span class="status-item" id="line-count">Lines: 1</span>
         </div>
     </div>
 
@@ -220,31 +226,30 @@ Happy writing!"></textarea>
                 <div id="find-history" class="history-dropdown"></div>
             </div>
             <button id="btn-find-prev" class="fr-btn" title="Previous">◀</button>
+            <span id="match-count" class="fr-count" aria-live="polite">0 / 0</span>
             <button id="btn-find-next" class="fr-btn" title="Next">▶</button>
             <div class="fr-flag-dropdown" id="fr-flag-dropdown" tabindex="0" aria-haspopup="true" aria-expanded="false">
                 <button class="fr-btn fr-flag-btn" id="fr-flag-btn" aria-label="Search Options"
-                    title="Search Options"><span class="material-symbols-outlined"
-                        style="font-size: 18px;">tune</span></button>
+                    title="Search Options"></button>
                 <div class="fr-flag-menu" id="fr-flag-menu" role="menu" aria-hidden="true">
                     <label class="fr-checkbox"><input type="checkbox" id="case-sensitive" /> Case Sensitive</label>
                     <label class="fr-checkbox"><input type="checkbox" id="use-regex" /> Regular Expression</label>
                     <label class="fr-checkbox"><input type="checkbox" id="wrap-around" checked /> Wrap Around</label>
                     <div class="menu-divider"></div>
-                    <div style="padding: 4px 8px; font-weight:bold; color:#666; font-size:11px;">Regex Flags</div>
+                    <div class="regex-flags-header">Regex Flags</div>
                     <label class="fr-checkbox"><input type="checkbox" id="flag-m" data-flag="m" class="flag-checkbox" />
                         Multiline (m)</label>
                     <label class="fr-checkbox"><input type="checkbox" id="flag-s" data-flag="s" class="flag-checkbox" />
                         Dot matches newline (s)</label>
                     <label class="fr-checkbox"><input type="checkbox" id="flag-y" data-flag="y" class="flag-checkbox" />
-                        Sticky searching (y)</label>
+                        Sticky (y)</label>
                 </div>
             </div>
-            <span id="match-count" class="fr-count" aria-live="polite">0 / 0</span>
             <button id="fr-compact-toggle" class="fr-btn fr-compact-toggle" aria-pressed="false"
-                title="Toggle compact mode"><span class="material-symbols-outlined">collapse_content</span></button>
+                title="Toggle compact mode"></button>
             <button id="find-close" class="fr-close" aria-label="Close">✕</button>
         </div>
-        <div class="fr-row" style="margin-top:8px;">
+        <div class="fr-row">
             <div class="input-wrapper">
                 <input id="replace-input" class="fr-input" placeholder="Replace" aria-label="Replace"
                     autocomplete="off" />
@@ -257,7 +262,7 @@ Happy writing!"></textarea>
     </div>
 
     <!-- Date/Time Dialog -->
-    <div id="date-time-dialog" style="display:none; width: 300px;">
+    <div id="date-time-dialog" class="generic-dialog dialog-300">
         <h3 style="margin-top:0;">Insert Date/Time</h3>
         <div style="margin-bottom:15px;">
             <div style="margin-bottom:5px; font-weight:bold;">Format</div>
@@ -282,11 +287,25 @@ Happy writing!"></textarea>
         </div>
     </div>
 
+    <!-- Go To Line Dialog -->
+    <div id="goto-dialog" class="generic-dialog dialog-300">
+        <h3 style="margin-top:0;">Go To Line</h3>
+        <div style="margin-bottom:15px;">
+            <label for="goto-line-input" style="display:block; margin-bottom:5px;">Line Number:</label>
+            <input id="goto-line-input" type="number" min="1"
+                style="width:100%; padding:8px; font-size:14px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;" />
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+            <button id="goto-cancel">Cancel</button>
+            <button id="goto-ok">Go</button>
+        </div>
+    </div>
+
     <!-- Overlay for popups -->
     <div id="popup-overlay" style="display:none;"></div>
 
     <!-- Link/Image Dialog -->
-    <div id="link-image-dialog" style="display:none;">
+    <div id="link-image-dialog" class="generic-dialog dialog-400">
         <h3 id="dialog-title">Insert Link</h3>
         <div style="margin-bottom:10px;">
             <label for="dialog-url">URL</label>
@@ -305,19 +324,38 @@ Happy writing!"></textarea>
 
 
     <!-- Custom Alert Dialog -->
-    <div id="custom-alert" style="display:none;">
+    <div id="custom-alert" class="generic-dialog dialog-450">
         <div id="custom-alert-message"></div>
         <button id="custom-alert-ok">OK</button>
     </div>
 
 
 
+    <!-- About Dialog -->
+    <div id="about-dialog" class="generic-dialog dialog-400">
+        <h3>About Markdown Editor</h3>
+        <div style="margin-bottom: 20px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;">Markdown Editor</div>
+            <div style="color: #666; margin-bottom: 5px;">Version 1.1.4</div>
+            <div style="color: #666;" id="about-build-number">Build 5147</div>
+        </div>
+        <div style="text-align: center; color: #888; font-size: 12px; margin-bottom: 20px;">
+            A lightweight, feature-rich markdown editor with live preview
+        </div>
+        <div class="dialog-actions">
+            <button id="about-close">Close</button>
+        </div>
+    </div>
+
 
 
     <input type="file" id="file-input" class="hidden-file-input" accept=".md,.txt,.text" />
 
+    <!-- Prism.js Syntax Highlighting (Always Latest) -->
+    <script src="https://unpkg.com/prismjs@latest/prism.js"></script>
+
     <!-- Load main functions from external JS file -->
-    <script src="function.js?v=5114"></script>
+    <script src="function.js"></script>
 
     <script>
         // Global variables for state management
@@ -327,7 +365,7 @@ Happy writing!"></textarea>
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = 'split';
-        let BUILD_NUMBER = '5114';
+        let BUILD_NUMBER = '5147';
 
         // Find/Replace state
         let findState = {
@@ -336,16 +374,16 @@ Happy writing!"></textarea>
             currentIndex: -1
         };
 
-        // Check if function.js is loaded
+        // Check if main-mdfunction.js is loaded
         if (!window.MAIN_MD_FUNCTION_LOADED) {
-            alert('ERROR: function.js is missing!\n\nPlease ensure function.js is in the same directory as this HTML file.\nThe editor will not function without it.');
+            alert('ERROR: main-mdfunction.js is missing!\n\nPlease ensure main-mdfunction.js is in the same directory as this HTML file.\nThe editor will not function without it.');
         }
 
         // Initialize the editor
         function initEditor() {
             // Check if functions are loaded
             if (typeof parseMarkdown === 'undefined') {
-                alert('CRITICAL ERROR: function.js failed to load!\n\nThe markdown editor requires function.js to function.\nPlease check:\n1. function.js exists in: ' + window.location.pathname.replace('index.html', '') + '\n2. The file is not blocked by browser security\n3. Check browser console for errors');
+                alert('CRITICAL ERROR: main-mdfunction.js failed to load!\n\nThe markdown editor requires main-mdfunction.js to function.\nPlease check:\n1. main-mdfunction.js exists in: ' + window.location.pathname.replace('index.html', '') + '\n2. The file is not blocked by browser security\n3. Check browser console for errors');
                 return;
             }
 
@@ -353,8 +391,12 @@ Happy writing!"></textarea>
             if (localStorage.getItem('markdown-dark-mode')) {
                 document.body.classList.add('dark-mode');
                 if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-darkmode', true, false);
+                // Force browser to render in dark mode
+                document.documentElement.style.colorScheme = 'dark';
             } else {
                 if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-darkmode', false, false);
+                // Force browser to render in light mode
+                document.documentElement.style.colorScheme = 'light';
             }
 
             // Set up event listeners
@@ -362,6 +404,7 @@ Happy writing!"></textarea>
                 updatePreview();
                 updateStatusBar();
                 saveToUndoStack();
+                if (typeof updateEditMenuStates === 'function') updateEditMenuStates();
             });
 
             editor.addEventListener('keydown', function (e) {
@@ -375,6 +418,7 @@ Happy writing!"></textarea>
             document.getElementById('btn-bold').addEventListener('click', function () { insertMarkdown('**', '**'); });
             document.getElementById('btn-italic').addEventListener('click', function () { insertMarkdown('*', '*'); });
             document.getElementById('btn-code').addEventListener('click', function () { insertMarkdown('`', '`'); });
+            document.getElementById('btn-strikethrough').addEventListener('click', function () { insertMarkdown('~~', '~~'); });
 
             document.getElementById('btn-hr').addEventListener('click', insertHorizontalRule);
             document.getElementById('btn-h1').addEventListener('click', function () { insertHeading(1); closeAllMenus(); });
@@ -383,7 +427,6 @@ Happy writing!"></textarea>
             document.getElementById('btn-h4').addEventListener('click', function () { insertHeading(4); closeAllMenus(); });
             document.getElementById('btn-h5').addEventListener('click', function () { insertHeading(5); closeAllMenus(); });
             document.getElementById('btn-h6').addEventListener('click', function () { insertHeading(6); closeAllMenus(); });
-            document.getElementById('btn-bullet-list').addEventListener('click', function () { insertList('- '); closeAllMenus(); });
             document.getElementById('btn-bullet-list').addEventListener('click', function () { insertList('- '); closeAllMenus(); });
             document.getElementById('btn-number-list').addEventListener('click', function () { insertList('1. '); closeAllMenus(); });
             document.getElementById('btn-indent-increase').addEventListener('click', function () { indentText(); closeAllMenus(); });
@@ -431,34 +474,70 @@ Happy writing!"></textarea>
 
             document.getElementById('menu-edit-undo').addEventListener('click', function () { undo(); closeAllMenus(); });
             document.getElementById('menu-edit-redo').addEventListener('click', function () { redo(); closeAllMenus(); });
-            document.getElementById('menu-edit-clear-format').addEventListener('click', function () { removeFormatting(); closeAllMenus(); });
+            document.getElementById('menu-edit-clear-format').addEventListener('click', function () {
+                if (!this.hasAttribute('disabled')) {
+                    removeFormatting(); closeAllMenus();
+                }
+            });
             document.getElementById('menu-edit-date-time').addEventListener('click', function () { showDateTimeDialog(); closeAllMenus(); });
             document.getElementById('menu-edit-find').addEventListener('click', function () { toggleFindReplace(); closeAllMenus(); });
+            document.getElementById('menu-edit-goto').addEventListener('click', function () {
+                if (!this.hasAttribute('disabled')) {
+                    showGoToDialog(); closeAllMenus();
+                }
+            });
             document.getElementById('menu-edit-search-google').addEventListener('click', function () {
                 if (!this.hasAttribute('disabled')) {
                     searchWithGoogle(); closeAllMenus();
                 }
             });
 
-            // Enable/disable Search with Google based on selection
-            const editMenu = document.getElementById('menu-edit');
-            if (editMenu) {
-                editMenu.addEventListener('mouseenter', updateSearchGoogleState); // For hover opening? No, current menu is click to open.
-                editMenu.addEventListener('click', updateSearchGoogleState);
-                editMenu.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') updateSearchGoogleState();
-                });
-            }
-
-            function updateSearchGoogleState() {
-                const btn = document.getElementById('menu-edit-search-google');
-                if (btn) {
+            // Update all Edit menu items state
+            function updateEditMenuStates() {
+                // Search with Google
+                const btnGoogle = document.getElementById('menu-edit-search-google');
+                if (btnGoogle) {
                     if (editor.selectionStart !== editor.selectionEnd) {
-                        btn.removeAttribute('disabled');
+                        btnGoogle.removeAttribute('disabled');
                     } else {
-                        btn.setAttribute('disabled', 'true');
+                        btnGoogle.setAttribute('disabled', 'true');
                     }
                 }
+
+                // Clear Formatting
+                const btnClear = document.getElementById('menu-edit-clear-format');
+                if (btnClear) {
+                    if (editor.selectionStart !== editor.selectionEnd) {
+                        btnClear.removeAttribute('disabled');
+                    } else {
+                        btnClear.setAttribute('disabled', 'true');
+                    }
+                }
+
+                // Go To Line
+                const btnGoto = document.getElementById('menu-edit-goto');
+                if (btnGoto) {
+                    if (editor.value.length > 0) {
+                        btnGoto.removeAttribute('disabled');
+                    } else {
+                        btnGoto.setAttribute('disabled', 'true');
+                    }
+                }
+            }
+
+            // Hook up events for menu state updates
+            editor.addEventListener('mouseup', updateEditMenuStates);
+            editor.addEventListener('keyup', updateEditMenuStates);
+            // Also update on any selection change in the document
+            document.addEventListener('selectionchange', updateEditMenuStates);
+
+            const editMenu = document.getElementById('menu-edit');
+            if (editMenu) {
+                editMenu.addEventListener('mouseenter', updateEditMenuStates);
+                editMenu.addEventListener('click', updateEditMenuStates);
+                editMenu.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') updateEditMenuStates();
+                });
             }
 
             document.getElementById('menu-view-split').addEventListener('click', function () { setViewMode('split'); closeAllMenus(); });
@@ -467,10 +546,11 @@ Happy writing!"></textarea>
             document.getElementById('menu-view-darkmode').addEventListener('click', function () { toggleDarkMode(); closeAllMenus(); });
             document.getElementById('menu-view-statusbar').addEventListener('click', function () { toggleStatusBar(); closeAllMenus(); });
             document.getElementById('menu-view-wordwrap').addEventListener('click', function () { toggleWordWrap(); closeAllMenus(); });
+            document.getElementById('menu-view-scrollsync').addEventListener('click', function () { toggleScrollSync(); closeAllMenus(); });
 
             document.getElementById('menu-help-guide').addEventListener('click', function () { showHelp(); closeAllMenus(); });
             document.getElementById('menu-help-changelog').addEventListener('click', function () { showAbout(); closeAllMenus(); });
-            document.getElementById('menu-help-about').addEventListener('click', function () { customAlert('Markdown Editor \nVersion: 1.1.3 (Build ' + BUILD_NUMBER + ')'); closeAllMenus(); });
+            document.getElementById('menu-help-about').addEventListener('click', function () { showAboutDialog(); closeAllMenus(); });
 
             // Set up splitter functionality
             setupSplitter();
@@ -506,6 +586,9 @@ Happy writing!"></textarea>
             } else {
                 if (typeof updateMenuCheck === 'function') updateMenuCheck('menu-view-wordwrap', true, false);
             }
+
+            // Init Scroll Sync
+            if (typeof initScrollSync === 'function') initScrollSync();
         }
 
         // Wire up find/replace bar buttons
@@ -517,12 +600,7 @@ Happy writing!"></textarea>
             const closeBtn = document.getElementById('find-close');
 
             // Wire up buttons
-            if (typeof setupFindReplaceHistory === 'function') {
-                setupFindReplaceHistory();
-            } else {
-                console.error('setupFindReplaceHistory is NOT defined. Type:', typeof setupFindReplaceHistory);
-                console.log('Available window keys:', Object.keys(window).filter(k => k.toLowerCase().includes('setup')));
-            }
+            setupFindReplaceHistory();
             if (findNextBtn) findNextBtn.addEventListener('click', findNext);
             if (findPrevBtn) findPrevBtn.addEventListener('click', findPrev);
             if (replaceBtn) replaceBtn.addEventListener('click', replaceOne);
@@ -593,10 +671,10 @@ Happy writing!"></textarea>
                 if (!findBar) return;
                 if (state) {
                     findBar.classList.add('compact');
-                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'true'); compactToggle.innerHTML = '<span class="material-symbols-outlined">expand_content</span>'; }
+                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'true'); }
                 } else {
                     findBar.classList.remove('compact');
-                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'false'); compactToggle.innerHTML = '<span class="material-symbols-outlined">collapse_content</span>'; }
+                    if (compactToggle) { compactToggle.setAttribute('aria-pressed', 'false'); }
                 }
                 try { localStorage.setItem('md-fr-compact', state ? '1' : '0'); } catch (e) { }
             }
@@ -608,7 +686,30 @@ Happy writing!"></textarea>
             // Also close when clicking overlay
             var overlay = document.getElementById('popup-overlay');
             if (overlay) overlay.addEventListener('click', function () {
-                overlay.style.display = 'none';
+                // Close all open dialogs
+                document.querySelectorAll('.generic-dialog.open').forEach(function (dialog) {
+                    if (typeof closeDialogElement === 'function') {
+                        closeDialogElement(dialog);
+                    } else {
+                        dialog.classList.remove('open');
+                        setTimeout(function () {
+                            if (!dialog.classList.contains('open')) {
+                                dialog.style.display = 'none';
+                            }
+                        }, 250);
+                    }
+                });
+                // Hide overlay
+                if (typeof hideOverlay === 'function') {
+                    hideOverlay();
+                } else {
+                    overlay.classList.remove('open');
+                    setTimeout(function () {
+                        if (!overlay.classList.contains('open')) {
+                            overlay.style.display = 'none';
+                        }
+                    }, 300);
+                }
             });
 
             // Close on Escape when bar is open
@@ -619,6 +720,15 @@ Happy writing!"></textarea>
                 }
             });
 
+            // Initialize Animated Icons
+            if (typeof initAnimatedIcons === 'function') {
+                initAnimatedIcons();
+            }
+
+            // Initialize Table Grid Selector
+            if (typeof initTableGrid === 'function') {
+                initTableGrid();
+            }
 
         });
 
@@ -647,6 +757,5 @@ Happy writing!"></textarea>
         window.addEventListener('load', initEditor);
     </script>
 </body>
-
 
 </html>

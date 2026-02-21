@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
-// main-mdfunction.js
-// Build 5114
+// function.js
+// Build 5147
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -74,12 +74,16 @@ function parseMarkdown(markdown) {
         // Horizontal rules (---, ***, ___ on their own line)
         .replace(/^(?:---|\\*\\*\\*|___)\\s*$/gm, '<hr>')
 
-        // Bold and italic only
+        // Bold, italic, and strikethrough
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/~~(.*?)~~/g, '<del>$1</del>')
 
         // Code blocks
-        .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => `<pre><code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`)
+        .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+            const languageClass = lang ? `language-${lang}` : 'language-none';
+            return `<pre><code class="${languageClass}">${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+        })
         .replace(/`([^`]+)`/g, '<code>$1</code>')
 
         // Links & Images
@@ -105,6 +109,45 @@ function parseMarkdown(markdown) {
             return `${lead}<a href="mailto:${email}">${email}</a>`;
         });
 
+    // Table processing
+    // Look for lines that start with | and have a subsequent line of separators
+    const tableRegex = /^\|(.+)\|\r?\n\|( *[-:]+[-| :]*)\|\r?\n((?:\|.*\|\r?\n?)*)/gm;
+
+    html = html.replace(tableRegex, function (match, header, separator, body) {
+        const headers = header.split('|').map(h => h.trim());
+        const aligns = separator.split('|').map(s => {
+            s = s.trim();
+            if (s.startsWith(':') && s.endsWith(':')) return 'center';
+            if (s.endsWith(':')) return 'right';
+            return 'left';
+        });
+
+        const rows = body.trim().split(/\r?\n/);
+
+        let tableHtml = '<table><thead><tr>';
+        headers.forEach((h, i) => {
+            const align = aligns[i] ? ` style="text-align: ${aligns[i]}"` : '';
+            tableHtml += `<th${align}>${h}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
+
+        rows.forEach(row => {
+            // Remove leading/trailing pipes if present (regex matches usually keep inner ones, but let's be safe)
+            row = row.replace(/^\||\|$/g, '');
+            const cells = row.split('|');
+            tableHtml += '<tr>';
+            cells.forEach((cell, i) => {
+                const align = aligns[i] ? ` style="text-align: ${aligns[i]}"` : '';
+                // Recursively parse inline content inside cells
+                tableHtml += `<td${align}>${cell.trim()}</td>`;
+            });
+            tableHtml += '</tr>';
+        });
+
+        tableHtml += '</tbody></table>';
+        return tableHtml;
+    });
+
     // List processing (Unordered and Ordered) - Supports nesting
     // We capture all list lines first, then process them recursively
     const listBlockRegex = /^(?:[ \t]*)(?:[\*\-\+]|\d+\.) (?:.*)(?:\r?\n(?:[ \t]*)(?:[\*\-\+]|\d+\.) (?:.*))*/gm;
@@ -112,49 +155,7 @@ function parseMarkdown(markdown) {
     html = html.replace(listBlockRegex, function (match) {
         const lines = match.split(/\r?\n/);
 
-        function processListItems(lines, depth) {
-            let result = '';
-            let currentListType = null; // 'ul' or 'ol'
 
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                if (!line.trim()) continue;
-
-                // Determine indentation level (approx 4 spaces or 1 tab per level)
-                const indentMatch = line.match(/^(\s*)/);
-                const indentLevel = indentMatch ? Math.floor(indentMatch[1].replace(/\t/g, '    ').length / 4) : 0;
-
-                // Determine list type
-                const isOrdered = /^\s*\d+\./.test(line);
-                const listType = isOrdered ? 'ol' : 'ul';
-
-                // Extract content
-                let content = line.replace(/^\s*(?:[\*\-\+]|\d+\.)\s+/, '');
-
-                // Check if we need to start a new list or close one
-                if (indentLevel > depth) {
-                    // Start sublist (recursive call)
-                    // Gather all subsequent lines that are deeper
-                    let subLines = [];
-                    let j = i;
-                    while (j < lines.length) {
-                        const nextLine = lines[j];
-                        const nextIndent = (nextLine.match(/^(\s*)/) || ['', ''])[1].replace(/\t/g, '    ').length / 4;
-                        if (nextIndent < indentLevel) break; // Back to parent
-                        subLines.push(nextLine);
-                        j++;
-                    }
-                    // Process sublist
-                    // We need to properly wrap this in the previous LI if possible, or just append
-                    // Ideally, recursion handles the structure properly
-                    // Simplified approach: Flat loop for current depth, recursion for children is tricky in a simple loop without lookahead
-                    // Let's stick to the structure:
-                    // If we found a deeper item *immediately*, it belongs to the previous LI (but standard markdown sometimes puts it on next line)
-                }
-            }
-            // Retrying a cleaner recursive parser strategy for just this block
-            return processListRecursive(lines, 0);
-        }
 
         function processListRecursive(lines, baseIndent) {
             if (lines.length === 0) return '';
@@ -171,18 +172,7 @@ function parseMarkdown(markdown) {
                 currentType = null;
             };
 
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                const indentMatch = line.match(/^(\s*)/);
-                const indentLen = indentMatch ? indentMatch[1].replace(/\t/g, '    ').length : 0;
 
-                // If line is deeper than baseIndent + 4, it's a child of the previous item
-                // However, we are iterating line by line.
-                // Standard approach: 
-                // 1. Identify list type of current line at this level
-                // 2. Wrap content
-                // 3. Look ahead for children
-            }
 
             // Re-implementing a simpler recursive strategy strictly based on indentation
             // Group lines by top-level items
@@ -300,6 +290,11 @@ function updatePreview() {
     const markdownText = editor.value;
     const htmlContent = parseMarkdown(markdownText);
     preview.innerHTML = htmlContent;
+
+    // Trigger Prism.js highlighting
+    if (window.Prism) {
+        Prism.highlightAllUnder(preview);
+    }
 }
 
 /**
@@ -409,10 +404,7 @@ function insertHeading(level) {
  * Insert list prefix at current line
  * @param {string} prefix - List prefix (e.g., '- ' or '1. ')
  */
-/**
- * Insert list prefix at current line
- * @param {string} prefix - List prefix (e.g., '- ' or '1. ')
- */
+
 function insertList(prefix) {
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
@@ -504,6 +496,108 @@ function insertLink() {
  */
 function insertImage() {
     showLinkImageDialog('image');
+}
+
+/**
+ * Insert table with specified dimensions
+ * @param {number} cols - Number of columns
+ * @param {number} rows - Number of rows
+ */
+function insertTable(cols = 2, rows = 2) {
+    const start = editor.selectionStart;
+
+    // Generate header row
+    let tableTemplate = '|';
+    for (let i = 1; i <= cols; i++) {
+        tableTemplate += ` Header ${i} |`;
+    }
+    tableTemplate += '\n|';
+
+    // Generate separator row
+    for (let i = 0; i < cols; i++) {
+        tableTemplate += ' -------- |';
+    }
+    tableTemplate += '\n';
+
+    // Generate data rows
+    for (let r = 1; r <= rows; r++) {
+        tableTemplate += '|';
+        for (let c = 1; c <= cols; c++) {
+            tableTemplate += ` Cell ${r}-${c} |`;
+        }
+        tableTemplate += '\n';
+    }
+
+    // Ensure we start on a new line if not already
+    const ls = editor.value.lastIndexOf('\n', start - 1) + 1;
+    const prefix = (ls === start) ? '' : '\n\n';
+
+    const snippet = prefix + tableTemplate;
+
+    editor.setRangeText(snippet, start, editor.selectionEnd, 'end');
+    editor.focus();
+    updatePreview();
+    updateStatusBar();
+}
+
+/**
+ * Initialize table grid selector
+ */
+function initTableGrid() {
+    const grid = document.getElementById('table-grid');
+    const preview = document.getElementById('table-grid-preview');
+
+    if (!grid || !preview) return;
+
+    let selectedCols = 1;
+    let selectedRows = 1;
+
+    // Create 5x5 grid
+    for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 5; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'table-grid-cell';
+            cell.dataset.row = row + 1;
+            cell.dataset.col = col + 1;
+
+            cell.addEventListener('mouseenter', function () {
+                const hoverRow = parseInt(this.dataset.row);
+                const hoverCol = parseInt(this.dataset.col);
+
+                // Update preview
+                preview.textContent = `${hoverCol} x ${hoverRow}`;
+
+                // Highlight cells
+                document.querySelectorAll('.table-grid-cell').forEach(c => {
+                    const cellRow = parseInt(c.dataset.row);
+                    const cellCol = parseInt(c.dataset.col);
+
+                    if (cellRow <= hoverRow && cellCol <= hoverCol) {
+                        c.classList.add('active');
+                    } else {
+                        c.classList.remove('active');
+                    }
+                });
+            });
+
+            cell.addEventListener('click', function () {
+                selectedRows = parseInt(this.dataset.row);
+                selectedCols = parseInt(this.dataset.col);
+                insertTable(selectedCols, selectedRows);
+                closeAllMenus();
+            });
+
+            grid.appendChild(cell);
+        }
+    }
+
+    // Reset on mouse leave
+    grid.addEventListener('mouseleave', function () {
+        preview.textContent = '1 x 1';
+        document.querySelectorAll('.table-grid-cell').forEach(c => {
+            c.classList.remove('active');
+        });
+    });
 }
 
 /**
@@ -800,7 +894,7 @@ function highlightMatches() {
         // Build regex or literal
         let re;
         if (useRegex) {
-            // build flags from flag checkboxes (includes y automatically)
+            // build flags from flag checkboxes
             let flags = 'g'; if (!cs) flags += 'i';
             document.querySelectorAll('.flag-checkbox:checked').forEach(b => { const f = b.getAttribute('data-flag'); if (f && !flags.includes(f)) flags += f; });
             try { re = new RegExp(q, flags); } catch (err) { const el = document.getElementById('match-count'); if (el) el.textContent = 'Invalid regex'; return; }
@@ -1174,13 +1268,263 @@ function handleKeyboardShortcuts(e) {
 }
 
 // ========================================
+// ANIMATED ICONS
+// ========================================
+
+/**
+ * Helper to interpolate and animate SVG attributes manually
+ */
+function animateSvgAttribute(element, attr, keyframes, duration) {
+    const start = performance.now();
+    const startValue = parseInt(element.getAttribute(attr), 10);
+
+    // Keyframes: e.g. [10, 4, 10]
+    // Timings: 0 -> 0.5 -> 1.0 (assuming equal spacing)
+
+    function update(time) {
+        const elapsed = time - start;
+        const progress = Math.min(elapsed / duration, 1);
+
+        let value;
+        // Simple 3-point interpolation for [start, mid, end]
+        if (keyframes.length === 3) {
+            if (progress < 0.5) {
+                // 0 to 0.5 -> keyframe 0 to 1
+                const localP = progress * 2;
+                value = keyframes[0] + (keyframes[1] - keyframes[0]) * easeInOut(localP);
+            } else {
+                // 0.5 to 1.0 -> keyframe 1 to 2
+                const localP = (progress - 0.5) * 2;
+                value = keyframes[1] + (keyframes[2] - keyframes[1]) * easeInOut(localP);
+            }
+        } else if (keyframes.length === 2) {
+            value = keyframes[0] + (keyframes[1] - keyframes[0]) * easeInOut(progress);
+        }
+
+        element.setAttribute(attr, value);
+
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    requestAnimationFrame(update);
+}
+
+function easeInOut(t) {
+    return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+
+/**
+ * createSlidersHorizontalIcon
+ * @param {HTMLElement} container 
+ */
+function createSlidersHorizontalIcon(container) {
+    if (!container) return;
+    container.innerHTML = '';
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("width", "18");
+    svg.setAttribute("height", "18");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "2");
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+
+    const linesConfig = [
+        { x1: 3, y1: 5, x2: 10, y2: 5, id: 'line1', animate: { x2: [10, 4, 10] } },
+        { x1: 14, y1: 3, x2: 14, y2: 7, id: 'line2', animate: { x1: [14, 8, 14], x2: [14, 8, 14] } },
+        { x1: 14, y1: 5, x2: 21, y2: 5, id: 'line3', animate: { x1: [14, 8, 14] } },
+        { x1: 3, y1: 12, x2: 8, y2: 12, id: 'line4', animate: { x2: [8, 16, 8] } },
+        { x1: 8, y1: 10, x2: 8, y2: 14, id: 'line5', animate: { x1: [8, 16, 8], x2: [8, 16, 8] } },
+        { x1: 12, y1: 12, x2: 21, y2: 12, id: 'line6', animate: { x1: [12, 20, 12] } },
+        { x1: 3, y1: 19, x2: 12, y2: 19, id: 'line7', animate: { x2: [12, 7, 12] } },
+        { x1: 16, y1: 17, x2: 16, y2: 21, id: 'line8', animate: { x1: [16, 11, 16], x2: [16, 11, 16] } },
+        { x1: 16, y1: 19, x2: 21, y2: 19, id: 'line9', animate: { x1: [16, 11, 16] } }
+    ];
+
+    const lines = {};
+    linesConfig.forEach(cfg => {
+        const line = document.createElementNS(ns, "line");
+        ["x1", "y1", "x2", "y2"].forEach(attr => line.setAttribute(attr, cfg[attr]));
+        svg.appendChild(line);
+        lines[cfg.id] = { el: line, config: cfg };
+    });
+    container.appendChild(svg);
+
+    container.addEventListener('click', () => {
+        linesConfig.forEach(cfg => {
+            const el = lines[cfg.id].el;
+            if (cfg.animate.x1) animateSvgAttribute(el, 'x1', cfg.animate.x1, 800);
+            if (cfg.animate.x2) animateSvgAttribute(el, 'x2', cfg.animate.x2, 800);
+            if (cfg.animate.y1) animateSvgAttribute(el, 'y1', cfg.animate.y1, 800);
+        });
+    });
+}
+
+/**
+ * createChevronIcon
+ * @param {HTMLElement} container 
+ */
+function createChevronIcon(container) {
+    if (!container) return null;
+    container.innerHTML = '';
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("width", "20");
+    svg.setAttribute("height", "20");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "2");
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+
+    const path = document.createElementNS(ns, "path");
+    // Initial state: ChevronDown (points down, for "Expand" action if compact, or just default)
+    // d="m6 9 6 6 6-6" is Down
+    // d="m18 15-6-6-6 6" is Up
+
+    // We'll control logic:
+    // If compact -> show Down (clicking expands).
+    // If expand -> show Up (clicking collapses).
+
+    // Actually, let's keep one path and morph D? Or rotate?
+    // User asked for specific "y" animation bounce of the path.
+    // Down path: "m6 9 6 6 6-6". Center is around y=12?
+    // Up path: "m18 15-6-6-6 6". 
+
+    // Let's rely on standard rotation or simpler path swap + bounce.
+    // The user's code had different `d` for Up and Down.
+    // ChevronDown: d="m6 9 6 6 6-6"
+    // ChevronUp: d="m18 15-6-6-6 6" (which is just inverted coordinate-wise or rotated).
+
+    // Let's implement setIconState(isUp)
+
+    let isUp = false; // Default Down
+    path.setAttribute("d", "m6 9 6 6 6-6");
+    svg.appendChild(path);
+    container.appendChild(svg);
+
+    const api = {
+        setDirection: (direction) => {
+            // direction 'up' or 'down'
+            isUp = direction === 'up';
+            if (isUp) {
+                path.setAttribute("d", "m18 15-6-6-6 6"); // Up
+            } else {
+                path.setAttribute("d", "m6 9 6 6 6-6"); // Down
+            }
+        },
+        animateBounce: () => {
+            // Bounce effect: [0, 4, 0] if Down, [0, -4, 0] if Up
+            // Wait, if we are "Down" (pointing down), we might bounce down?
+            // User: "ChevronDown ... y: [0, 4, 0]" (downwards bounce)
+            // User: "ChevronUp ... y: [0, -4, 0]" (upwards bounce)
+
+            const keyframes = isUp
+                ? [{ transform: 'translateY(0)' }, { transform: 'translateY(-4px)' }, { transform: 'translateY(0)' }]
+                : [{ transform: 'translateY(0)' }, { transform: 'translateY(4px)' }, { transform: 'translateY(0)' }];
+
+            path.animate(keyframes, {
+                duration: 600,
+                easing: 'ease-in-out'
+            });
+        }
+    };
+
+    return api;
+}
+
+// Global hook for icon creation to be called from HTML
+window.initAnimatedIcons = function () {
+    createSlidersHorizontalIcon(document.getElementById('fr-flag-btn'));
+
+    const toggleBtn = document.getElementById('fr-compact-toggle');
+    if (toggleBtn) {
+        const chevron = createChevronIcon(toggleBtn);
+        // We need to sync with initial state.
+        // Check local storage or existing class
+        const bar = document.getElementById('find-replace-bar');
+        const isCompact = bar ? bar.classList.contains('compact') : false;
+
+        // Compact mode -> We see 1 row. Button should Expand. Icon: ChevronDown.
+        // Expanded mode -> We see 2 rows. Button should Collapse. Icon: ChevronUp.
+        if (isCompact) {
+            chevron.setDirection('down');
+        } else {
+            chevron.setDirection('up');
+        }
+
+        // Add click listener to animate
+        // Note: The actual toggling logic is in markdown_editor.html's event listener.
+        // We can add another listener here just for animation/icon update.
+        toggleBtn.addEventListener('click', () => {
+            // The state toggles after this click.
+            // Current state (before toggle logic runs or concurrent):
+            const willBeCompact = !document.getElementById('find-replace-bar').classList.contains('compact');
+            // Wait, logic in HTML toggles it. 
+            // If we run `click`, we don't know if we run before or after the other listener.
+            // Safer to check state *after* a microtask or rely on button aria-pressed if updated?
+            // The HTML logic toggles class immediately.
+
+            // Let's assume we want to animate the *action*.
+            // If currently Down (Compact) -> Click -> Animate Down Bounce -> Switch to Up.
+            // If currently Up (Full) -> Click -> Animate Up Bounce -> Switch to Down.
+
+            chevron.animateBounce();
+
+            // Switch direction after short delay or immediately?
+            // Animation is 600ms.
+            // Let's swap direction halfway?
+            setTimeout(() => {
+                const nowCompact = document.getElementById('find-replace-bar').classList.contains('compact');
+                if (nowCompact) {
+                    chevron.setDirection('down'); // Now compact, show down (expand)
+                } else {
+                    chevron.setDirection('up'); // Now expanded, show up (collapse)
+                }
+            }, 300);
+        });
+    }
+};
+
+
+// ========================================
 // DIALOGS
 // ========================================
 
 /**
  * Show link or image insertion dialog
+ * Show link or image insertion dialog
  * @param {string} type - 'link' or 'image'
  */
+function openDialogElement(el) {
+    if (!el) return;
+    el.style.display = 'block';
+    void el.offsetWidth; // Force reflow
+    el.classList.add('open');
+}
+
+function closeDialogElement(el) {
+    if (!el) return;
+    el.classList.remove('open');
+    setTimeout(() => {
+        if (!el.classList.contains('open')) {
+            el.style.display = 'none';
+        }
+    }, 250);
+}
+
+function showOverlay() {
+    openDialogElement(document.getElementById('popup-overlay'));
+}
+
+function hideOverlay() {
+    closeDialogElement(document.getElementById('popup-overlay'));
+}
+
 function showLinkImageDialog(type) {
     const dialog = document.getElementById('link-image-dialog');
     const overlay = document.getElementById('popup-overlay');
@@ -1196,8 +1540,8 @@ function showLinkImageDialog(type) {
     urlInput.value = '';
     textInput.value = editor.value.substring(editor.selectionStart, editor.selectionEnd);
 
-    overlay.style.display = 'block';
-    dialog.style.display = 'block';
+    showOverlay();
+    openDialogElement(dialog);
     urlInput.focus();
 
     const handleOk = () => {
@@ -1215,8 +1559,8 @@ function showLinkImageDialog(type) {
     };
 
     const closeDialog = () => {
-        overlay.style.display = 'none';
-        dialog.style.display = 'none';
+        hideOverlay();
+        closeDialogElement(dialog);
         okBtn.removeEventListener('click', handleOk);
         cancelBtn.removeEventListener('click', handleCancel);
         editor.focus();
@@ -1251,8 +1595,8 @@ function showDateTimeDialog() {
         }
     } catch (e) { }
 
-    overlay.style.display = 'block';
-    dialog.style.display = 'block';
+    showOverlay();
+    openDialogElement(dialog);
 
     // Focus first radio
     radioButtons[0].focus();
@@ -1309,8 +1653,8 @@ function showDateTimeDialog() {
     };
 
     const closeDialog = () => {
-        overlay.style.display = 'none';
-        dialog.style.display = 'none';
+        hideOverlay();
+        closeDialogElement(dialog);
         insertBtn.removeEventListener('click', handleInsert);
         cancelBtn.removeEventListener('click', handleCancel);
         editor.focus();
@@ -1318,6 +1662,77 @@ function showDateTimeDialog() {
 
     insertBtn.addEventListener('click', handleInsert);
     cancelBtn.addEventListener('click', handleCancel);
+}
+
+/**
+ * Show Go To Line dialog
+ */
+function showGoToDialog() {
+    const dialog = document.getElementById('goto-dialog');
+    const overlay = document.getElementById('popup-overlay');
+    const lineInput = document.getElementById('goto-line-input');
+    const okBtn = document.getElementById('goto-ok');
+    const cancelBtn = document.getElementById('goto-cancel');
+
+    // Get total line count
+    const totalLines = editor.value.split('\n').length;
+    lineInput.max = totalLines;
+    lineInput.value = '';
+
+    showOverlay();
+    openDialogElement(dialog);
+    lineInput.focus();
+
+    const handleGo = () => {
+        const lineNumber = parseInt(lineInput.value, 10);
+        if (lineNumber && lineNumber > 0 && lineNumber <= totalLines) {
+            // Calculate position of the line
+            const lines = editor.value.split('\n');
+            let position = 0;
+            for (let i = 0; i < lineNumber - 1; i++) {
+                position += lines[i].length + 1; // +1 for newline
+            }
+
+            // Set cursor at the beginning of the line
+            editor.selectionStart = position;
+            editor.selectionEnd = position;
+            editor.focus();
+
+            // Scroll to the cursor position
+            editor.blur();
+            editor.focus();
+
+            updateStatus(`Jumped to line ${lineNumber}`);
+        }
+        closeDialog();
+    };
+
+    const handleCancel = () => {
+        closeDialog();
+    };
+
+    const closeDialog = () => {
+        hideOverlay();
+        closeDialogElement(dialog);
+        okBtn.removeEventListener('click', handleGo);
+        cancelBtn.removeEventListener('click', handleCancel);
+        lineInput.removeEventListener('keydown', handleKeyDown);
+        editor.focus();
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleGo();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            handleCancel();
+        }
+    };
+
+    okBtn.addEventListener('click', handleGo);
+    cancelBtn.addEventListener('click', handleCancel);
+    lineInput.addEventListener('keydown', handleKeyDown);
 }
 
 /**
@@ -1332,17 +1747,44 @@ function customAlert(message, callback) {
     const okBtn = document.getElementById('custom-alert-ok');
 
     msgEl.textContent = message;
-    overlay.style.display = 'block';
-    alertBox.style.display = 'block';
+    showOverlay();
+    openDialogElement(alertBox);
 
     const closeAlert = () => {
-        alertBox.style.display = 'none';
-        overlay.style.display = 'none';
+        hideOverlay();
+        closeDialogElement(alertBox);
         okBtn.removeEventListener('click', closeAlert);
         if (callback) callback();
     };
     okBtn.addEventListener('click', closeAlert);
 }
+
+/**
+ * Show About dialog
+ */
+function showAboutDialog() {
+    const dialog = document.getElementById('about-dialog');
+    const overlay = document.getElementById('popup-overlay');
+    const closeBtn = document.getElementById('about-close');
+    const buildNumberEl = document.getElementById('about-build-number');
+
+    // Update build number from global variable
+    if (typeof BUILD_NUMBER !== 'undefined') {
+        buildNumberEl.textContent = 'Build ' + BUILD_NUMBER;
+    }
+
+    showOverlay();
+    openDialogElement(dialog);
+
+    const closeDialog = () => {
+        hideOverlay();
+        closeDialogElement(dialog);
+        closeBtn.removeEventListener('click', closeDialog);
+    };
+
+    closeBtn.addEventListener('click', closeDialog);
+}
+
 
 /**
  * Show help popup
@@ -1355,7 +1797,7 @@ function showHelp() {
  * Show about/changelog popup
  */
 function showAbout() {
-    window.open('https://github.com/anhoa2007-coder/lancer-notes/releases', '_blank');
+    window.open('https://objectpresents.github.io/lancer-notes/', '_blank');
 }
 
 /**
@@ -1455,9 +1897,13 @@ function toggleDarkMode() {
     if (document.body.classList.contains('dark-mode')) {
         localStorage.setItem('markdown-dark-mode', '1');
         updateMenuCheck('menu-view-darkmode', true);
+        // Force browser to render in dark mode
+        document.documentElement.style.colorScheme = 'dark';
     } else {
         localStorage.removeItem('markdown-dark-mode');
         updateMenuCheck('menu-view-darkmode', false);
+        // Force browser to render in light mode
+        document.documentElement.style.colorScheme = 'light';
     }
 }
 
@@ -1505,6 +1951,267 @@ function toggleWordWrap() {
             updateMenuCheck('menu-view-wordwrap', false);
         }
     }
+}
+
+// ========================================
+// SCROLL SYNCHRONIZATION (Anchor-Based)
+// ========================================
+
+let isScrollSyncEnabled = true; // Default
+let scrollMap = null; // Cache
+let isSyncingLeft = false;
+let isSyncingRight = false;
+let syncTimeoutLeft = null;
+let syncTimeoutRight = null;
+let buildMapTimeout = null;
+
+// Initialize scroll sync
+function initScrollSync() {
+    // Load preference
+    const storedSync = localStorage.getItem('markdown-scroll-sync');
+    if (storedSync === '0') {
+        isScrollSyncEnabled = false;
+    } else {
+        isScrollSyncEnabled = true;
+    }
+
+    // Initial menu check
+    if (typeof updateMenuCheck === 'function') {
+        updateMenuCheck('menu-view-scrollsync', isScrollSyncEnabled, false);
+    }
+
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+
+    if (!editor || !preview) return;
+
+    // Scroll Event Listeners with Throttling via requestAnimationFrame
+    editor.addEventListener('scroll', () => {
+        if (!isScrollSyncEnabled || isSyncingLeft) return;
+        isSyncingRight = true;
+        window.requestAnimationFrame(() => {
+            syncPreview();
+            // Reset lock after a small delay to allow target to settle
+            clearTimeout(syncTimeoutRight);
+            syncTimeoutRight = setTimeout(() => { isSyncingRight = false; }, 100);
+        });
+    });
+
+    preview.addEventListener('scroll', () => {
+        if (!isScrollSyncEnabled || isSyncingRight) return;
+        isSyncingLeft = true;
+        window.requestAnimationFrame(() => {
+            syncEditor();
+            // Reset lock after a small delay to allow target to settle
+            clearTimeout(syncTimeoutLeft);
+            syncTimeoutLeft = setTimeout(() => { isSyncingLeft = false; }, 100);
+        });
+    });
+
+    // Input Debouncing for Map Rebuild
+    editor.addEventListener('input', () => {
+        if (!isScrollSyncEnabled) return;
+        clearTimeout(buildMapTimeout);
+        buildMapTimeout = setTimeout(() => {
+            buildScrollMap();
+        }, 300); // 300ms debounce
+    });
+
+    // Rebuild map when images load in preview
+    // Use MutationObserver to detect DOM changes in preview (like images loading/rendering)
+    const observer = new MutationObserver((mutations) => {
+        let shouldRebuild = false;
+        for (const mutation of mutations) {
+            if (mutation.type === 'childList' || (mutation.type === 'attributes' && mutation.target.tagName === 'IMG')) {
+                shouldRebuild = true;
+                break;
+            }
+        }
+        if (shouldRebuild) {
+            // Debounce image load rebuilds too
+            clearTimeout(buildMapTimeout);
+            buildMapTimeout = setTimeout(buildScrollMap, 300);
+        }
+    });
+    observer.observe(preview, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'height'] });
+
+    // Initial build
+    setTimeout(buildScrollMap, 500);
+}
+
+// Toggle Scroll Sync
+function toggleScrollSync() {
+    isScrollSyncEnabled = !isScrollSyncEnabled;
+    localStorage.setItem('markdown-scroll-sync', isScrollSyncEnabled ? '1' : '0');
+
+    if (typeof updateMenuCheck === 'function') {
+        updateMenuCheck('menu-view-scrollsync', isScrollSyncEnabled);
+    }
+
+    if (isScrollSyncEnabled) {
+        updateStatus('Scroll Sync Enabled');
+        buildScrollMap();
+        syncPreview(); // Initial sync
+    } else {
+        updateStatus('Scroll Sync Disabled');
+    }
+}
+
+// Build the mapping between Editor lines and Preview elements (Anchors)
+function buildScrollMap() {
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+    if (!editor || !preview) return;
+
+    const sourceText = editor.value;
+    const lines = sourceText.split('\n');
+    const editorHeaders = [];
+
+    // 1. Find Editor Anchors (Headers)
+    // We only track top-level headers (start of line)
+    // Matches: # Header, ## Header, etc.
+    // Skip headers inside code blocks is tricky without full parser state, 
+    // but we can do a simple check for code block fences.
+    let inCodeBlock = false;
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim().startsWith('```')) {
+            inCodeBlock = !inCodeBlock;
+            continue;
+        }
+        if (inCodeBlock) continue;
+
+        if (line.match(/^#{1,6}\s/)) {
+            editorHeaders.push({ line: i, text: line });
+        }
+    }
+
+    // 2. Find Preview Anchors
+    const previewHeadersNodeList = preview.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const previewHeaders = Array.from(previewHeadersNodeList);
+
+    // 3. Map them
+    // We map pairs based on index. Minimizing length mismatch processing for now.
+    // Ideally we would match content, but index is faster and usually sufficient for sync.
+    const count = Math.min(editorHeaders.length, previewHeaders.length);
+
+    scrollMap = [];
+
+    // Always add Start (Line 0 -> Top of Preview)
+    scrollMap.push({ editorLine: 0, previewTop: 0 });
+
+    for (let i = 0; i < count; i++) {
+        scrollMap.push({
+            editorLine: editorHeaders[i].line,
+            previewTop: previewHeaders[i].offsetTop
+        });
+    }
+
+    // Always add End (Last Line -> Bottom of Preview)
+    scrollMap.push({
+        editorLine: lines.length,
+        previewTop: preview.scrollHeight
+    });
+}
+
+// Sync Preview based on Editor position
+function syncPreview() {
+    if (!scrollMap || scrollMap.length < 2) {
+        buildScrollMap();
+        if (!scrollMap || scrollMap.length < 2) return;
+    }
+
+    const editor = document.getElementById('editor');
+    const previewContainer = document.getElementById('preview');
+
+    // Calculate current line in editor
+    // lineHeight is approx 24px usually. Let's try to get computed style.
+    const computedStyle = window.getComputedStyle(editor);
+    const lineHeight = parseFloat(computedStyle.lineHeight) || 24;
+
+    const editorScrollTop = editor.scrollTop;
+    const currentLine = editorScrollTop / lineHeight;
+
+    // Find section in map
+    let startNode = scrollMap[0];
+    let endNode = scrollMap[1];
+    let found = false;
+
+    for (let i = 0; i < scrollMap.length - 1; i++) {
+        if (currentLine >= scrollMap[i].editorLine && currentLine < scrollMap[i + 1].editorLine) {
+            startNode = scrollMap[i];
+            endNode = scrollMap[i + 1];
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        startNode = scrollMap[scrollMap.length - 2];
+        endNode = scrollMap[scrollMap.length - 1];
+    }
+
+    // Calculate percentage within section
+    const lineSpan = endNode.editorLine - startNode.editorLine;
+    let progress = 0;
+    if (lineSpan > 0) {
+        progress = (currentLine - startNode.editorLine) / lineSpan;
+    }
+    progress = Math.max(0, Math.min(1, progress)); // Clamp
+
+    // Map to Preview
+    const previewSpan = endNode.previewTop - startNode.previewTop;
+    const targetScrollTop = startNode.previewTop + (previewSpan * progress);
+
+    previewContainer.scrollTop = targetScrollTop;
+}
+
+// Sync Editor based on Preview position
+function syncEditor() {
+    if (!scrollMap || scrollMap.length < 2) {
+        buildScrollMap();
+        if (!scrollMap || scrollMap.length < 2) return;
+    }
+
+    const editor = document.getElementById('editor');
+    const previewContainer = document.getElementById('preview');
+    const currentScrollTop = previewContainer.scrollTop;
+
+    // Find section in map
+    let startNode = scrollMap[0];
+    let endNode = scrollMap[1];
+    let found = false;
+
+    for (let i = 0; i < scrollMap.length - 1; i++) {
+        if (currentScrollTop >= scrollMap[i].previewTop && currentScrollTop < scrollMap[i + 1].previewTop) {
+            startNode = scrollMap[i];
+            endNode = scrollMap[i + 1];
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        startNode = scrollMap[scrollMap.length - 2];
+        endNode = scrollMap[scrollMap.length - 1];
+    }
+
+    // Calculate percentage
+    const pixelSpan = endNode.previewTop - startNode.previewTop;
+    let progress = 0;
+    if (pixelSpan > 0) {
+        progress = (currentScrollTop - startNode.previewTop) / pixelSpan;
+    }
+    progress = Math.max(0, Math.min(1, progress));
+
+    // Map to Editor
+    const computedStyle = window.getComputedStyle(editor);
+    const lineHeight = parseFloat(computedStyle.lineHeight) || 24;
+
+    const lineSpan = endNode.editorLine - startNode.editorLine;
+    const targetLine = startNode.editorLine + (lineSpan * progress);
+
+    editor.scrollTop = targetLine * lineHeight;
 }
 
 // ========================================
@@ -1572,6 +2279,14 @@ function showCheckAnimation(target) {
     }, 1000);
 }
 
+/**
+ * Select all text in the editor
+ */
+function selectAll() {
+    editor.select();
+    editor.focus();
+}
+
 // ========================================
 // ANIMATION UTILS
 // ========================================
@@ -1631,6 +2346,6 @@ function updateMenuCheck(btnId, isChecked, animate = true) {
 // ========================================
 // This marker indicates the file loaded successfully
 window.MAIN_MD_FUNCTION_LOADED = true;
-console.log('✓ main-mdfunction.js loaded successfully');
+console.log('✓ function.js loaded successfully');
 // Flag to indicate successful loading
 window.MAIN_MD_FUNCTION_LOADED = true;
