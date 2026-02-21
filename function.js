@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // main-mdfunction.js
-// Build 5113
+// Build 5114
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -794,18 +794,19 @@ function highlightMatches() {
         const cs = document.getElementById('case-sensitive') && document.getElementById('case-sensitive').checked;
         const flagM = document.getElementById('flag-m') && document.getElementById('flag-m').checked;
         const flagS = document.getElementById('flag-s') && document.getElementById('flag-s').checked;
+        const flagY = document.getElementById('flag-y') && document.getElementById('flag-y').checked;
         const q = document.getElementById('find-input').value;
         if (!q) { updatePreview(); return; }
         // Build regex or literal
         let re;
         if (useRegex) {
-            // build flags from flag checkboxes
+            // build flags from flag checkboxes (includes y automatically)
             let flags = 'g'; if (!cs) flags += 'i';
             document.querySelectorAll('.flag-checkbox:checked').forEach(b => { const f = b.getAttribute('data-flag'); if (f && !flags.includes(f)) flags += f; });
             try { re = new RegExp(q, flags); } catch (err) { const el = document.getElementById('match-count'); if (el) el.textContent = 'Invalid regex'; return; }
         } else {
             const esc = q.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-            let flags = 'g'; if (!cs) flags += 'i'; if (flagM) flags += 'm'; if (flagS) flags += 's';
+            let flags = 'g'; if (!cs) flags += 'i'; if (flagM) flags += 'm'; if (flagS) flags += 's'; if (flagY) flags += 'y';
             // also include other checked flags
             document.querySelectorAll('.flag-checkbox:checked').forEach(b => { const f = b.getAttribute('data-flag'); if (f && !flags.includes(f)) flags += f; });
             re = new RegExp(esc, flags);
