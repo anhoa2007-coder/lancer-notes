@@ -4,3 +4,4 @@ With markdown and text editing support\
 And easy to use UI, you can use it like other text editors.
 #### Importantly...
 It's lightweight, only less than 40-60MB of usage, and low depdenacies.
+Only used highlight.js, DOMPurify and markdown-it.
