@@ -1,6 +1,6 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
-// function.js
+// main-mdfunction.js
 // Build 6345
 // ========================================
 // This file contains all core markdown processing,
@@ -118,10 +118,20 @@ function updatePreview() {
     htmlContent = parseMarkdown(markdownText);
   }
 
-  preview.innerHTML = htmlContent;
-
-  // Trigger highlight.js syntax highlighting
-  highlightCodeBlocks(preview);
+  if (typeof morphdom === "function") {
+    // Build new DOM in a detached element
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlContent;
+    // Pre-highlight code blocks so morphdom can diff highlighted trees accurately;
+    // unchanged code blocks will match exactly and be skipped entirely
+    highlightCodeBlocks(tempDiv);
+    // Surgically patch only the differences into the live preview
+    morphdom(preview, tempDiv, { childrenOnly: true });
+  } else {
+    // Fallback: full replacement if morphdom is unavailable
+    preview.innerHTML = htmlContent;
+    highlightCodeBlocks(preview);
+  }
 }
 
 // ========================================
@@ -740,10 +750,10 @@ function showAlert(message, title = "Alert") {
   const closeDialog = () => {
     hideOverlay();
     closeDialogElement(dialog);
-    okBtn.removeEventListener("click", handleOk);
+    okBtn.onclick = null;
   };
 
-  okBtn.addEventListener("click", handleOk);
+  okBtn.onclick = handleOk;
 }
 
 /**
@@ -779,12 +789,12 @@ function showConfirm(message, onConfirm, title = "Confirm") {
   const closeDialog = () => {
     hideOverlay();
     closeDialogElement(dialog);
-    okBtn.removeEventListener("click", handleOk);
-    cancelBtn.removeEventListener("click", handleCancel);
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
   };
 
-  okBtn.addEventListener("click", handleOk);
-  cancelBtn.addEventListener("click", handleCancel);
+  okBtn.onclick = handleOk;
+  cancelBtn.onclick = handleCancel;
 }
 
 // Expose to window for HTML access
@@ -1562,7 +1572,7 @@ try {
   replaceHistory = JSON.parse(
     localStorage.getItem("md-replace-history-v2") || "[]",
   );
-} catch (e) {}
+} catch (e) { }
 
 function addToFindHistory(term) {
   if (!term || term.trim() === "") return;
@@ -1572,7 +1582,7 @@ function addToFindHistory(term) {
   if (findHistory.length > MAX_HISTORY) findHistory.pop();
   try {
     localStorage.setItem("md-find-history-v2", JSON.stringify(findHistory));
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function addToReplaceHistory(term) {
@@ -1586,7 +1596,7 @@ function addToReplaceHistory(term) {
       "md-replace-history-v2",
       JSON.stringify(replaceHistory),
     );
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function setupFindReplaceHistory() {
@@ -1618,8 +1628,8 @@ function setupHistoryInput(inputId, dropdownId, getHistoryFn, onSelect) {
     const history = getHistoryFn();
     const filtered = filterText
       ? history.filter((h) =>
-          h.toLowerCase().includes(filterText.toLowerCase()),
-        )
+        h.toLowerCase().includes(filterText.toLowerCase()),
+      )
       : history;
 
     dropdown.innerHTML = "";
@@ -1926,15 +1936,15 @@ function createChevronIcon(container) {
 
       const keyframes = isUp
         ? [
-            { transform: "translateY(0)" },
-            { transform: "translateY(-4px)" },
-            { transform: "translateY(0)" },
-          ]
+          { transform: "translateY(0)" },
+          { transform: "translateY(-4px)" },
+          { transform: "translateY(0)" },
+        ]
         : [
-            { transform: "translateY(0)" },
-            { transform: "translateY(4px)" },
-            { transform: "translateY(0)" },
-          ];
+          { transform: "translateY(0)" },
+          { transform: "translateY(4px)" },
+          { transform: "translateY(0)" },
+        ];
 
       path.animate(keyframes, {
         duration: 600,
@@ -1967,7 +1977,7 @@ window.initAnimatedIcons = function () {
     }
 
     // Add click listener to animate
-    // Note: The actual toggling logic is in index.html's event listener.
+    // Note: The actual toggling logic is in markdown_editor.html's event listener.
     // We can add another listener here just for animation/icon update.
     toggleBtn.addEventListener("click", () => {
       // The state toggles after this click.
@@ -2090,13 +2100,13 @@ function showLinkImageDialog(type) {
   const closeDialog = () => {
     hideOverlay();
     closeDialogElement(dialog);
-    okBtn.removeEventListener("click", handleOk);
-    cancelBtn.removeEventListener("click", handleCancel);
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
     editor.focus();
   };
 
-  okBtn.addEventListener("click", handleOk);
-  cancelBtn.addEventListener("click", handleCancel);
+  okBtn.onclick = handleOk;
+  cancelBtn.onclick = handleCancel;
 }
 
 /**
@@ -2122,7 +2132,7 @@ function showDateTimeDialog() {
     if (stored24h !== null) {
       checkbox24h.checked = stored24h === "1";
     }
-  } catch (e) {}
+  } catch (e) { }
 
   showOverlay();
   openDialogElement(dialog);
@@ -2141,7 +2151,7 @@ function showDateTimeDialog() {
     try {
       localStorage.setItem("md-dt-type", type);
       localStorage.setItem("md-dt-24h", is24h ? "1" : "0");
-    } catch (e) {}
+    } catch (e) { }
 
     const now = new Date();
     let text = "";
@@ -2184,13 +2194,13 @@ function showDateTimeDialog() {
   const closeDialog = () => {
     hideOverlay();
     closeDialogElement(dialog);
-    insertBtn.removeEventListener("click", handleInsert);
-    cancelBtn.removeEventListener("click", handleCancel);
+    insertBtn.onclick = null;
+    cancelBtn.onclick = null;
     editor.focus();
   };
 
-  insertBtn.addEventListener("click", handleInsert);
-  cancelBtn.addEventListener("click", handleCancel);
+  insertBtn.onclick = handleInsert;
+  cancelBtn.onclick = handleCancel;
 }
 
 /**
@@ -2243,9 +2253,9 @@ function showGoToDialog() {
   const closeDialog = () => {
     hideOverlay();
     closeDialogElement(dialog);
-    okBtn.removeEventListener("click", handleGo);
-    cancelBtn.removeEventListener("click", handleCancel);
-    lineInput.removeEventListener("keydown", handleKeyDown);
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
+    lineInput.onkeydown = null;
     editor.focus();
   };
 
@@ -2259,9 +2269,9 @@ function showGoToDialog() {
     }
   };
 
-  okBtn.addEventListener("click", handleGo);
-  cancelBtn.addEventListener("click", handleCancel);
-  lineInput.addEventListener("keydown", handleKeyDown);
+  okBtn.onclick = handleGo;
+  cancelBtn.onclick = handleCancel;
+  lineInput.onkeydown = handleKeyDown;
 }
 
 /**
@@ -2282,10 +2292,10 @@ function customAlert(message, callback) {
   const closeAlert = () => {
     hideOverlay();
     closeDialogElement(alertBox);
-    okBtn.removeEventListener("click", closeAlert);
+    okBtn.onclick = null;
     if (callback) callback();
   };
-  okBtn.addEventListener("click", closeAlert);
+  okBtn.onclick = closeAlert;
 }
 
 /**
@@ -2308,10 +2318,10 @@ function showAboutDialog() {
   const closeDialog = () => {
     hideOverlay();
     closeDialogElement(dialog);
-    closeBtn.removeEventListener("click", closeDialog);
+    closeBtn.onclick = null;
   };
 
-  closeBtn.addEventListener("click", closeDialog);
+  closeBtn.onclick = closeDialog;
 }
 
 /**
@@ -2999,6 +3009,6 @@ window.toggleDarkMode = toggleDarkMode;
 // ========================================
 // This marker indicates the file loaded successfully
 window.MAIN_MD_FUNCTION_LOADED = true;
-console.log("✓ function.js loaded successfully");
+console.log("✓ main-mdfunction.js loaded successfully");
 // Flag to indicate successful loading
 window.MAIN_MD_FUNCTION_LOADED = true;
