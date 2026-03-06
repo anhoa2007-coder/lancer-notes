@@ -568,13 +568,13 @@ Happy writing!"></textarea>
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.2.0
+                    Version 1.2.2
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6345
+                    Build 6372
                 </div>
 
                 <div style="
@@ -606,7 +606,7 @@ Happy writing!"></textarea>
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6345";
+        let BUILD_NUMBER = "6372";
         let _editorInitialized = false;
         let _domContentInitialized = false;
 
@@ -636,7 +636,7 @@ Happy writing!"></textarea>
                 alert(
                     "CRITICAL ERROR: function.js failed to load!\n\nThe markdown editor requires function.js to function.\nPlease check:\n1. function.js exists in: " +
                     window.location.pathname.replace(
-                        "markdown_editor.html",
+                        "index.html",
                         "",
                     ) +
                     "\n2. The file is not blocked by browser security\n3. Check browser console for errors",

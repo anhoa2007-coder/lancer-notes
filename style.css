@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MARKDOWN EDITOR STYLES - Build 6345
+   MARKDOWN EDITOR STYLES - Build 6372
    ========================================================================== */
 
 /* ============================================
@@ -17,7 +17,7 @@
     --color-text-secondary: #222;
     --color-text-tertiary: #333;
     --color-text-muted: #666;
-    --color-text-disabled: #999;
+    --color-text-disabled: #6b6b6b;
 
     --color-border-light: #eee;
     --color-border-primary: #ddd;
@@ -146,7 +146,7 @@ html.dark-mode {
     --color-text-secondary: #ddd;
     --color-text-tertiary: #ccc;
     --color-text-muted: #888;
-    --color-text-disabled: #666;
+    --color-text-disabled: #a0a0a0;
 
     --color-border-light: #333;
     --color-border-primary: #444;
@@ -308,17 +308,13 @@ html {
 
 .generic-dialog::-webkit-scrollbar-button:vertical:decrement,
 .generic-dialog *::-webkit-scrollbar-button:vertical:decrement {
-    background: var(--color-dialog-bg)
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 5l4-4 4 4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
-        no-repeat center center;
+    background: var(--color-dialog-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 5l4-4 4 4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center center;
     background-size: 8px 5px;
 }
 
 .generic-dialog::-webkit-scrollbar-button:vertical:increment,
 .generic-dialog *::-webkit-scrollbar-button:vertical:increment {
-    background: var(--color-dialog-bg)
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
-        no-repeat center center;
+    background: var(--color-dialog-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center center;
     background-size: 8px 5px;
 }
 
@@ -528,9 +524,12 @@ input[type="radio"] {
     background: var(--color-menu-dropdown-hover-bg);
 }
 
-.menu-dropdown-item[disabled] {
+.menu-dropdown-item[disabled],
+.menu-dropdown-item[disabled]:hover,
+.menu-dropdown-item[disabled]:active {
+    opacity: 1;
     color: var(--color-text-disabled);
-    cursor: default;
+    cursor: not-allowed;
     background: transparent !important;
 }
 
@@ -633,9 +632,14 @@ input[type="radio"] {
     border-color: var(--color-accent-hover);
 }
 
-.toolbar-btn[disabled] {
-    opacity: 0.5;
-    cursor: default;
+.toolbar-btn[disabled],
+.toolbar-btn[disabled]:hover,
+.toolbar-btn[disabled]:active {
+    opacity: 1;
+    color: var(--color-text-disabled);
+    background-color: var(--color-bg-primary);
+    border-color: var(--color-border-light);
+    cursor: not-allowed;
 }
 
 .toolbar-btn.icon-only {
@@ -915,11 +919,11 @@ input[type="radio"] {
     margin-bottom: 10px;
 }
 
-.preview-content blockquote > :first-child {
+.preview-content blockquote> :first-child {
     margin-top: 0;
 }
 
-.preview-content blockquote > :last-child {
+.preview-content blockquote> :last-child {
     margin-bottom: 0;
 }
 
@@ -1107,7 +1111,9 @@ input[type="radio"] {
 .find-replace-bar .fr-input {
     flex: 1;
     width: 100%;
-    padding: 7px 10px;
+    height: 32px;
+    box-sizing: border-box;
+    padding: 0 10px;
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-md);
     font-size: 13px;
@@ -1116,7 +1122,7 @@ input[type="radio"] {
 }
 
 .find-replace-bar.compact .fr-input {
-    padding: 6px 8px;
+    padding: 0 8px;
 }
 
 .find-replace-bar .fr-btn {
@@ -1139,9 +1145,23 @@ input[type="radio"] {
     border-color: var(--color-border-dark);
 }
 
+#btn-find-prev,
+#btn-find-next {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .find-replace-bar .fr-close {
-    padding: 6px 10px;
-    min-height: 32px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
     background: transparent;
     font-weight: bold;
@@ -1154,8 +1174,8 @@ input[type="radio"] {
 }
 
 .find-replace-bar .fr-close:hover {
-    background: rgba(0, 0, 0, 0.1);
-    color: var(--color-danger);
+    background: var(--color-danger);
+    color: #fff;
 }
 
 .find-replace-bar .fr-count {
@@ -1175,8 +1195,9 @@ input[type="radio"] {
 }
 
 .find-replace-bar .fr-compact-toggle {
-    width: 40px;
-    min-width: 40px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1192,7 +1213,9 @@ input[type="radio"] {
 }
 
 .fr-flag-btn {
-    padding: 6px 8px !important;
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1596,6 +1619,7 @@ input[type="radio"] {
    PRINT STYLES
    ============================================ */
 @media print {
+
     /* Hide UI elements */
     .menu-bar,
     .status-bar,
@@ -1683,6 +1707,7 @@ input[type="radio"] {
    HIGH CONTRAST MODE SUPPORT
    ============================================ */
 @media (forced-colors: active) {
+
     /* Let browser handle most styling automatically */
     * {
         forced-color-adjust: auto;

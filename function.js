@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
-// main-mdfunction.js
-// Build 6345
+// function.js
+// Build 6372
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -1977,7 +1977,7 @@ window.initAnimatedIcons = function () {
     }
 
     // Add click listener to animate
-    // Note: The actual toggling logic is in markdown_editor.html's event listener.
+    // Note: The actual toggling logic is in index.html's event listener.
     // We can add another listener here just for animation/icon update.
     toggleBtn.addEventListener("click", () => {
       // The state toggles after this click.
@@ -2527,6 +2527,8 @@ let isSyncingRight = false;
 let syncTimeoutLeft = null;
 let syncTimeoutRight = null;
 let buildMapTimeout = null;
+let _scrollSyncObserver = null; // Track MutationObserver for cleanup
+let _scrollSyncHandlers = null; // Track event handlers for cleanup
 
 // Initialize scroll sync
 function initScrollSync() {
@@ -2538,55 +2540,70 @@ function initScrollSync() {
     isScrollSyncEnabled = true;
   }
 
-  // Initial menu check
-  // if (typeof updateMenuCheck === 'function') {
-  //     updateMenuCheck('menu-view-scrollsync', isScrollSyncEnabled, false);
-  // }
-
   const editor = document.getElementById("editor");
   const preview = document.getElementById("preview");
 
   if (!editor || !preview) return;
 
-  // Scroll Event Listeners with Throttling via requestAnimationFrame
-  editor.addEventListener("scroll", () => {
+  // Clean up previous initialization if any
+  if (_scrollSyncObserver) {
+    _scrollSyncObserver.disconnect();
+    _scrollSyncObserver = null;
+  }
+  if (_scrollSyncHandlers) {
+    editor.removeEventListener("scroll", _scrollSyncHandlers.editorScroll);
+    preview.removeEventListener("scroll", _scrollSyncHandlers.previewScroll);
+    editor.removeEventListener("input", _scrollSyncHandlers.editorInput);
+    _scrollSyncHandlers = null;
+  }
+
+  // Create named handlers so they can be removed later
+  const editorScrollHandler = () => {
     if (!isScrollSyncEnabled || isSyncingLeft) return;
     isSyncingRight = true;
     window.requestAnimationFrame(() => {
       syncPreview();
-      // Reset lock after a small delay to allow target to settle
       clearTimeout(syncTimeoutRight);
       syncTimeoutRight = setTimeout(() => {
         isSyncingRight = false;
       }, 100);
     });
-  });
+  };
 
-  preview.addEventListener("scroll", () => {
+  const previewScrollHandler = () => {
     if (!isScrollSyncEnabled || isSyncingRight) return;
     isSyncingLeft = true;
     window.requestAnimationFrame(() => {
       syncEditor();
-      // Reset lock after a small delay to allow target to settle
       clearTimeout(syncTimeoutLeft);
       syncTimeoutLeft = setTimeout(() => {
         isSyncingLeft = false;
       }, 100);
     });
-  });
+  };
 
-  // Input Debouncing for Map Rebuild
-  editor.addEventListener("input", () => {
+  const editorInputHandler = () => {
     if (!isScrollSyncEnabled) return;
     clearTimeout(buildMapTimeout);
     buildMapTimeout = setTimeout(() => {
       buildScrollMap();
-    }, 300); // 300ms debounce
-  });
+    }, 300);
+  };
+
+  // Store handler references for cleanup
+  _scrollSyncHandlers = {
+    editorScroll: editorScrollHandler,
+    previewScroll: previewScrollHandler,
+    editorInput: editorInputHandler,
+  };
+
+  // Attach event listeners
+  editor.addEventListener("scroll", editorScrollHandler);
+  preview.addEventListener("scroll", previewScrollHandler);
+  editor.addEventListener("input", editorInputHandler);
 
   // Rebuild map when images load in preview
-  // Use MutationObserver to detect DOM changes in preview (like images loading/rendering)
-  const observer = new MutationObserver((mutations) => {
+  _scrollSyncObserver = new MutationObserver((mutations) => {
     let shouldRebuild = false;
     for (const mutation of mutations) {
       if (
@@ -2598,12 +2615,11 @@ function initScrollSync() {
       }
     }
     if (shouldRebuild) {
-      // Debounce image load rebuilds too
       clearTimeout(buildMapTimeout);
       buildMapTimeout = setTimeout(buildScrollMap, 300);
     }
   });
-  observer.observe(preview, {
+  _scrollSyncObserver.observe(preview, {
     childList: true,
     subtree: true,
     attributes: true,
@@ -3009,6 +3025,6 @@ window.toggleDarkMode = toggleDarkMode;
 // ========================================
 // This marker indicates the file loaded successfully
 window.MAIN_MD_FUNCTION_LOADED = true;
-console.log("✓ main-mdfunction.js loaded successfully");
+console.log("✓ function.js loaded successfully");
 // Flag to indicate successful loading
 window.MAIN_MD_FUNCTION_LOADED = true;
