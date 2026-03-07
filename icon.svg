@@ -1,21 +1,108 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="512" height="512" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
- <style>
-   .outline { stroke: #000; stroke-width: 32; stroke-linejoin: round; }
-   .fill { fill: #fff; }
-   .accent { fill: #007acc; }
-   .pencil { fill: #ff9966; }
-   .pencil-tip { fill: #666; }
- </style>
- <g>
-   <!-- Notebook base -->
-   <path class="outline fill" d="M100 50 L380 50 Q400 50 400 70 L400 430 Q400 450 380 450 L100 450 Q80 450 80 430 L80 70 Q80 50 100 50 Z"/>
-   <!-- Spiral binding -->
-   <path class="outline accent" d="M90 80 C110 80 110 100 90 100 M90 140 C110 140 110 160 90 160 M90 200 C110 200 110 220 90 220 M90 260 C110 260 110 280 90 280 M90 320 C110 320 110 340 90 340 M90 380 C110 380 110 400 90 400"/>
-   <!-- Paper lines -->
-   <path class="accent" style="stroke-width:4" d="M140 150 L340 150 M140 200 L340 200 M140 250 L340 250 M140 300 L340 300 M140 350 L340 350"/>
-   <!-- Pencil -->
-   <path class="outline pencil" d="M280 120 L400 240 L360 280 L240 160 Z"/>
-   <path class="outline pencil-tip" d="M220 140 L260 180 L240 200 L200 160 Z"/>
- </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <!-- Base Paper shape -->
+    <rect id="paper" x="42" y="24" width="64" height="85" rx="6" />
+    
+    <!-- ClipPath to bound the cast shadow entirely inside the base paper -->
+    <clipPath id="paper-clip">
+      <use href="#paper" />
+    </clipPath>
+
+    <!-- Cover shape, perfectly designed to fit with a 24-degree skew -->
+    <rect id="cover" x="0" y="0" width="65" height="55" rx="4" />
+
+    <g id="ring-paths">
+      <!-- Spiral 1 -->
+      <path d="M 45 28 L 45 16 A 4 4 0 0 0 37 16 L 37 24" />
+      <!-- Spiral 2 -->
+      <path d="M 55 28 L 55 16 A 4 4 0 0 0 47 16 L 47 24" />
+      <!-- Spiral 3 -->
+      <path d="M 65 28 L 65 16 A 4 4 0 0 0 57 16 L 57 24" />
+      <!-- Spiral 4 -->
+      <path d="M 75 28 L 75 16 A 4 4 0 0 0 67 16 L 67 24" />
+      <!-- Spiral 5 -->
+      <path d="M 85 28 L 85 16 A 4 4 0 0 0 77 16 L 77 24" />
+      <!-- Spiral 6 -->
+      <path d="M 95 28 L 95 16 A 4 4 0 0 0 87 16 L 87 24" />
+    </g>
+
+    <!-- Defines a mask to cut through any black outlines wherever the grey rings cross them -->
+    <mask id="ring-mask" maskUnits="userSpaceOnUse">
+      <rect x="-10" y="-10" width="140" height="140" fill="white" />
+      <use href="#ring-paths" fill="none" stroke="black" stroke-width="8" stroke-linecap="round" />
+    </mask>
+
+    <g id="cover-group">
+      <!-- Base Blue Fill mapped to markdown_editor.css accent-color -->
+      <use href="#cover" fill="#007acc" />
+      
+      <!-- Abstract Text Lines printed on the cover -->
+      <rect x="15" y="16" width="34" height="4" rx="2" fill="#111111" />
+      <rect x="15" y="27" width="24" height="4" rx="2" fill="#111111" />
+
+      <!-- Markdown Style Indicator printed directly into the layout -->
+      <g transform="translate(40, 38) scale(1.15)" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <path d="M -1.5 8 V 0 L 3 4 L 7.5 0 V 8" />
+        <path d="M 14 1 V 8 M 11 5 L 14 8 L 17 5" />
+      </g>
+    </g>
+
+    <g id="cover-global">
+      <use href="#cover-group" transform="translate(35, 24) skewX(-24.44)" />
+    </g>
+
+    <g id="cover-outline-global">
+      <use href="#cover" transform="translate(35, 24) skewX(-24.44)" fill="none" stroke="#111111" stroke-width="4.5" stroke-linejoin="round" />
+    </g>
+
+    <g id="back-outline-global">
+      <use href="#paper" fill="none" stroke="#111111" stroke-width="4.5" stroke-linejoin="round" />
+    </g>
+  </defs>
+
+  <!-- Deep outline drop shadow behind the entire notebook (shifts bottom-right) -->
+  <rect x="44" y="27" width="64" height="85" rx="6" fill="#111111" />
+
+  <!-- Back Page -->
+  <!-- Solid white paper background -->
+  <use href="#paper" fill="#ffffff" />
+  
+  <!-- Artistic drop shadow cast by the skewed cover onto the white paper -->
+  <path d="M 42 24 L 85 24 Q 75 60 60 110 L 42 110 Z" fill="#cccccc" clip-path="url(#paper-clip)" />
+
+  <!-- Document Lines mapped onto the paper -->
+  <g clip-path="url(#paper-clip)" stroke="#999999" stroke-width="3" stroke-linecap="round">
+    <line x1="52" y1="36" x2="96" y2="36" />
+    <line x1="52" y1="44" x2="96" y2="44" />
+    <line x1="52" y1="52" x2="96" y2="52" />
+    <line x1="52" y1="60" x2="96" y2="60" />
+    <line x1="52" y1="68" x2="96" y2="68" />
+    <line x1="52" y1="76" x2="96" y2="76" />
+    <line x1="52" y1="84" x2="96" y2="84" />
+    <line x1="52" y1="92" x2="85" y2="92" />
+  </g>
+
+  <!-- Outline for back page, masked to show the punch hole gap! -->
+  <use href="#back-outline-global" mask="url(#ring-mask)" />
+
+  <!-- Skewed Front Cover Fill -->
+  <use href="#cover-global" />
+
+  <!-- Outline for front cover, masked to show the punch hole gap! -->
+  <use href="#cover-outline-global" mask="url(#ring-mask)" />
+
+  <!-- Holes perfectly punched within the top layout -->
+  <g fill="#111111">
+    <circle cx="45" cy="28" r="3.5" />
+    <circle cx="55" cy="28" r="3.5" />
+    <circle cx="65" cy="28" r="3.5" />
+    <circle cx="75" cy="28" r="3.5" />
+    <circle cx="85" cy="28" r="3.5" />
+    <circle cx="95" cy="28" r="3.5" />
+  </g>
+
+  <!-- Metallic Spirals rendering on top -->
+  <use href="#ring-paths" fill="none" stroke="#111111" stroke-width="8.5" stroke-linecap="round" />
+  <use href="#ring-paths" fill="none" stroke="#888888" stroke-width="4" stroke-linecap="round" />
+
 </svg>
