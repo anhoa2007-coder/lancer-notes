@@ -35,7 +35,7 @@
     <g id="cover-group">
       <!-- Base Blue Fill mapped to markdown_editor.css accent-color -->
       <use href="#cover" fill="#007acc" />
-
+      
       <!-- Abstract Text Lines printed on the cover -->
       <rect x="15" y="16" width="34" height="4" rx="2" fill="#111111" />
       <rect x="15" y="27" width="24" height="4" rx="2" fill="#111111" />
@@ -88,10 +88,10 @@
   <!-- Skewed Front Cover Fill -->
   <use href="#cover-global" />
 
-  <!-- Outline for front cover, masked to show the punch hole gap! -->
-  <use href="#cover-outline-global" mask="url(#ring-mask)" />
+  <!-- Outline for front cover (blue notes) with full border applied -->
+  <use href="#cover-outline-global" />
 
-  <!-- Holes perfectly punched within the top layout -->
+  <!-- Holes perfectly punched within the top layout and cover -->
   <g fill="#111111">
     <circle cx="45" cy="28" r="3.5" />
     <circle cx="55" cy="28" r="3.5" />
@@ -101,17 +101,7 @@
     <circle cx="95" cy="28" r="3.5" />
   </g>
 
-  <!-- Hole punch notches in the top edge of the cover -->
-  <g fill="none" stroke="#111111" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M 43 23 L 43.5 19" />
-    <path d="M 53 23 L 53.5 19" />
-    <path d="M 63 23 L 63.5 19" />
-    <path d="M 73 23 L 73.5 19" />
-    <path d="M 83 23 L 83.5 19" />
-    <path d="M 93 23 L 93.5 19" />
-  </g>
-
-  <!-- Metallic Spirals rendering on top (no black border) -->
+  <!-- Metallic Spirals rendering on top without borders -->
   <use href="#ring-paths" fill="none" stroke="#888888" stroke-width="4" stroke-linecap="round" />
 
 </svg>
