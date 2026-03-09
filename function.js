@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6372
+// Build 6379
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -2886,6 +2886,10 @@ function selectAll() {
 function updateMenuCheck(btnId, isChecked, animate = true) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
+
+  // Mark this item as one that reserves space for a checkmark.  Doing it here
+  // means callers don't need to remember to add the class in markup.
+  btn.classList.add("menu-checkable");
 
   // Remove existing check if any
   const existingIcon = btn.querySelector(".menu-check-icon");

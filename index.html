@@ -43,6 +43,8 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css" disabled />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/morphdom@2.7.4/dist/morphdom-umd.min.js"></script>
+    <!-- PDF export library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
@@ -68,9 +70,20 @@
                     Print
                 </button>
                 <div class="menu-divider"></div>
-                <button type="button" class="menu-dropdown-item" id="menu-file-export" role="menuitem">
-                    Export HTML
-                </button>
+                <div class="menu-dropdown-item-group" role="none">
+                    <button type="button" class="menu-dropdown-item" id="menu-file-export-group" aria-haspopup="true" aria-expanded="false" style="justify-content: space-between">
+                        <span>Export</span>
+                        <span class="material-symbols-rounded icon-18">chevron_right</span>
+                    </button>
+                    <div class="menu-submenu" role="menu" aria-label="Export menu">
+                        <button type="button" class="menu-dropdown-item" id="menu-file-export-html" role="menuitem">
+                            Export HTML
+                        </button>
+                        <button type="button" class="menu-dropdown-item" id="menu-file-export-pdf" role="menuitem">
+                            Export PDF
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="menu-item dropdown" id="menu-edit" role="menuitem" tabindex="0" aria-haspopup="true"
@@ -140,13 +153,13 @@
                 </div>
 
                 <div class="menu-divider"></div>
-                <button type="button" class="menu-dropdown-item" id="menu-view-scrollsync" role="menuitem">
+                <button type="button" class="menu-dropdown-item menu-checkable" id="menu-view-scrollsync" role="menuitem">
                     Scroll Sync
                 </button>
-                <button type="button" class="menu-dropdown-item" id="menu-view-wordwrap" role="menuitem">
+                <button type="button" class="menu-dropdown-item menu-checkable" id="menu-view-wordwrap" role="menuitem">
                     Word Wrap
                 </button>
-                <button type="button" class="menu-dropdown-item" id="menu-view-statusbar" role="menuitem">
+                <button type="button" class="menu-dropdown-item menu-checkable" id="menu-view-statusbar" role="menuitem">
                     Status Bar
                 </button>
             </div>
@@ -568,13 +581,13 @@ Happy writing!"></textarea>
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.2.2
+                    Version 1.2.3
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6372
+                    Build 6379
                 </div>
 
                 <div style="
@@ -584,6 +597,12 @@ Happy writing!"></textarea>
                         ">
                     A lightweight, feature-rich markdown editor with live
                     preview.
+                </div>
+                <div style="margin-top:8px; font-size:13px;">
+                    Source code:
+                    <a href="https://github.com/anhoa2007-coder/lancer-notes" target="_blank" rel="noopener noreferrer">
+                        GitHub
+                    </a>
                 </div>
             </div>
         </div>
@@ -606,7 +625,7 @@ Happy writing!"></textarea>
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6372";
+        let BUILD_NUMBER = "6379";
         let _editorInitialized = false;
         let _domContentInitialized = false;
 
@@ -853,6 +872,114 @@ Happy writing!"></textarea>
                 });
             });
 
+            // Helpers for export functionality
+            function gatherExportStyles() {
+                let stylesToInline = "";
+                let externalLinksHtml = "";
+                try {
+                    Array.from(document.styleSheets).forEach((sheet) => {
+                        try {
+                            if (
+                                sheet.href &&
+                                sheet.href.includes("fonts.googleapis.com")
+                            ) {
+                                externalLinksHtml += `<link rel="stylesheet" href="${sheet.href}" />\n`;
+                            } else {
+                                if (sheet.cssRules) {
+                                    Array.from(sheet.cssRules).forEach((rule) => {
+                                        stylesToInline += rule.cssText + "\n";
+                                    });
+                                }
+                            }
+                        } catch (err) {
+                            console.warn(
+                                "Skipping stylesheet due to access error:",
+                                sheet.href,
+                                err,
+                            );
+                        }
+                    });
+                } catch (e) {
+                    console.error("Error processing stylesheets:", e);
+                    if (typeof showAlert === "function") {
+                        showAlert(
+                            "Warning: Could not fully export styles. The output document might look unstyled.",
+                        );
+                    } else {
+                        alert(
+                            "Warning: Could not fully export styles. The output document might look unstyled.",
+                        );
+                    }
+                }
+                return { stylesToInline, externalLinksHtml };
+            }
+
+            function exportHTML() {
+                const { stylesToInline, externalLinksHtml } = gatherExportStyles();
+                const htmlClass = document.documentElement.className;
+                const htmlContent = `<!DOCTYPE html>
+<html lang="en" class="${htmlClass}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exported Document</title>
+    ${externalLinksHtml}
+    <style>
+${stylesToInline}
+        /* Ensure body overrides for export */
+        body {
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-content" style="border:none;">
+    ${preview.innerHTML}
+    </div>
+</body>
+</html>`;
+                const blob = new Blob([htmlContent], {
+                    type: "text/html",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "document.html";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                updateStatus("Exported HTML");
+                closeAllMenus();
+            }
+
+            function exportPDF() {
+                // html2pdf will render the current preview div
+                const opt = {
+                    margin: 0.5,
+                    filename: "document.pdf",
+                    image: { type: "jpeg", quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+                };
+                html2pdf()
+                    .set(opt)
+                    .from(preview)
+                    .save()
+                    .then(() => {
+                        updateStatus("Exported PDF");
+                        closeAllMenus();
+                    })
+                    .catch((err) => {
+                        console.error("PDF export failed", err);
+                        updateStatus("PDF export error");
+                        closeAllMenus();
+                    });
+            }
+
             // Menu actions
             document
                 .getElementById("menu-file-new")
@@ -884,100 +1011,16 @@ Happy writing!"></textarea>
                     printDocument();
                     closeAllMenus();
                 });
+            // export submenu items
             document
-                .getElementById("menu-file-export")
+                .getElementById("menu-file-export-html")
                 .addEventListener("click", function (e) {
-                    // Dynamic CSS Extraction
-                    let stylesToInline = "";
-                    let externalLinksHtml = "";
-
-                    try {
-                        Array.from(document.styleSheets).forEach(
-                            (sheet) => {
-                                try {
-                                    // Check if it's an external link we want to preserve (Google Fonts)
-                                    if (
-                                        sheet.href &&
-                                        sheet.href.includes(
-                                            "fonts.googleapis.com",
-                                        )
-                                    ) {
-                                        externalLinksHtml += `<link rel="stylesheet" href="${sheet.href}" />\n`;
-                                    } else {
-                                        // Inline local styles (style.css and any inline styles)
-                                        // Note: accessing cssRules on cross-origin sheets might define security errors,
-                                        // avoiding them with the try-catch block inside the loop.
-                                        if (sheet.cssRules) {
-                                            Array.from(
-                                                sheet.cssRules,
-                                            ).forEach((rule) => {
-                                                stylesToInline +=
-                                                    rule.cssText + "\n";
-                                            });
-                                        }
-                                    }
-                                } catch (err) {
-                                    console.warn(
-                                        "Skipping stylesheet due to access error:",
-                                        sheet.href,
-                                        err,
-                                    );
-                                }
-                            },
-                        );
-                    } catch (e) {
-                        console.error("Error processing stylesheets:", e);
-                        if (typeof showAlert === "function") {
-                            showAlert(
-                                "Warning: Could not fully export styles. The output document might look unstyled.",
-                            );
-                        } else {
-                            alert(
-                                "Warning: Could not fully export styles. The output document might look unstyled.",
-                            );
-                        }
-                    }
-
-                    const htmlClass = document.documentElement.className; // Capture dark-mode class if present
-
-                    const htmlContent = `<!DOCTYPE html>
-<html lang="en" class="${htmlClass}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exported Document</title>
-    ${externalLinksHtml}
-    <style>
-${stylesToInline}
-        /* Ensure body overrides for export */
-        body {
-            margin: 0 auto;
-            max-width: 800px;
-            padding: 20px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-        }
-    </style>
-</head>
-<body>
-    <div class="preview-content" style="border:none;">
-    ${preview.innerHTML}
-    </div>
-</body>
-</html>`;
-
-                    const blob = new Blob([htmlContent], {
-                        type: "text/html",
-                    });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = "document.html";
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    updateStatus("Exported HTML");
-                    closeAllMenus();
+                    exportHTML();
+                });
+            document
+                .getElementById("menu-file-export-pdf")
+                .addEventListener("click", function (e) {
+                    exportPDF();
                 });
 
             document

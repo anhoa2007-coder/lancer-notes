@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MARKDOWN EDITOR STYLES - Build 6372
+   MARKDOWN EDITOR STYLES - Build 6379
    ========================================================================== */
 
 /* ============================================
@@ -507,6 +507,8 @@ input[type="radio"] {
 }
 
 .menu-dropdown-item {
+    /* generic dropdown item styling; padding is symmetric for all items
+       so labels align normally when no checkmark space is needed. */
     display: flex;
     align-items: center;
     width: 100%;
@@ -520,8 +522,22 @@ input[type="radio"] {
     gap: var(--space-sm);
 }
 
+/* apply extra left offset only to items that may show a checkmark */
+.menu-dropdown-item.menu-checkable {
+    position: relative; /* contain absolutely positioned icon */
+    padding-left: calc(var(--space-md) + 16px + var(--space-sm));
+}
+
 .menu-dropdown-item:hover {
     background: var(--color-menu-dropdown-hover-bg);
+}
+
+/* position the checkmark icon out of the flow so the padded text
+   does not shift when the svg is added/removed */
+.menu-dropdown-item.menu-checkable .menu-check-icon {
+    position: absolute;
+    left: var(--space-md);
+    /* flex-shrink/width/height already defined elsewhere */
 }
 
 .menu-dropdown-item[disabled],
@@ -1167,6 +1183,8 @@ input[type="radio"] {
     font-weight: bold;
     cursor: pointer;
     font-size: 16px;
+    /* ensure the glyph itself is vertically centred inside the flex box */
+    line-height: 1;
     transition:
         background-color 0.2s,
         color 0.2s;
