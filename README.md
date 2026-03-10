@@ -14,5 +14,5 @@ Visit https://lancer-notes-sivs.vercel.app/ for the editor and use it now.
   - Automatically detecting syntax highlighting, supported up to 192 languages.
 - **_If you're confused about the Markdown commands?_**
     - The welcome text already gave you a hint upon opening the app.
-    - If you are lost, try using the toolbar and try copy it.
+    - If you are lost, try using the toolbar and try copy it manually.
     - If you are still lost, you can try to check [Basic Syntax Guide](https://www.markdownguide.org/basic-syntax/)
