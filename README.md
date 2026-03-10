@@ -6,7 +6,7 @@ And easy to use UI, you can use it like other text editors.
 It's lightweight, only less than 40-60MB of usage, and low depdenacies.\
 Only used markdown-it, highlight.js, DOMPurify and Morphdom.
 ### Get started
-Visit https://lancer-notes-sivs.vercel.app/ for the editor and use it now.
+Visit lancer-notes.neocities.org/ for the editor and use it now.
 - _**Basic features:**_
   - All the basic Commonmark markdown, with additional table and strikethough support.
   - Spilt mode between Editor and Preview
