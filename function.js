@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6379
+// Build 6401
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -1023,6 +1023,139 @@ function showSaveAsDialog() {
 function printDocument() {
   updatePreview();
   window.print();
+}
+
+// ========================================
+// EXPORT FUNCTIONALITY
+// ========================================
+
+/**
+ * Gather styles and external links needed when exporting the document.
+ * Returns an object containing two strings: `stylesToInline` and
+ * `externalLinksHtml`. Any failures are caught and reported via an
+ * alert so the export still proceeds with whatever was successfully
+ * collected.
+ */
+function gatherExportStyles() {
+    let stylesToInline = "";
+    let externalLinksHtml = "";
+
+    try {
+        Array.from(document.styleSheets).forEach((sheet) => {
+            try {
+                if (sheet.href && sheet.href.includes("fonts.googleapis.com")) {
+                    externalLinksHtml += `<link rel="stylesheet" href="${sheet.href}" />\n`;
+                } else if (sheet.cssRules) {
+                    Array.from(sheet.cssRules).forEach((rule) => {
+                        stylesToInline += rule.cssText + "\n";
+                    });
+                }
+            } catch (err) {
+                // Stylesheet may be from another origin; ignore it and
+                // continue processing the rest.
+                console.warn("Skipping stylesheet due to access error:", sheet.href, err);
+            }
+        });
+    } catch (e) {
+        console.error("Error processing stylesheets:", e);
+        if (typeof showAlert === "function") {
+            showAlert(
+                "Warning: Could not fully export styles. The output document might look unstyled."
+            );
+        } else {
+            alert(
+                "Warning: Could not fully export styles. The output document might look unstyled."
+            );
+        }
+    }
+
+    return { stylesToInline, externalLinksHtml };
+}
+
+/**
+ * Creates a standalone HTML file containing the preview content and
+ * all necessary styles, then triggers a download.
+ */
+function exportHTML() {
+    // make sure preview is current
+    updatePreview();
+
+    const { stylesToInline, externalLinksHtml } = gatherExportStyles();
+    const htmlClass = document.documentElement.className;
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en" class="${htmlClass}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exported Document</title>
+    ${externalLinksHtml}
+    <style>
+${stylesToInline}
+        /* Ensure body overrides for export */
+        body {
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-content" style="border:none;">
+    ${preview.innerHTML}
+    </div>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "document.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    updateStatus("Exported HTML");
+}
+
+/**
+ * Export the current preview pane as a PDF using html2pdf.js.
+ * The library must be included in the HTML via a <script> tag.
+ */
+function exportPDF() {
+    // ensure preview is current before rendering
+    updatePreview();
+
+    // options taken from legacy implementation; users can tweak these
+    const opt = {
+        margin: 0.5,
+        filename: "document.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    };
+
+    if (typeof html2pdf === "undefined") {
+        console.error("html2pdf library not loaded");
+        updateStatus("PDF export unavailable");
+        return;
+    }
+
+    html2pdf()
+        .set(opt)
+        .from(preview)
+        .save()
+        .then(() => {
+            updateStatus("Exported PDF");
+            closeAllMenus();
+        })
+        .catch((err) => {
+            console.error("PDF export failed", err);
+            updateStatus("PDF export error");
+            closeAllMenus();
+        });
 }
 
 // ========================================
@@ -2355,7 +2488,7 @@ function showEditMenu() {
  */
 function showViewMenu() {
   customAlert(
-    "View menu - Use the view toggle buttons to switch between Editor, Preview, and Split view.",
+    "View menu - Use the view toggle buttons to switch between Editor Only, Split View, and Preview Only.",
   );
 }
 
@@ -2887,8 +3020,8 @@ function updateMenuCheck(btnId, isChecked, animate = true) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
 
-  // Mark this item as one that reserves space for a checkmark.  Doing it here
-  // means callers don't need to remember to add the class in markup.
+  // mark this item as one that reserves space for a checkmark; callers
+  // no longer need to add the class manually in markup.
   btn.classList.add("menu-checkable");
 
   // Remove existing check if any

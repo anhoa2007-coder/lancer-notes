@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MARKDOWN EDITOR STYLES - Build 6379
+   MARKDOWN EDITOR STYLES - Build 6401
    ========================================================================== */
 
 /* ============================================
@@ -507,8 +507,6 @@ input[type="radio"] {
 }
 
 .menu-dropdown-item {
-    /* generic dropdown item styling; padding is symmetric for all items
-       so labels align normally when no checkmark space is needed. */
     display: flex;
     align-items: center;
     width: 100%;
@@ -528,16 +526,16 @@ input[type="radio"] {
     padding-left: calc(var(--space-md) + 16px + var(--space-sm));
 }
 
-.menu-dropdown-item:hover {
-    background: var(--color-menu-dropdown-hover-bg);
-}
-
 /* position the checkmark icon out of the flow so the padded text
    does not shift when the svg is added/removed */
 .menu-dropdown-item.menu-checkable .menu-check-icon {
     position: absolute;
     left: var(--space-md);
     /* flex-shrink/width/height already defined elsewhere */
+}
+
+.menu-dropdown-item:hover {
+    background: var(--color-menu-dropdown-hover-bg);
 }
 
 .menu-dropdown-item[disabled],
@@ -592,6 +590,19 @@ input[type="radio"] {
 .menu-submenu .menu-dropdown-item {
     font-size: 13px;
     color: var(--color-text-primary);
+}
+
+.menu-submenu.open-left {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 2px;
+    transform: translateX(10px);
+}
+
+.menu-dropdown-item-group:hover .menu-submenu.open-left,
+.menu-dropdown-item-group:focus-within .menu-submenu.open-left {
+    transform: translateX(0);
 }
 
 .menu-item-no-padding {
@@ -1178,13 +1189,12 @@ input[type="radio"] {
     display: flex;
     align-items: center;
     justify-content: center;
+    line-height: 0; 
     border: none;
     background: transparent;
     font-weight: bold;
     cursor: pointer;
     font-size: 16px;
-    /* ensure the glyph itself is vertically centred inside the flex box */
-    line-height: 1;
     transition:
         background-color 0.2s,
         color 0.2s;
@@ -1779,6 +1789,145 @@ input[type="radio"] {
         background-color: var(--color-accent-primary);
         border: 1px solid var(--color-accent-primary);
     }
+}
+
+/* ============================================
+   ZOOM TOOLBAR
+   ============================================ */
+.zoom-toolbar {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    background: var(--color-find-replace-bg);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: var(--z-find-replace);
+    opacity: 1;
+    pointer-events: auto;
+    font-size: 13px;
+    transition:
+        opacity var(--transition-fast) ease-out,
+        transform var(--transition-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.zoom-toolbar.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(-10px) scale(0.95);
+    transition:
+        opacity 0.15s ease-in,
+        transform 0.15s ease-in;
+}
+
+.zoom-toolbar-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-tertiary);
+    cursor: pointer;
+    color: var(--color-text-primary);
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+.zoom-toolbar-btn:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-border-dark);
+}
+
+.zoom-toolbar-btn:active {
+    background: var(--color-bg-active);
+}
+
+.zoom-toolbar-btn svg {
+    display: block;
+}
+
+/* Zoom Range Slider */
+#zoom-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 120px;
+    height: 6px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    /* Track background is set dynamically via JS */
+}
+
+#zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+#zoom-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background-color: var(--color-accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.zoom-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    min-width: 38px;
+    text-align: center;
+    user-select: none;
+}
+
+.zoom-toolbar-close {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--color-text-primary);
+    border-radius: 4px;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.zoom-toolbar-close:hover {
+    background: var(--color-danger);
+    color: #fff;
+}
+
+/* Preview content zoom transition */
+.preview-content {
+    transform-origin: top left;
+    transition: transform 0.1s ease-out;
 }
 
 /* ============================================

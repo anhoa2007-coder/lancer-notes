@@ -129,6 +129,7 @@
                 <button type="button" class="menu-dropdown-item" id="menu-view-editor" role="menuitem">
                     Editor
                 </button>
+
                 <button type="button" class="menu-dropdown-item" id="menu-view-preview" role="menuitem">
                     Preview
                 </button>
@@ -140,28 +141,31 @@
                         <span class="material-symbols-rounded icon-18">chevron_right</span>
                     </button>
                     <div class="menu-submenu" role="menu" aria-label="Theme">
-                        <button type="button" class="menu-dropdown-item" id="menu-theme-system" role="menuitem">
+                        <button type="button" class="menu-dropdown-item menu-checkable" id="menu-theme-system" role="menuitem">
                             System
                         </button>
-                        <button type="button" class="menu-dropdown-item" id="menu-theme-light" role="menuitem">
+                        <button type="button" class="menu-dropdown-item menu-checkable" id="menu-theme-light" role="menuitem">
                             Light
                         </button>
-                        <button type="button" class="menu-dropdown-item" id="menu-theme-dark" role="menuitem">
+                        <button type="button" class="menu-dropdown-item menu-checkable" id="menu-theme-dark" role="menuitem">
                             Dark
                         </button>
                     </div>
                 </div>
-
-                <div class="menu-divider"></div>
-                <button type="button" class="menu-dropdown-item menu-checkable" id="menu-view-scrollsync" role="menuitem">
-                    Scroll Sync
+                <button type="button" class="menu-dropdown-item" id="menu-view-zoom" role="menuitem">
+                    Zoom
                 </button>
+                <div class="menu-divider"></div>
                 <button type="button" class="menu-dropdown-item menu-checkable" id="menu-view-wordwrap" role="menuitem">
                     Word Wrap
+                </button>
+                <button type="button" class="menu-dropdown-item menu-checkable" id="menu-view-scrollsync" role="menuitem">
+                    Scroll Sync
                 </button>
                 <button type="button" class="menu-dropdown-item menu-checkable" id="menu-view-statusbar" role="menuitem">
                     Status Bar
                 </button>
+
             </div>
         </div>
         <div class="menu-item dropdown" id="menu-help" role="menuitem" tabindex="0" aria-haspopup="true"
@@ -381,6 +385,40 @@ Happy writing!"></textarea>
         </div>
     </div>
 
+    <!-- Zoom Toolbar -->
+    <div id="zoom-toolbar" class="zoom-toolbar hidden">
+        <button id="zoom-out-btn" class="zoom-toolbar-btn" title="Zoom Out">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="7" fill="currentColor" />
+                <rect x="7" y="9" width="6" height="2" fill="var(--color-bg-secondary)" />
+                <path d="M15 15L20 20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </svg>
+        </button>
+        <input type="range" id="zoom-slider" min="50" max="200" value="100">
+        <button id="zoom-in-btn" class="zoom-toolbar-btn" title="Zoom In">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="7" fill="currentColor" />
+                <rect x="9" y="6" width="2" height="8" fill="var(--color-bg-secondary)" />
+                <rect x="6" y="9" width="8" height="2" fill="var(--color-bg-secondary)" />
+                <path d="M15 15L20 20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </svg>
+        </button>
+        <span id="zoom-text" class="zoom-text">100%</span>
+        <button id="zoom-reset-btn" class="zoom-toolbar-btn" title="Reset to 100%">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="5" width="20" height="14" rx="3" fill="currentColor" />
+                <text x="12" y="15" font-size="10" font-weight="bold" fill="var(--color-bg-secondary)"
+                    text-anchor="middle" font-family="sans-serif">1:1</text>
+            </svg>
+        </button>
+        <button id="zoom-close-btn" class="zoom-toolbar-close" title="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+        </button>
+    </div>
+
     <!-- Find/Replace Bar -->
     <div id="find-replace-bar" class="find-replace-bar" aria-hidden="true" role="dialog" aria-label="Find and Replace"
         style="display: none">
@@ -420,8 +458,8 @@ Happy writing!"></textarea>
                     autocomplete="off" />
                 <div id="replace-history" class="history-dropdown"></div>
             </div>
-            <button id="btn-replace" class="fr-btn">Replace</button>
-            <button id="btn-replace-all" class="fr-btn">Replace All</button>
+            <button id="btn-replace" class="fr-btn" type="button" title="Replace">Replace</button>
+            <button id="btn-replace-all" class="fr-btn" type="button" title="Replace All">Replace All</button>
         </div>
     </div>
 
@@ -581,13 +619,13 @@ Happy writing!"></textarea>
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.2.3
+                    Version 1.3.0
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6379
+                    Build 6401
                 </div>
 
                 <div style="
@@ -598,11 +636,13 @@ Happy writing!"></textarea>
                     A lightweight, feature-rich markdown editor with live
                     preview.
                 </div>
-                <div style="margin-top:8px; font-size:13px;">
-                    Source code:
-                    <a href="https://github.com/anhoa2007-coder/lancer-notes" target="_blank" rel="noopener noreferrer">
-                        GitHub
-                    </a>
+                <div style="
+                            color: var(--color-text-tertiary);
+                            font-size: 13px;
+                            line-height: 1.4;
+                            margin-top: 10px;
+                        ">
+                    Source code available on <a href="https://github.com/anhoa2007-coder/lancer-notes" target="_blank" rel="noopener">GitHub</a>.
                 </div>
             </div>
         </div>
@@ -625,7 +665,7 @@ Happy writing!"></textarea>
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6379";
+        let BUILD_NUMBER = "6401";
         let _editorInitialized = false;
         let _domContentInitialized = false;
 
@@ -826,6 +866,21 @@ Happy writing!"></textarea>
                     alignTable("right");
                 });
 
+            // Handle submenu overflow
+            document.querySelectorAll('.menu-dropdown-item-group').forEach(group => {
+                group.addEventListener('mouseenter', function () {
+                    const submenu = this.querySelector('.menu-submenu');
+                    if (submenu) {
+                        submenu.classList.remove('open-left');
+                        const rect = submenu.getBoundingClientRect();
+                        // If the right edge of the submenu exceeds the viewport width
+                        if (rect.right > window.innerWidth) {
+                            submenu.classList.add('open-left');
+                        }
+                    }
+                });
+            });
+
             // Top menu dropdown behaviour
             // Close menus when clicking outside or pressing Escape
             document.addEventListener("click", function () {
@@ -872,114 +927,6 @@ Happy writing!"></textarea>
                 });
             });
 
-            // Helpers for export functionality
-            function gatherExportStyles() {
-                let stylesToInline = "";
-                let externalLinksHtml = "";
-                try {
-                    Array.from(document.styleSheets).forEach((sheet) => {
-                        try {
-                            if (
-                                sheet.href &&
-                                sheet.href.includes("fonts.googleapis.com")
-                            ) {
-                                externalLinksHtml += `<link rel="stylesheet" href="${sheet.href}" />\n`;
-                            } else {
-                                if (sheet.cssRules) {
-                                    Array.from(sheet.cssRules).forEach((rule) => {
-                                        stylesToInline += rule.cssText + "\n";
-                                    });
-                                }
-                            }
-                        } catch (err) {
-                            console.warn(
-                                "Skipping stylesheet due to access error:",
-                                sheet.href,
-                                err,
-                            );
-                        }
-                    });
-                } catch (e) {
-                    console.error("Error processing stylesheets:", e);
-                    if (typeof showAlert === "function") {
-                        showAlert(
-                            "Warning: Could not fully export styles. The output document might look unstyled.",
-                        );
-                    } else {
-                        alert(
-                            "Warning: Could not fully export styles. The output document might look unstyled.",
-                        );
-                    }
-                }
-                return { stylesToInline, externalLinksHtml };
-            }
-
-            function exportHTML() {
-                const { stylesToInline, externalLinksHtml } = gatherExportStyles();
-                const htmlClass = document.documentElement.className;
-                const htmlContent = `<!DOCTYPE html>
-<html lang="en" class="${htmlClass}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exported Document</title>
-    ${externalLinksHtml}
-    <style>
-${stylesToInline}
-        /* Ensure body overrides for export */
-        body {
-            margin: 0 auto;
-            max-width: 800px;
-            padding: 20px;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-        }
-    </style>
-</head>
-<body>
-    <div class="preview-content" style="border:none;">
-    ${preview.innerHTML}
-    </div>
-</body>
-</html>`;
-                const blob = new Blob([htmlContent], {
-                    type: "text/html",
-                });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "document.html";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                updateStatus("Exported HTML");
-                closeAllMenus();
-            }
-
-            function exportPDF() {
-                // html2pdf will render the current preview div
-                const opt = {
-                    margin: 0.5,
-                    filename: "document.pdf",
-                    image: { type: "jpeg", quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-                };
-                html2pdf()
-                    .set(opt)
-                    .from(preview)
-                    .save()
-                    .then(() => {
-                        updateStatus("Exported PDF");
-                        closeAllMenus();
-                    })
-                    .catch((err) => {
-                        console.error("PDF export failed", err);
-                        updateStatus("PDF export error");
-                        closeAllMenus();
-                    });
-            }
-
             // Menu actions
             document
                 .getElementById("menu-file-new")
@@ -1011,16 +958,24 @@ ${stylesToInline}
                     printDocument();
                     closeAllMenus();
                 });
+            // export submenu behaviour
+            document
+                .getElementById("menu-file-export-group")
+                .addEventListener("click", function (e) {
+                    e.stopPropagation();
+                });
             // export submenu items
             document
                 .getElementById("menu-file-export-html")
                 .addEventListener("click", function (e) {
                     exportHTML();
+                    closeAllMenus();
                 });
             document
                 .getElementById("menu-file-export-pdf")
                 .addEventListener("click", function (e) {
                     exportPDF();
+                    closeAllMenus();
                 });
 
             document
@@ -1235,6 +1190,106 @@ ${stylesToInline}
                     toggleScrollSync();
                     closeAllMenus();
                 });
+
+            // Zoom toolbar setup
+            const zoomToolbar = document.getElementById("zoom-toolbar");
+            const zoomSlider = document.getElementById("zoom-slider");
+            const zoomText = document.getElementById("zoom-text");
+            const zoomOutBtn = document.getElementById("zoom-out-btn");
+            const zoomInBtn = document.getElementById("zoom-in-btn");
+            const zoomResetBtn = document.getElementById("zoom-reset-btn");
+            const zoomCloseBtn = document.getElementById("zoom-close-btn");
+            const previewContent = document.getElementById("preview");
+
+            // Restore persisted zoom level
+            const storedZoom = localStorage.getItem("markdown-zoom-level");
+            if (storedZoom) {
+                zoomSlider.value = storedZoom;
+            }
+
+            function updateZoom() {
+                const value = parseInt(zoomSlider.value);
+                zoomText.textContent = value + "%";
+
+                // Update slider track gradient
+                const min = parseInt(zoomSlider.min);
+                const max = parseInt(zoomSlider.max);
+                const pct = ((value - min) / (max - min)) * 100;
+                const accentColor = getComputedStyle(document.documentElement)
+                    .getPropertyValue("--color-accent-primary").trim() || "#007acc";
+                zoomSlider.style.background =
+                    `linear-gradient(to right, ${accentColor} ${pct}%, var(--color-border-secondary) ${pct}%)`;
+
+                // Apply scale to preview content
+                const scale = value / 100;
+                previewContent.style.transform = `scale(${scale})`;
+                previewContent.style.transformOrigin = "top left";
+
+                // Adjust width so scaled content fills the pane properly
+                previewContent.style.width = (100 / scale) + "%";
+
+                // Persist
+                localStorage.setItem("markdown-zoom-level", value);
+            }
+
+            zoomSlider.addEventListener("input", updateZoom);
+
+            zoomOutBtn.addEventListener("click", function () {
+                zoomSlider.value = Math.max(parseInt(zoomSlider.min), parseInt(zoomSlider.value) - 10);
+                updateZoom();
+            });
+
+            zoomInBtn.addEventListener("click", function () {
+                zoomSlider.value = Math.min(parseInt(zoomSlider.max), parseInt(zoomSlider.value) + 10);
+                updateZoom();
+            });
+
+            zoomResetBtn.addEventListener("click", function () {
+                zoomSlider.value = 100;
+                updateZoom();
+            });
+
+            zoomCloseBtn.addEventListener("click", function () {
+                zoomToolbar.classList.add("hidden");
+            });
+
+            function toggleZoomToolbar() {
+                zoomToolbar.classList.toggle("hidden");
+                if (!zoomToolbar.classList.contains("hidden")) {
+                    updateZoom();
+                }
+            }
+
+            document
+                .getElementById("menu-view-zoom")
+                .addEventListener("click", function () {
+                    toggleZoomToolbar();
+                    closeAllMenus();
+                });
+
+            // Keyboard shortcuts for zoom (Ctrl+=/Ctrl+-/Ctrl+0)
+            document.addEventListener("keydown", function (e) {
+                if (e.ctrlKey && !e.shiftKey && !e.altKey) {
+                    if (e.key === "=" || e.key === "+") {
+                        e.preventDefault();
+                        zoomSlider.value = Math.min(parseInt(zoomSlider.max), parseInt(zoomSlider.value) + 10);
+                        updateZoom();
+                        if (zoomToolbar.classList.contains("hidden")) toggleZoomToolbar();
+                    } else if (e.key === "-") {
+                        e.preventDefault();
+                        zoomSlider.value = Math.max(parseInt(zoomSlider.min), parseInt(zoomSlider.value) - 10);
+                        updateZoom();
+                        if (zoomToolbar.classList.contains("hidden")) toggleZoomToolbar();
+                    } else if (e.key === "0") {
+                        e.preventDefault();
+                        zoomSlider.value = 100;
+                        updateZoom();
+                    }
+                }
+            });
+
+            // Apply saved zoom on load
+            updateZoom();
 
             document
                 .getElementById("menu-help-guide")
