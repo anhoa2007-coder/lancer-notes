@@ -1,5 +1,5 @@
 # Changelog
-
+## NOTE: This is old build, replaced by Lancer Notes 1.3.1, directly replacing the old app.
 ## v1.3.2 (2025-10-26)
 
 ### Major Improvements
