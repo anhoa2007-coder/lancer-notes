@@ -1,8 +1,7 @@
 PARSER NOTES
 ============
 
-Summary
-This project previously used a small custom Markdown parser (regex-based) inside `legacy_markdown_editor.html`. I replaced the custom parser with `markdown-it` (client-side) and `DOMPurify` for sanitization. The goal: improve CommonMark compliance, robust table/code handling, and reduce maintenance burden.
+This project previously used a small custom Markdown parser (regex-based) inside `legacy_markdown_editor.html`. The custom parser was replaced with `markdown-it` (client-side) and `DOMPurify` for sanitization. The goal: improve CommonMark compliance, robust table/code handling, and reduce maintenance burden.
 Files changed
  `legacy_markdown_editor.html` — now prefers local vendor copies (./vendor/) when present, otherwise uses CDN; initializes a `markdown-it` instance at load time, uses `DOMPurify` for sanitization when security is enabled, and integrates `highlight.js` for code-block syntax highlighting when available.
 
@@ -48,17 +47,10 @@ This will create a `vendor/` directory with the required files; reload the HTML 
 5. Fallback
    - If `markdown-it` is not loaded for any reason (offline, CDN blocked), the existing fallback parser is used. It keeps previously added escape protection and table parsing logic.
 
-How to test manually (quick)
+How to test manually
 ----------------------------
 - Open `legacy_markdown_editor.html` in a browser.
 - Verify standard Markdown features still work: headings, lists, bold, italics, tables, fenced code blocks.
 - Verify escapes: type `\*not bold\*` → preview should show `*not bold*` (asterisks visible, not italicized).
 - Toggle security: click "Security: On" to turn it off and try raw HTML in the editor. With security off, raw HTML will be rendered; with security on, it will be sanitized.
 - Run the "Tests" toolbar button to see a small set of parser smoke tests in a new tab.
-
-Notes / Next steps
-------------------
-- If you prefer local dependencies (no CDN), we can vendor `markdown-it` and `dompurify` into the project and load local copies.
-- Optionally wire syntax highlighting for code blocks (e.g., highlight.js or prism) — would require loading an additional script and hooking into `markdown-it` renderer for code fences.
-
-If you'd like, I can also: vendor the libs locally, add an integration test file, or enable client-side syntax highlighting for fenced code blocks.
