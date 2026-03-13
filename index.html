@@ -350,7 +350,8 @@
 
 # Welcome to Markdown Editor
 
-This is a **bold** text and this is *italic* text.
+This is **bold**, *italic*, ~~strikethrough~~ text.
+And here is a link [Example](https://www.example.com).
 
 ## Features
 - Real-time preview
@@ -619,13 +620,13 @@ Happy writing!"></textarea>
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.3.0
+                    Version 1.3.1
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6401
+                    Build 6413
                 </div>
 
                 <div style="
@@ -665,9 +666,10 @@ Happy writing!"></textarea>
         let undoStack = [];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6401";
+        let BUILD_NUMBER = "6413";
         let _editorInitialized = false;
         let _domContentInitialized = false;
+        let trapTab = true;
 
         // Find/Replace state
         let findState = {
@@ -717,6 +719,9 @@ Happy writing!"></textarea>
 
             editor.addEventListener("keydown", function (e) {
                 handleKeyboardShortcuts(e);
+            });
+            editor.addEventListener("focus", function () {
+                trapTab = true;
             });
 
             // Set up file input listener
@@ -1200,12 +1205,41 @@ Happy writing!"></textarea>
             const zoomResetBtn = document.getElementById("zoom-reset-btn");
             const zoomCloseBtn = document.getElementById("zoom-close-btn");
             const previewContent = document.getElementById("preview");
+            const zoomPositionKey = "markdown-zoom-toolbar-position";
+
+            function applyZoomToolbarPosition(position, persist = true) {
+                const normalized = position === "bottom" ? "bottom" : "top";
+                zoomToolbar.classList.toggle("is-bottom", normalized === "bottom");
+                if (persist) {
+                    localStorage.setItem(zoomPositionKey, normalized);
+                }
+            }
+
+            function toggleZoomToolbarPosition() {
+                const isBottom = zoomToolbar.classList.contains("is-bottom");
+                applyZoomToolbarPosition(isBottom ? "top" : "bottom");
+            }
 
             // Restore persisted zoom level
             const storedZoom = localStorage.getItem("markdown-zoom-level");
             if (storedZoom) {
                 zoomSlider.value = storedZoom;
             }
+
+            const storedZoomPosition = localStorage.getItem(zoomPositionKey);
+            applyZoomToolbarPosition(storedZoomPosition || "top", false);
+
+            window.setZoomToolbarPosition = function (position) {
+                applyZoomToolbarPosition(position);
+            };
+
+            window.toggleZoomToolbarPosition = function () {
+                toggleZoomToolbarPosition();
+            };
+
+            window.getZoomToolbarPosition = function () {
+                return zoomToolbar.classList.contains("is-bottom") ? "bottom" : "top";
+            };
 
             function updateZoom() {
                 const value = parseInt(zoomSlider.value);

@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6401
+// Build 6413
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -195,6 +195,7 @@ function insertMarkdown(before, after) {
   const selectedText = editor.value.substring(start, end);
 
   const newText = before + selectedText + after;
+  saveToUndoStack();
   editor.value =
     editor.value.substring(0, start) + newText + editor.value.substring(end);
 
@@ -306,7 +307,7 @@ function insertList(prefix) {
 }
 
 /**
- * Indent selected text (add 4 spaces)
+ * Indent selected text (add a tab)
  */
 function indentText() {
   const start = editor.selectionStart;
@@ -318,7 +319,7 @@ function indentText() {
   if (lineEnd === -1) lineEnd = text.length;
 
   const selectedLines = text.substring(lineStart, lineEnd);
-  const indented = selectedLines.replace(/^/gm, "    ");
+  const indented = selectedLines.replace(/^/gm, "\t");
 
   saveToUndoStack();
   editor.setRangeText(indented, lineStart, lineEnd, "select");
@@ -633,6 +634,7 @@ function alignTable(alignment) {
   }
 
   // 5. Replace text
+  saveToUndoStack();
   const newTableBlock = lines.join("\n");
   editor.setRangeText(newTableBlock, blockStart, blockEnd, "select");
 
@@ -648,6 +650,7 @@ function insertHorizontalRule() {
   const ls = editor.value.lastIndexOf("\n", start - 1) + 1;
   const prefix = ls === start ? "" : "\n";
   const snippet = `${prefix}---\n`;
+  saveToUndoStack();
   editor.setRangeText(snippet, start, start, "end");
   updatePreview();
   updateStatusBar();
@@ -1022,6 +1025,72 @@ function showSaveAsDialog() {
  */
 function printDocument() {
   updatePreview();
+  const previewContent = document.getElementById("preview");
+  if (!previewContent) {
+    window.print();
+    return;
+  }
+
+  // --- Save zoom styles ---
+  const previousStyles = {
+    transform: previewContent.style.transform,
+    transformOrigin: previewContent.style.transformOrigin,
+    width: previewContent.style.width,
+  };
+
+  // Force print output to 100% regardless of preview zoom.
+  previewContent.style.transform = "none";
+  previewContent.style.transformOrigin = "top left";
+  previewContent.style.width = "100%";
+
+  // --- Force-close any open dialogs / overlays / zoom toolbar ---
+  const overlay = document.getElementById("popup-overlay");
+  const overlayWasOpen = overlay && overlay.classList.contains("open");
+
+  const openDialogs = document.querySelectorAll(".generic-dialog.open");
+  const dialogStates = [];
+  openDialogs.forEach(function (dialog) {
+    dialogStates.push({ el: dialog, display: dialog.style.display });
+    dialog.classList.remove("open");
+    dialog.style.display = "none";
+  });
+  if (overlayWasOpen) {
+    overlay.classList.remove("open");
+    overlay.style.display = "none";
+  }
+
+  const zoomToolbar = document.getElementById("zoom-toolbar");
+  const zoomWasVisible = zoomToolbar && !zoomToolbar.classList.contains("hidden");
+  if (zoomWasVisible) {
+    zoomToolbar.classList.add("hidden");
+  }
+
+  // --- Restore everything after printing ---
+  const restoreAll = () => {
+    previewContent.style.transform = previousStyles.transform;
+    previewContent.style.transformOrigin = previousStyles.transformOrigin;
+    previewContent.style.width = previousStyles.width;
+
+    // Restore dialogs
+    dialogStates.forEach(function (state) {
+      state.el.style.display = state.display;
+      state.el.classList.add("open");
+    });
+    if (overlayWasOpen) {
+      overlay.style.display = "";
+      overlay.classList.add("open");
+    }
+    if (zoomWasVisible) {
+      zoomToolbar.classList.remove("hidden");
+    }
+  };
+
+  const handleAfterPrint = () => {
+    restoreAll();
+    window.removeEventListener("afterprint", handleAfterPrint);
+  };
+
+  window.addEventListener("afterprint", handleAfterPrint);
   window.print();
 }
 
@@ -1143,15 +1212,108 @@ function exportPDF() {
         return;
     }
 
+    const previewContent = document.getElementById("preview");
+
+    // --- Save and reset zoom styles ---
+    const previousStyles = previewContent ? {
+        transform: previewContent.style.transform,
+        transformOrigin: previewContent.style.transformOrigin,
+        width: previewContent.style.width,
+    } : null;
+
+    if (previewContent) {
+        previewContent.style.transform = "none";
+        previewContent.style.transformOrigin = "top left";
+        previewContent.style.width = "100%";
+    }
+
+    // --- Force-close open dialogs / overlays / zoom toolbar ---
+    const overlay = document.getElementById("popup-overlay");
+    const overlayWasOpen = overlay && overlay.classList.contains("open");
+
+    const openDialogs = document.querySelectorAll(".generic-dialog.open");
+    const dialogStates = [];
+    openDialogs.forEach(function (dialog) {
+        dialogStates.push({ el: dialog, display: dialog.style.display });
+        dialog.classList.remove("open");
+        dialog.style.display = "none";
+    });
+    if (overlayWasOpen) {
+        overlay.classList.remove("open");
+        overlay.style.display = "none";
+    }
+
+    const zoomToolbar = document.getElementById("zoom-toolbar");
+    const zoomWasVisible = zoomToolbar && !zoomToolbar.classList.contains("hidden");
+    if (zoomWasVisible) {
+        zoomToolbar.classList.add("hidden");
+    }
+
+    // --- Force code blocks to wrap for PDF capture ---
+    const codeBlocks = previewContent ? previewContent.querySelectorAll("pre, pre code") : [];
+    const codeBlockStates = [];
+    codeBlocks.forEach(function (el) {
+        codeBlockStates.push({
+            el: el,
+            whiteSpace: el.style.whiteSpace,
+            wordWrap: el.style.wordWrap,
+            overflowWrap: el.style.overflowWrap,
+            overflow: el.style.overflow,
+            maxHeight: el.style.maxHeight,
+            width: el.style.width,
+            minWidth: el.style.minWidth,
+        });
+        el.style.whiteSpace = "pre-wrap";
+        el.style.wordWrap = "break-word";
+        el.style.overflowWrap = "break-word";
+        el.style.overflow = "visible";
+        el.style.maxHeight = "none";
+        if (el.tagName === "CODE") {
+            el.style.width = "100%";
+            el.style.minWidth = "0";
+        }
+    });
+
+    // --- Restore everything ---
+    const restoreAll = () => {
+        if (previewContent && previousStyles) {
+            previewContent.style.transform = previousStyles.transform;
+            previewContent.style.transformOrigin = previousStyles.transformOrigin;
+            previewContent.style.width = previousStyles.width;
+        }
+        dialogStates.forEach(function (state) {
+            state.el.style.display = state.display;
+            state.el.classList.add("open");
+        });
+        if (overlayWasOpen) {
+            overlay.style.display = "";
+            overlay.classList.add("open");
+        }
+        if (zoomWasVisible) {
+            zoomToolbar.classList.remove("hidden");
+        }
+        codeBlockStates.forEach(function (state) {
+            state.el.style.whiteSpace = state.whiteSpace;
+            state.el.style.wordWrap = state.wordWrap;
+            state.el.style.overflowWrap = state.overflowWrap;
+            state.el.style.overflow = state.overflow;
+            state.el.style.maxHeight = state.maxHeight;
+            state.el.style.width = state.width;
+            state.el.style.minWidth = state.minWidth;
+        });
+    };
+
     html2pdf()
         .set(opt)
         .from(preview)
         .save()
         .then(() => {
+            restoreAll();
             updateStatus("Exported PDF");
             closeAllMenus();
         })
         .catch((err) => {
+            restoreAll();
             console.error("PDF export failed", err);
             updateStatus("PDF export error");
             closeAllMenus();
@@ -1821,6 +1983,24 @@ function setupHistoryInput(inputId, dropdownId, getHistoryFn, onSelect) {
  * @param {KeyboardEvent} e - Keyboard event
  */
 function handleKeyboardShortcuts(e) {
+  if (e.key === "Escape") {
+    trapTab = false; // release tab trap so next Tab moves focus normally
+    return;
+  }
+
+  if (e.key === "Tab" && trapTab) {
+    e.preventDefault();
+    if (e.shiftKey) {
+      outdentText();
+    } else {
+      indentText();
+    }
+    if (typeof updateEditMenuStates === "function") {
+      updateEditMenuStates();
+    }
+    return;
+  }
+
   if (e.ctrlKey || e.metaKey) {
     switch (e.key) {
       case "n":
@@ -1842,6 +2022,10 @@ function handleKeyboardShortcuts(e) {
         } else {
           undo();
         }
+        break;
+      case "y":
+        e.preventDefault();
+        redo();
         break;
       case "b":
         e.preventDefault();

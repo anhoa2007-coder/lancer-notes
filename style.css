@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MARKDOWN EDITOR STYLES - Build 6401
+   MARKDOWN EDITOR STYLES - Build 6413
    ========================================================================== */
 
 /* ============================================
@@ -160,11 +160,11 @@ html.dark-mode {
     --color-link-hover: #22d3ee;
 
     /* Menu & Toolbar matches dark mode specific */
-    --color-menu-bg: #23272a;
+    --color-menu-bg: #141617;
 
-    --color-menu-dropdown-bg: #222;
-    --color-menu-item-hover-bg: rgba(255, 255, 255, 0.03);
-    --color-menu-dropdown-hover-bg: #2a2c2d;
+    --color-menu-dropdown-bg: #1a1c1d;
+    --color-menu-item-hover-bg: rgba(255, 255, 255, 0.05);
+    --color-menu-dropdown-hover-bg: #222425;
 
     /* Code & Preview */
     --color-code-bg: #1a1d1f;
@@ -450,6 +450,7 @@ input[type="radio"] {
     font-size: 14px;
     border-bottom: 1px solid var(--color-border-secondary);
     flex-wrap: wrap;
+    transition: background-color var(--transition-medium), color var(--transition-medium), border-color var(--transition-medium);
 }
 
 .menu-separator {
@@ -1657,7 +1658,11 @@ input[type="radio"] {
     #find-replace-bar,
     .menu-dropdown,
     #popup-overlay,
-    .check-anim-container {
+    .check-anim-container,
+    .zoom-toolbar,
+    .generic-dialog,
+    .fullscreen-popup,
+    .table-grid-dropdown {
         display: none !important;
     }
 
@@ -1681,12 +1686,16 @@ input[type="radio"] {
         padding: 0 !important;
     }
 
+    /* Reset zoom transform so print is always at 100% */
     .preview-content {
         padding: 0 !important;
         margin: 0 !important;
         border: none !important;
         overflow: visible !important;
         height: auto !important;
+        transform: none !important;
+        transform-origin: top left !important;
+        width: 100% !important;
     }
 
     /* Ensure text color is black for printing */
@@ -1697,10 +1706,22 @@ input[type="radio"] {
         box-shadow: none !important;
     }
 
-    /* Preserve borders for tables/codeblocks */
+    /* Preserve borders for tables/codeblocks and force wrapping */
     .preview-content pre {
         border: 1px solid #ccc !important;
         white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        overflow: visible !important;
+        max-height: none !important;
+    }
+
+    .preview-content pre code {
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        width: 100% !important;
+        min-width: 0 !important;
     }
 
     .preview-content blockquote {
@@ -1794,11 +1815,11 @@ input[type="radio"] {
 /* ============================================
    ZOOM TOOLBAR
    ============================================ */
-.zoom-toolbar {
-    position: fixed;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%) translateY(0);
+  .zoom-toolbar {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
     background: var(--color-find-replace-bg);
     border: 1px solid var(--color-border-secondary);
     border-radius: var(--radius-lg);
@@ -1811,19 +1832,29 @@ input[type="radio"] {
     opacity: 1;
     pointer-events: auto;
     font-size: 13px;
-    transition:
-        opacity var(--transition-fast) ease-out,
-        transform var(--transition-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+      transition:
+          opacity var(--transition-fast) ease-out,
+          transform var(--transition-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
 
-.zoom-toolbar.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(-50%) translateY(-10px) scale(0.95);
-    transition:
-        opacity 0.15s ease-in,
-        transform 0.15s ease-in;
-}
+  .zoom-toolbar.is-bottom {
+      top: auto;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(0);
+  }
+  
+  .zoom-toolbar.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(-10px) scale(0.95);
+      transition:
+          opacity 0.15s ease-in,
+          transform 0.15s ease-in;
+  }
+
+  .zoom-toolbar.is-bottom.hidden {
+      transform: translateX(-50%) translateY(10px) scale(0.95);
+  }
 
 .zoom-toolbar-btn {
     width: 32px;
