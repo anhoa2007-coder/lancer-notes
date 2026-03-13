@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6413
+// Build 6418
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -195,9 +195,9 @@ function insertMarkdown(before, after) {
   const selectedText = editor.value.substring(start, end);
 
   const newText = before + selectedText + after;
-  saveToUndoStack();
   editor.value =
     editor.value.substring(0, start) + newText + editor.value.substring(end);
+  saveToUndoStack();
 
   // Position cursor appropriately
   if (selectedText) {
@@ -247,8 +247,8 @@ function insertHeading(level) {
     newLine = "#".repeat(level) + " " + currentLine;
   }
 
-  saveToUndoStack();
   editor.setRangeText(newLine, lineStart, lineEnd, "end");
+  saveToUndoStack();
 
   editor.focus();
   updatePreview();
@@ -299,8 +299,8 @@ function insertList(prefix) {
     }
   }
 
-  saveToUndoStack();
   editor.setRangeText(newSubstring, lineStart, lineEnd, "select");
+  saveToUndoStack();
   editor.focus();
   updatePreview();
   updateStatusBar();
@@ -321,8 +321,8 @@ function indentText() {
   const selectedLines = text.substring(lineStart, lineEnd);
   const indented = selectedLines.replace(/^/gm, "\t");
 
-  saveToUndoStack();
   editor.setRangeText(indented, lineStart, lineEnd, "select");
+  saveToUndoStack();
   updatePreview();
   updateStatusBar();
 }
@@ -343,8 +343,8 @@ function outdentText() {
   // Remove up to 4 spaces or a tab
   const outdented = selectedLines.replace(/^(?:    |\t)/gm, "");
 
-  saveToUndoStack();
   editor.setRangeText(outdented, lineStart, lineEnd, "select");
+  saveToUndoStack();
   updatePreview();
   updateStatusBar();
 }
@@ -400,6 +400,7 @@ function insertTable(cols = 2, rows = 2) {
   const snippet = prefix + tableTemplate;
 
   editor.setRangeText(snippet, start, editor.selectionEnd, "end");
+  saveToUndoStack();
   editor.focus();
   updatePreview();
   updateStatusBar();
@@ -634,9 +635,9 @@ function alignTable(alignment) {
   }
 
   // 5. Replace text
-  saveToUndoStack();
   const newTableBlock = lines.join("\n");
   editor.setRangeText(newTableBlock, blockStart, blockEnd, "select");
+  saveToUndoStack();
 
   updatePreview();
   updateStatusBar();
@@ -650,8 +651,8 @@ function insertHorizontalRule() {
   const ls = editor.value.lastIndexOf("\n", start - 1) + 1;
   const prefix = ls === start ? "" : "\n";
   const snippet = `${prefix}---\n`;
-  saveToUndoStack();
   editor.setRangeText(snippet, start, start, "end");
+  saveToUndoStack();
   updatePreview();
   updateStatusBar();
 }
@@ -665,8 +666,6 @@ function removeFormatting() {
   let selectedText = editor.value.substring(start, end);
 
   if (!selectedText) return;
-
-  saveToUndoStack();
 
   // Remove formatting markers
   selectedText = selectedText
@@ -688,6 +687,8 @@ function removeFormatting() {
     .replace(/^>\s+/gm, "");
 
   editor.setRangeText(selectedText, start, end, "select");
+  saveToUndoStack();
+  saveToUndoStack();
   editor.focus();
   updatePreview();
   updateStatusBar();
@@ -719,6 +720,8 @@ function newFile() {
 
 function resetEditor() {
   editor.value = "";
+  undoStack = [""];
+  redoStack = [];
   currentFile = null;
   currentFileHandle = null;
   updatePreview();
@@ -826,6 +829,8 @@ async function openFile() {
       const contents = await file.text();
 
       editor.value = contents;
+      undoStack = [contents];
+      redoStack = [];
       currentFile = file.name;
       currentFileHandle = handle;
       updatePreview();
@@ -852,6 +857,8 @@ function handleFileSelect(e) {
     const reader = new FileReader();
     reader.onload = function (event) {
       editor.value = event.target.result;
+      undoStack = [event.target.result];
+      redoStack = [];
       currentFile = file.name;
       currentFileHandle = null; // Clear handle as we can't write back to legacy input
       updatePreview();
@@ -1328,7 +1335,12 @@ function exportPDF() {
  * Save current state to undo stack
  */
 function saveToUndoStack() {
-  undoStack.push(editor.value);
+  const currentValue = editor.value;
+  // Skip if the top of the stack already matches the current value
+  if (undoStack.length > 0 && undoStack[undoStack.length - 1] === currentValue) {
+    return;
+  }
+  undoStack.push(currentValue);
   if (undoStack.length > 50) {
     undoStack.shift();
   }
@@ -1712,7 +1724,6 @@ function replaceOne() {
         editor.selectionEnd,
       );
       if (selected && re.test(selected)) {
-        saveToUndoStack();
         const replaced = selected.replace(re, r);
         editor.setRangeText(
           replaced,
@@ -1720,6 +1731,7 @@ function replaceOne() {
           editor.selectionEnd,
           "end",
         );
+        saveToUndoStack();
         updatePreview();
         updateStatusBar();
         updateMatches(q);
@@ -1731,7 +1743,6 @@ function replaceOne() {
         editor.selectionEnd,
       );
       if (sel && re.test(sel)) {
-        saveToUndoStack();
         const replaced2 = sel.replace(re, r);
         editor.setRangeText(
           replaced2,
@@ -1739,6 +1750,7 @@ function replaceOne() {
           editor.selectionEnd,
           "end",
         );
+        saveToUndoStack();
         updatePreview();
         updateStatusBar();
         updateMatches(q);
@@ -1759,10 +1771,10 @@ function replaceOne() {
     ((cs && selected === q) ||
       (!cs && selected.toLowerCase() === q.toLowerCase()));
   if (matchesSelected) {
-    saveToUndoStack();
-    addToFindHistory(q);
-    addToReplaceHistory(r);
-    editor.setRangeText(r, editor.selectionStart, editor.selectionEnd, "end");
+        addToFindHistory(q);
+        addToReplaceHistory(r);
+        editor.setRangeText(r, editor.selectionStart, editor.selectionEnd, "end");
+        saveToUndoStack();
     updatePreview();
     updateStatusBar();
     updateMatches(q);
@@ -1776,10 +1788,10 @@ function replaceOne() {
       sel &&
       ((cs && sel === q) || (!cs && sel.toLowerCase() === q.toLowerCase()));
     if (selMatches) {
-      saveToUndoStack();
-      addToFindHistory(q);
-      addToReplaceHistory(r);
-      editor.setRangeText(r, editor.selectionStart, editor.selectionEnd, "end");
+          addToFindHistory(q);
+          addToReplaceHistory(r);
+          editor.setRangeText(r, editor.selectionStart, editor.selectionEnd, "end");
+          saveToUndoStack();
       updatePreview();
       updateStatusBar();
       updateMatches(q);
@@ -1812,10 +1824,10 @@ function replaceAll() {
     try {
       const re = new RegExp(q, flags);
       if (!re.test(text)) return;
-      saveToUndoStack();
       addToFindHistory(q);
       addToReplaceHistory(r);
       editor.value = text.replace(re, r);
+      saveToUndoStack();
       updatePreview();
       updateStatusBar();
       updateMatches(q);
@@ -1828,7 +1840,6 @@ function replaceAll() {
   const hay = cs ? text : text.toLowerCase();
   const needle = cs ? q : q.toLowerCase();
   if (hay.indexOf(needle) === -1) return;
-  saveToUndoStack();
   addToFindHistory(q);
   addToReplaceHistory(r);
   if (cs) {
@@ -1849,6 +1860,7 @@ function replaceAll() {
     }
     editor.value = result;
   }
+  saveToUndoStack();
   updatePreview();
   updateStatusBar();
   updateMatches(q);
@@ -1964,13 +1976,23 @@ function setupHistoryInput(inputId, dropdownId, getHistoryFn, onSelect) {
     dropdown.classList.add("open");
   }
 
-  input.addEventListener("input", () => showSuggestions(input.value));
-  input.addEventListener("focus", () => showSuggestions(input.value));
+  let historyActive = false;
+  input.addEventListener("click", () => {
+    historyActive = true;
+    showSuggestions(input.value);
+  });
+  input.addEventListener("input", () => {
+    if (historyActive) showSuggestions(input.value);
+  });
   input.addEventListener("blur", () => {
+    historyActive = false;
     setTimeout(() => dropdown.classList.remove("open"), 150);
   });
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") dropdown.classList.remove("open");
+    if (e.key === "Escape") {
+      historyActive = false;
+      dropdown.classList.remove("open");
+    }
   });
 }
 
@@ -1985,6 +2007,7 @@ function setupHistoryInput(inputId, dropdownId, getHistoryFn, onSelect) {
 function handleKeyboardShortcuts(e) {
   if (e.key === "Escape") {
     trapTab = false; // release tab trap so next Tab moves focus normally
+    updateStatus("Tab: Disabled");
     return;
   }
 
@@ -2002,7 +2025,7 @@ function handleKeyboardShortcuts(e) {
   }
 
   if (e.ctrlKey || e.metaKey) {
-    switch (e.key) {
+    switch (e.key.toLowerCase()) {
       case "n":
         e.preventDefault();
         newFile();

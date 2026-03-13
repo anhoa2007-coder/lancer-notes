@@ -187,7 +187,7 @@
 
         <div class="menu-separator"></div>
 
-        <div class="toolbar-container">
+        <div class="toolbar-container" role="toolbar" aria-label="Editor Toolbar">
             <!-- undo/redo group added -->
             <div class="toolbar-group">
                 <button class="toolbar-btn icon-only" id="btn-undo" title="Undo">
@@ -387,7 +387,7 @@ Happy writing!"></textarea>
     </div>
 
     <!-- Zoom Toolbar -->
-    <div id="zoom-toolbar" class="zoom-toolbar hidden">
+    <div id="zoom-toolbar" class="zoom-toolbar hidden" role="toolbar" aria-label="Zoom Toolbar">
         <button id="zoom-out-btn" class="zoom-toolbar-btn" title="Zoom Out">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="10" cy="10" r="7" fill="currentColor" />
@@ -395,7 +395,7 @@ Happy writing!"></textarea>
                 <path d="M15 15L20 20" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
             </svg>
         </button>
-        <input type="range" id="zoom-slider" min="50" max="200" value="100">
+        <input type="range" id="zoom-slider" min="50" max="200" value="100" aria-label="Zoom Slider">
         <button id="zoom-in-btn" class="zoom-toolbar-btn" title="Zoom In">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="10" cy="10" r="7" fill="currentColor" />
@@ -626,7 +626,7 @@ Happy writing!"></textarea>
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6413
+                    Build 6418
                 </div>
 
                 <div style="
@@ -663,10 +663,10 @@ Happy writing!"></textarea>
         let preview = document.getElementById("preview");
         let currentFile = null;
         let currentFileHandle = null;
-        let undoStack = [];
+        let undoStack = [""];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6413";
+        let BUILD_NUMBER = "6418";
         let _editorInitialized = false;
         let _domContentInitialized = false;
         let trapTab = true;
@@ -722,6 +722,7 @@ Happy writing!"></textarea>
             });
             editor.addEventListener("focus", function () {
                 trapTab = true;
+                updateStatus("Tab: Enabled");
             });
 
             // Set up file input listener
