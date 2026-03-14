@@ -108,7 +108,10 @@
                     Insert Date/Time
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-find" role="menuitem">
-                    Find/Replace
+                    Find
+                </button>
+                <button type="button" class="menu-dropdown-item" id="menu-edit-replace" role="menuitem">
+                    Replace
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-goto" role="menuitem">
                     Go To Line
@@ -453,7 +456,7 @@ Happy writing!"></textarea>
                 ✕
             </button>
         </div>
-        <div class="fr-row">
+        <div class="fr-row" id="replace-row">
             <div class="input-wrapper">
                 <input id="replace-input" class="fr-input" placeholder="Replace" aria-label="Replace"
                     autocomplete="off" />
@@ -1019,7 +1022,13 @@ Happy writing!"></textarea>
             document
                 .getElementById("menu-edit-find")
                 .addEventListener("click", function () {
-                    toggleFindReplace();
+                    toggleFindReplace(false);
+                    closeAllMenus();
+                });
+            document
+                .getElementById("menu-edit-replace")
+                .addEventListener("click", function () {
+                    toggleFindReplace(true);
                     closeAllMenus();
                 });
             document

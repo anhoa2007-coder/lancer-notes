@@ -1390,9 +1390,12 @@ function redo() {
  */
 function toggleFindReplace(openReplace) {
   const bar = document.getElementById("find-replace-bar");
+  const replaceRow = document.getElementById("replace-row");
   const isVisible = bar.classList.contains("open");
+  const isReplaceVisible = replaceRow && replaceRow.style.display !== "none";
 
-  if (!isVisible) {
+  // Open if currently closed, or if switching between Find and Replace modes
+  if (!isVisible || (openReplace && !isReplaceVisible) || (!openReplace && isReplaceVisible)) {
     // Open logic
     bar.style.display = "block";
     // Force reflow
@@ -1403,18 +1406,21 @@ function toggleFindReplace(openReplace) {
     bar.setAttribute("aria-hidden", "false");
     bar.setAttribute("aria-controls", "editor");
 
+    // Show or hide replace row
+    if (replaceRow) {
+      replaceRow.style.display = openReplace ? "" : "none";
+    }
+
     if (openReplace) {
       const replaceInput = document.getElementById("replace-input");
       if (replaceInput) replaceInput.focus();
-      // Ensure expanded mode if opening replace specifically?
-      // The user didn't request auto-expand on replace click from menu, but it's good UX.
-      // For now, respect current state or manual toggle.
     } else {
       document.getElementById("find-input").focus();
     }
     updateMatches(document.getElementById("find-input").value || "");
     closeAllMenus();
   } else {
+    // If it's open and in the same mode, toggle it closed
     closeFindReplace();
   }
 }
@@ -2060,12 +2066,11 @@ function handleKeyboardShortcuts(e) {
         break;
       case "f":
         e.preventDefault();
-        toggleFindReplace();
+        toggleFindReplace(false);
         break;
       case "h":
         e.preventDefault();
-        toggleFindReplace();
-        document.getElementById("replace-input").focus();
+        toggleFindReplace(true);
         break;
     }
   }
