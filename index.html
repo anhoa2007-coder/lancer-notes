@@ -108,10 +108,7 @@
                     Insert Date/Time
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-find" role="menuitem">
-                    Find
-                </button>
-                <button type="button" class="menu-dropdown-item" id="menu-edit-replace" role="menuitem">
-                    Replace
+                    Find/Replace
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-goto" role="menuitem">
                     Go To Line
@@ -623,13 +620,13 @@ Happy writing!"></textarea>
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.3.1
+                    Version 1.3.2
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6418
+                    Build 6419
                 </div>
 
                 <div style="
@@ -669,7 +666,7 @@ Happy writing!"></textarea>
         let undoStack = [""];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6418";
+        let BUILD_NUMBER = "6419";
         let _editorInitialized = false;
         let _domContentInitialized = false;
         let trapTab = true;
@@ -1021,12 +1018,6 @@ Happy writing!"></textarea>
                 });
             document
                 .getElementById("menu-edit-find")
-                .addEventListener("click", function () {
-                    toggleFindReplace(false);
-                    closeAllMenus();
-                });
-            document
-                .getElementById("menu-edit-replace")
                 .addEventListener("click", function () {
                     toggleFindReplace(true);
                     closeAllMenus();
@@ -1537,39 +1528,52 @@ Happy writing!"></textarea>
             // Compact mode toggle & persistence
             const compactToggle =
                 document.getElementById("fr-compact-toggle");
-            function setCompactMode(state) {
-                const findBar = document.getElementById("find-replace-bar");
-                if (!findBar) return;
-                if (state) {
-                    findBar.classList.add("compact");
-                    if (compactToggle) {
-                        compactToggle.setAttribute("aria-pressed", "true");
-                    }
-                } else {
-                    findBar.classList.remove("compact");
-                    if (compactToggle) {
-                        compactToggle.setAttribute("aria-pressed", "false");
-                    }
-                }
-                try {
-                    localStorage.setItem(
-                        "md-fr-compact",
-                        state ? "1" : "0",
-                    );
-                } catch (e) { }
-            }
             if (compactToggle) {
                 compactToggle.addEventListener("click", function () {
-                    setCompactMode(
-                        !document
-                            .getElementById("find-replace-bar")
-                            .classList.contains("compact"),
+                    const bar = document.getElementById("find-replace-bar");
+                    if (!bar) return;
+                    const shouldCompact = !bar.classList.contains("compact");
+                    if (typeof setFindReplaceCompactMode === "function") {
+                        setFindReplaceCompactMode(shouldCompact, true);
+                        return;
+                    }
+                    bar.classList.toggle("compact", shouldCompact);
+                    compactToggle.setAttribute(
+                        "aria-pressed",
+                        shouldCompact ? "true" : "false",
                     );
+                    const path = compactToggle.querySelector("svg path");
+                    if (path) {
+                        path.setAttribute(
+                            "d",
+                            shouldCompact
+                                ? "m6 9 6 6 6-6"
+                                : "m18 15-6-6-6 6",
+                        );
+                    }
+                    try {
+                        localStorage.setItem(
+                            "md-fr-compact",
+                            shouldCompact ? "1" : "0",
+                        );
+                    } catch (e) { }
                 });
                 try {
                     const storedCompact =
                         localStorage.getItem("md-fr-compact");
-                    if (storedCompact === "1") setCompactMode(true);
+                    if (storedCompact === "1") {
+                        if (typeof setFindReplaceCompactMode === "function") {
+                            setFindReplaceCompactMode(true, false);
+                        } else {
+                            const bar =
+                                document.getElementById("find-replace-bar");
+                            if (bar) bar.classList.add("compact");
+                            compactToggle.setAttribute(
+                                "aria-pressed",
+                                "true",
+                            );
+                        }
+                    }
                 } catch (e) { }
             }
 
