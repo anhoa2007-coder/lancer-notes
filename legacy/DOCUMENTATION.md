@@ -1,4 +1,4 @@
-# Markdown Editor Documentation
+# Markdown Editor (1.3.2) Documentation
 
 ## Overview
 A lightweight markdown editor with real-time preview, syntax highlighting, and security features. Built with vanilla JavaScript and modern browser APIs.
