@@ -64,6 +64,7 @@
     --color-dialog-bg: var(--color-bg-secondary);
     --color-input-bg: var(--color-bg-secondary);
     --color-input-text: var(--color-text-primary);
+    --find-replace-bottom-offset: 48px;
 
     /* Match Highlights */
     --color-match-bg: #fffb91;
@@ -1095,6 +1096,12 @@ input[type="radio"] {
         transform 0.1s ease-in;
 }
 
+.find-replace-bar.position-bottom {
+    top: auto;
+    bottom: var(--find-replace-bottom-offset);
+    transform: translateX(-50%) translateY(10px) scale(0.95);
+}
+
 .find-replace-bar.open {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
@@ -1267,12 +1274,23 @@ input[type="radio"] {
     transition: all 0.1s ease-in;
 }
 
+.find-replace-bar.position-bottom .fr-flag-menu {
+    top: auto;
+    bottom: calc(100% + 10px);
+    transform: translateY(10px);
+}
+
 .fr-flag-dropdown.open .fr-flag-menu {
     visibility: visible;
     opacity: 1;
     top: calc(100% + 6px);
     transform: translateY(0);
     transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.find-replace-bar.position-bottom .fr-flag-dropdown.open .fr-flag-menu {
+    top: auto;
+    bottom: calc(100% + 6px);
 }
 
 .fr-flag-menu .fr-checkbox {
@@ -1286,13 +1304,6 @@ input[type="radio"] {
 
 .fr-flag-menu .fr-checkbox:hover {
     background-color: var(--color-menu-dropdown-hover-bg);
-}
-
-.regex-flags-header {
-    padding: 4px 8px;
-    font-weight: bold;
-    color: var(--color-text-muted);
-    font-size: 11px;
 }
 
 /* History Dropdown */
@@ -1317,6 +1328,18 @@ input[type="radio"] {
     overflow-y: auto;
     border-bottom-left-radius: var(--radius-md);
     border-bottom-right-radius: var(--radius-md);
+}
+
+.find-replace-bar.position-bottom .history-dropdown {
+    top: auto;
+    bottom: 100%;
+    transform: translateY(10px);
+    border-top: 1px solid var(--color-border-secondary);
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
 }
 
 .history-dropdown.open {
