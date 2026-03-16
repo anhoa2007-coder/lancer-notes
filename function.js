@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6419
+// Build 6432
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -96,6 +96,30 @@ function parseMarkdown(markdown) {
 }
 // UI UPDATE FUNCTIONS
 // ========================================
+const HELLO_PLACEHOLDER_TEXT = "# Hello, World!";
+const HELLO_PLACEHOLDER_KEY = "markdown-hello-shown";
+
+function initHelloPlaceholder() {
+  if (!editor) return;
+  const hasShown = localStorage.getItem(HELLO_PLACEHOLDER_KEY) === "1";
+  if (hasShown) {
+    editor.placeholder = "";
+    return;
+  }
+  editor.placeholder = HELLO_PLACEHOLDER_TEXT;
+  localStorage.setItem(HELLO_PLACEHOLDER_KEY, "1");
+}
+
+function refreshHelloPlaceholder() {
+  if (!editor) return;
+  const hasShown = localStorage.getItem(HELLO_PLACEHOLDER_KEY) === "1";
+  editor.placeholder = hasShown ? "" : HELLO_PLACEHOLDER_TEXT;
+}
+
+function dismissHelloPlaceholder() {
+  localStorage.setItem(HELLO_PLACEHOLDER_KEY, "1");
+  if (editor) editor.placeholder = "";
+}
 
 /**
  * Update the preview pane with parsed markdown
@@ -724,6 +748,7 @@ function resetEditor() {
   redoStack = [];
   currentFile = null;
   currentFileHandle = null;
+  refreshHelloPlaceholder();
   updatePreview();
   updateStatusBar();
   updateStatus("New file created");
@@ -878,6 +903,7 @@ async function saveFile() {
     try {
       await writeFile(currentFileHandle, editor.value);
       updateStatus(`Saved: ${currentFile}`);
+      dismissHelloPlaceholder();
     } catch (err) {
       console.error("Save Error:", err);
       alert("Failed to save file. You may need to use Save As.");
@@ -915,6 +941,7 @@ async function saveAsFile() {
       const file = await handle.getFile();
       currentFile = file.name;
       updateStatus(`Saved: ${currentFile}`);
+      dismissHelloPlaceholder();
     } catch (err) {
       if (err.name !== "AbortError") {
         console.error("Save As Error:", err);
@@ -969,6 +996,7 @@ function performSave(filenameToUse) {
   // Update current file if we just saved it
   currentFile = filename;
   updateStatus(`Saved: ${filename}`);
+  dismissHelloPlaceholder();
 }
 
 /**
@@ -1448,6 +1476,45 @@ function closeFindReplace() {
 
   // Safety timeout in case transitionend doesn't fire (e.g. hidden tab)
   setTimeout(cleanup, 250);
+}
+
+/**
+ * Set find/replace bar position
+ * @param {boolean} useBottom - Whether to pin the bar to the bottom
+ * @param {boolean} persist - Whether to persist preference
+ */
+function setFindReplacePosition(useBottom, persist) {
+  const bar = document.getElementById("find-replace-bar");
+  if (!bar) return;
+  bar.classList.toggle("position-bottom", useBottom);
+  const topRadio = document.getElementById("fr-position-top");
+  const bottomRadio = document.getElementById("fr-position-bottom");
+  if (topRadio) topRadio.checked = !useBottom;
+  if (bottomRadio) bottomRadio.checked = !!useBottom;
+  if (typeof updateMenuCheck === "function") {
+    updateMenuCheck("menu-bar-position-top", !useBottom, !!persist);
+    updateMenuCheck("menu-bar-position-bottom", !!useBottom, !!persist);
+  }
+}
+
+/**
+ * Toggle find/replace bar position between top and bottom
+ */
+function toggleFindReplacePosition() {
+  const bar = document.getElementById("find-replace-bar");
+  if (!bar) return;
+  const isBottom = bar.classList.contains("position-bottom");
+  setFindReplacePosition(!isBottom, true);
+}
+
+/**
+ * Initialize persisted find/replace bar position
+ */
+function initFindReplacePosition() {
+  try {
+    const unified = localStorage.getItem("markdown-bar-position") || "top";
+    setFindReplacePosition(unified === "bottom", false);
+  } catch (e) {}
 }
 
 /**
@@ -2031,6 +2098,12 @@ function handleKeyboardShortcuts(e) {
   }
 
   if (e.ctrlKey || e.metaKey) {
+    const key = e.key.toLowerCase();
+    if (e.shiftKey && key === "f") {
+      e.preventDefault();
+      toggleFindReplacePosition();
+      return;
+    }
     switch (e.key.toLowerCase()) {
       case "n":
         e.preventDefault();

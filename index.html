@@ -152,6 +152,21 @@
                         </button>
                     </div>
                 </div>
+                <div class="menu-dropdown-item-group" role="none">
+                    <button type="button" class="menu-dropdown-item" id="menu-view-barpos-group" aria-haspopup="true"
+                        aria-expanded="false" style="justify-content: space-between">
+                        <span>Position</span>
+                        <span class="material-symbols-rounded icon-18">chevron_right</span>
+                    </button>
+                    <div class="menu-submenu" role="menu" aria-label="Position">
+                        <button type="button" class="menu-dropdown-item menu-checkable" id="menu-bar-position-top" role="menuitem">
+                            Top
+                        </button>
+                        <button type="button" class="menu-dropdown-item menu-checkable" id="menu-bar-position-bottom" role="menuitem">
+                            Bottom
+                        </button>
+                    </div>
+                </div>
                 <button type="button" class="menu-dropdown-item" id="menu-view-zoom" role="menuitem">
                     Zoom
                 </button>
@@ -346,28 +361,7 @@
     <div class="main-container" id="main-container">
         <div class="editor-pane" id="editor-pane">
             <div class="pane-header">Editor</div>
-            <textarea class="editor-textarea" id="editor" placeholder="Start typing your markdown here...
-
-# Welcome to Markdown Editor
-
-This is **bold**, *italic*, ~~strikethrough~~ text.
-And here is a link [Example](https://www.example.com).
-
-## Features
-- Real-time preview
-- Syntax highlighting
-- WordPad-like interface
-- File operations
-
-### Code Example
-```js
-function hello() {
-    console.log('Hello, World!');
-}
-```
-> This is a blockquote.
-
-Happy writing!"></textarea>
+            <textarea class="editor-textarea" id="editor" placeholder=""></textarea>
         </div>
         <div class="splitter" id="splitter"></div>
 
@@ -620,13 +614,13 @@ Happy writing!"></textarea>
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.3.2
+                    Version 1.3.3
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6419
+                    Build 6432
                 </div>
 
                 <div style="
@@ -666,7 +660,7 @@ Happy writing!"></textarea>
         let undoStack = [""];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6419";
+        let BUILD_NUMBER = "6432";
         let _editorInitialized = false;
         let _domContentInitialized = false;
         let trapTab = true;
@@ -707,6 +701,7 @@ Happy writing!"></textarea>
 
             // Initialize Theme
             initTheme();
+            initHelloPlaceholder();
 
             // Set up event listeners
             editor.addEventListener("input", function () {
@@ -1179,6 +1174,16 @@ Happy writing!"></textarea>
                     closeAllMenus();
                 });
             document
+                .getElementById("menu-bar-position-top")
+                .addEventListener("click", function () {
+                    handleUnifiedBarPositionClick("top");
+                });
+            document
+                .getElementById("menu-bar-position-bottom")
+                .addEventListener("click", function () {
+                    handleUnifiedBarPositionClick("bottom");
+                });
+            document
                 .getElementById("menu-view-statusbar")
                 .addEventListener("click", function () {
                     toggleStatusBar();
@@ -1206,19 +1211,30 @@ Happy writing!"></textarea>
             const zoomResetBtn = document.getElementById("zoom-reset-btn");
             const zoomCloseBtn = document.getElementById("zoom-close-btn");
             const previewContent = document.getElementById("preview");
-            const zoomPositionKey = "markdown-zoom-toolbar-position";
+            const editorEl = document.getElementById("editor");
+            const unifiedBarPositionKey = "markdown-bar-position";
 
             function applyZoomToolbarPosition(position, persist = true) {
                 const normalized = position === "bottom" ? "bottom" : "top";
                 zoomToolbar.classList.toggle("is-bottom", normalized === "bottom");
-                if (persist) {
-                    localStorage.setItem(zoomPositionKey, normalized);
+                if (typeof updateMenuCheck === "function") {
+                    updateMenuCheck("menu-bar-position-top", normalized === "top", persist);
+                    updateMenuCheck("menu-bar-position-bottom", normalized === "bottom", persist);
                 }
+            }
+
+            function handleUnifiedBarPositionClick(position) {
+                if (typeof setUnifiedBarPosition === "function") {
+                    setUnifiedBarPosition(position, true);
+                } else if (typeof setZoomToolbarPosition === "function") {
+                    setZoomToolbarPosition(position);
+                }
+                closeAllMenus();
             }
 
             function toggleZoomToolbarPosition() {
                 const isBottom = zoomToolbar.classList.contains("is-bottom");
-                applyZoomToolbarPosition(isBottom ? "top" : "bottom");
+                setUnifiedBarPosition(isBottom ? "top" : "bottom", true);
             }
 
             // Restore persisted zoom level
@@ -1227,11 +1243,22 @@ Happy writing!"></textarea>
                 zoomSlider.value = storedZoom;
             }
 
-            const storedZoomPosition = localStorage.getItem(zoomPositionKey);
-            applyZoomToolbarPosition(storedZoomPosition || "top", false);
+            function setUnifiedBarPosition(position, persist = true) {
+                const normalized = position === "bottom" ? "bottom" : "top";
+                applyZoomToolbarPosition(normalized, persist);
+                if (typeof setFindReplacePosition === "function") {
+                    setFindReplacePosition(normalized === "bottom", persist);
+                }
+                if (persist) {
+                    localStorage.setItem(unifiedBarPositionKey, normalized);
+                }
+            }
+
+            const storedUnifiedPosition = localStorage.getItem(unifiedBarPositionKey);
+            setUnifiedBarPosition(storedUnifiedPosition || "top", false);
 
             window.setZoomToolbarPosition = function (position) {
-                applyZoomToolbarPosition(position);
+                setUnifiedBarPosition(position, true);
             };
 
             window.toggleZoomToolbarPosition = function () {
@@ -1240,6 +1267,10 @@ Happy writing!"></textarea>
 
             window.getZoomToolbarPosition = function () {
                 return zoomToolbar.classList.contains("is-bottom") ? "bottom" : "top";
+            };
+
+            window.setUnifiedBarPosition = function (position, persist = true) {
+                setUnifiedBarPosition(position, persist);
             };
 
             function updateZoom() {
@@ -1262,6 +1293,16 @@ Happy writing!"></textarea>
 
                 // Adjust width so scaled content fills the pane properly
                 previewContent.style.width = (100 / scale) + "%";
+
+                // Apply zoom to editor font size
+                if (editorEl) {
+                    if (!editorEl.dataset.baseFontSize) {
+                        const computed = window.getComputedStyle(editorEl);
+                        editorEl.dataset.baseFontSize = parseFloat(computed.fontSize) || 14;
+                    }
+                    const base = parseFloat(editorEl.dataset.baseFontSize) || 14;
+                    editorEl.style.fontSize = (base * scale).toFixed(2) + "px";
+                }
 
                 // Persist
                 localStorage.setItem("markdown-zoom-level", value);
@@ -1413,6 +1454,10 @@ Happy writing!"></textarea>
             // Guard against double initialization
             if (_domContentInitialized) return;
             _domContentInitialized = true;
+
+            if (typeof initFindReplacePosition === "function") {
+                initFindReplacePosition();
+            }
 
             const findNextBtn = document.getElementById("btn-find-next");
             const findPrevBtn = document.getElementById("btn-find-prev");
