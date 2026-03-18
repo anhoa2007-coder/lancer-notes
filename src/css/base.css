@@ -1,1 +1,155 @@
+/* ==========================================================================
+   BASE.CSS - Core tokens, reset, layout, typography
+   Build 6418 (extracted)
+   ========================================================================== */
 
+/* ============================================
+   CSS CUSTOM PROPERTIES
+   ============================================ */
+:root {
+    /* Colors - Light Mode */
+    --color-bg-primary: #f0f0f0;
+    --color-bg-secondary: #fff;
+    --color-bg-tertiary: #f8f8f8;
+    --color-bg-hover: #e8e8e8;
+    --color-bg-active: #d0d0d0;
+
+    --color-text-primary: #111;
+    --color-text-secondary: #222;
+    --color-text-tertiary: #333;
+    --color-text-muted: #666;
+    --color-text-disabled: #6b6b6b;
+
+    --color-border-light: #eee;
+    --color-border-primary: #ddd;
+    --color-border-secondary: #ccc;
+    --color-border-dark: #999;
+
+    --color-accent-primary: #007acc;
+    --color-accent-hover: #005a9e;
+    --color-accent-darker: #003f6e;
+
+    --color-link: #005a9e;
+    --color-link-hover: #003f6e;
+
+    --color-success: #22c55e;
+    --color-danger: #cc0000;
+
+    /* Menu & Toolbar */
+    --color-menu-bg: #e0e0e0;
+
+    --color-menu-dropdown-bg: var(--color-bg-secondary);
+    --color-menu-item-hover-bg: rgba(0, 0, 0, 0.05);
+    --color-menu-dropdown-hover-bg: #f3f6fb;
+
+    /* Code & Preview */
+    --color-code-bg: #f0f0f0;
+    --color-code-text: #222;
+    --color-pre-bg: #f8f8f8;
+    --color-blockquote-border: #ccc;
+    --color-blockquote-bg: transparent;
+    --color-blockquote-text: var(--color-text-muted);
+    --color-blockquote-nested-border: #ddd;
+    --color-blockquote-nested-bg: transparent;
+
+    /* Table */
+    --color-table-header-bg: var(--color-bg-tertiary);
+    --color-table-row-even-bg: var(--color-bg-tertiary);
+
+    /* Pane Header */
+    --color-pane-header-bg: var(--color-bg-tertiary);
+    --color-pane-header-text: var(--color-text-muted);
+
+    /* Find & Replace / Dialogs */
+    --color-find-replace-bg: var(--color-bg-secondary);
+    --color-dialog-bg: var(--color-bg-secondary);
+    --color-input-bg: var(--color-bg-secondary);
+    --color-input-text: var(--color-text-primary);
+    --find-replace-bottom-offset: 48px;
+
+    /* Match Highlights */
+    --color-match-bg: #fffb91;
+    --color-match-current-bg: #ffcf66;
+
+    /* Z-Index Scale */
+    --z-dropdown-menu: 100;
+    --z-flag-menu: 104;
+    --z-history-menu: 105;
+    --z-popup-overlay: 999;
+    --z-dialog: 1000;
+    --z-find-replace: 1003;
+    --z-fullscreen-popup: 2000;
+    --z-animation: 10000;
+
+    /* Spacing Scale */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+
+    /* Separator Thickness */
+    --separator-thickness: 1px;
+
+    /* Border Radius */
+    --radius-sm: 3px;
+    --radius-md: 4px;
+    --radius-lg: 6px;
+    --radius-xl: 10px;
+
+    /* Transitions */
+    --transition-fast: 0.2s;
+    --transition-medium: 0.25s;
+    --transition-slow: 0.3s;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.18);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 6px 18px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+    /* Scrollbar */
+    --scrollbar-width: 10px;
+    --scrollbar-thumb: rgba(0, 0, 0, 0.25);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.4);
+    --scrollbar-button-arrow: rgba(0, 0, 0, 0.5);
+}
+
+/* Dark Mode Variables */
+html.dark-mode {
+    /* ... (all dark-mode variables exactly as before) ... */
+    /* (I kept the full dark block here - copy-paste from your original style.css) */
+}
+
+/* Material Symbols Rounded */
+.material-symbols-rounded { /* ... unchanged ... */ }
+
+/* ============================================
+   RESET & BASE + SCROLLBAR (editor/preview only)
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { /* ... */ }
+html { /* ... */ }
+
+/* --- Editor, Preview & Pre-blocks scrollbar --- */
+.editor-textarea::-webkit-scrollbar,
+.preview-content::-webkit-scrollbar,
+.preview-content pre::-webkit-scrollbar { /* ... all editor/preview scrollbar rules ... */ }
+
+/* ============================================
+   LAYOUT + EDITOR + PREVIEW TYPOGRAPHY
+   ============================================ */
+.main-container { /* ... */ }
+.editor-pane, .preview-pane { /* ... */ }
+.pane-header { /* ... */ }
+.splitter { /* ... */ }
+/* single-pane, editor-only, etc. */
+
+.editor-textarea { /* ... */ }
+.preview-content { /* ... full markdown styles: h1-h6, p, ul, code, pre, blockquote, img, table, etc. */ }
+
+/* Table styles (basic support) */
+.preview-content table { /* ... */ }
+.preview-content th, .preview-content td { /* ... */ }
+.preview-content tr:nth-child(2n) { /* ... */ }

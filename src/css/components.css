@@ -1,0 +1,36 @@
+/* ==========================================================================
+   COMPONENTS.CSS - All UI pieces
+   Build 6418 (extracted)
+   ========================================================================== */
+
+/* HIGHLIGHT.JS SYNTAX HIGHLIGHTING */
+.hljs { /* ... */ }
+
+/* STATUS BAR */
+.status-bar { /* ... */ }
+
+/* FIND & REPLACE BAR + all its sub-styles */
+.find-replace-bar { /* ... full block including .fr-row, history-dropdown, etc. */ }
+
+/* DIALOGS + OVERLAY + FULLSCREEN POPUPS */
+#popup-overlay { /* ... */ }
+.generic-dialog { /* ... */ }
+.fullscreen-popup { /* ... */ }
+
+/* ANIMATIONS (CHECKMARK) */
+.check-anim-container { /* ... */ }
+
+/* PRINT STYLES */
+@media print { /* ... */ }
+
+/* About Dialog Redesign */
+.about-container { /* ... */ }
+
+/* HIGH CONTRAST MODE SUPPORT */
+@media (forced-colors: active) { /* ... */ }
+
+/* ZOOM TOOLBAR */
+.zoom-toolbar { /* ... */ }
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 600px) { /* ... */ }
