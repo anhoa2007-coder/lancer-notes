@@ -2,20 +2,14 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Since there's many users who want to stay supported against latest security issues, here's the real list of the supported versions:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.3.3   | :white_check_mark: |
-| 1.3.2   | :x:                |
-| 1.3.1   | :white_check_mark: |
-| 1.3.0  | :x:                |
+| 1.3.0 - 1.3.3   | Yes (Full support) |
+| 1.2.1 - 1.2.3   | Ending in April 16th |
+| 1.0.0 - 1.2.0   | Not supported* |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+If you want to report any security vulnerabilities, check out [Issues](https://github.com/anhoa2007-coder/lancer-notes/issues) tab in the repo, then apply **security** label.
