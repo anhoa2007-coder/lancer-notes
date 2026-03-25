@@ -1,11 +1,11 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6432
+// Build 6441
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
-// Note: Global variables (editor, preview, currentFile, undoStack, redoStack, currentViewMode, BUILD_NUMBER, findState)
+// Note: Global variables (editor, preview, currentFile, undoStack, redoStack, currentViewMode, BUILD_NUMBER, toggleFindReplaceState)
 // are defined in the HTML file and referenced here.
 // ========================================
 
@@ -129,12 +129,9 @@ function updatePreview() {
   let htmlContent = "";
 
   // Check file extension for special handling
-  if (
-    currentFile &&
-    (currentFile.endsWith(".ini") || currentFile.endsWith(".log"))
-  ) {
+  if (currentFile && currentFile.endsWith(".log")) {
     // Render as code block
-    const lang = currentFile.endsWith(".ini") ? "ini" : "text"; // 'text' or 'log' if you have a log definition
+    const lang = "text"; // 'text' or 'log' if you have a log definition
     // We can use markdown-it to render a code block
     const codeBlock = "```" + lang + "\n" + markdownText + "\n```";
     htmlContent = parseMarkdown(codeBlock);
@@ -712,7 +709,6 @@ function removeFormatting() {
 
   editor.setRangeText(selectedText, start, end, "select");
   saveToUndoStack();
-  saveToUndoStack();
   editor.focus();
   updatePreview();
   updateStatusBar();
@@ -722,9 +718,6 @@ function removeFormatting() {
 // FILE OPERATIONS
 // ========================================
 
-/**
- * Create a new file (with confirmation if unsaved changes)
- */
 /**
  * Create a new file (with confirmation if unsaved changes)
  */
@@ -844,7 +837,7 @@ async function openFile() {
             description: "Markdown & Text Files",
             accept: {
               "text/markdown": [".md", ".markdown"],
-              "text/plain": [".txt", ".text", ".ini", ".log"],
+              "text/plain": [".txt", ".text", ".log"],
             },
           },
         ],
@@ -932,7 +925,7 @@ async function saveAsFile() {
           },
           {
             description: "Text File",
-            accept: { "text/plain": [".txt", ".ini", ".log"] },
+            accept: { "text/plain": [".txt", ".log"] },
           },
         ],
       });
@@ -973,13 +966,13 @@ function performSave(filenameToUse) {
   let filename = filenameToUse;
 
   // Ensure extension
-  if (!/\.(md|markdown|txt|text|ini|log)$/i.test(filename)) {
+  if (!/\.(md|markdown|txt|text|log)$/i.test(filename)) {
     filename += ".md";
   }
 
   // Determine MIME type
   let type = "text/markdown";
-  if (/\.(txt|text|ini|log)$/i.test(filename)) {
+  if (/\.(txt|text|log)$/i.test(filename)) {
     type = "text/plain";
   }
 
@@ -1224,137 +1217,6 @@ ${stylesToInline}
     updateStatus("Exported HTML");
 }
 
-/**
- * Export the current preview pane as a PDF using html2pdf.js.
- * The library must be included in the HTML via a <script> tag.
- */
-function exportPDF() {
-    // ensure preview is current before rendering
-    updatePreview();
-
-    // options taken from legacy implementation; users can tweak these
-    const opt = {
-        margin: 0.5,
-        filename: "document.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
-
-    if (typeof html2pdf === "undefined") {
-        console.error("html2pdf library not loaded");
-        updateStatus("PDF export unavailable");
-        return;
-    }
-
-    const previewContent = document.getElementById("preview");
-
-    // --- Save and reset zoom styles ---
-    const previousStyles = previewContent ? {
-        transform: previewContent.style.transform,
-        transformOrigin: previewContent.style.transformOrigin,
-        width: previewContent.style.width,
-    } : null;
-
-    if (previewContent) {
-        previewContent.style.transform = "none";
-        previewContent.style.transformOrigin = "top left";
-        previewContent.style.width = "100%";
-    }
-
-    // --- Force-close open dialogs / overlays / zoom toolbar ---
-    const overlay = document.getElementById("popup-overlay");
-    const overlayWasOpen = overlay && overlay.classList.contains("open");
-
-    const openDialogs = document.querySelectorAll(".generic-dialog.open");
-    const dialogStates = [];
-    openDialogs.forEach(function (dialog) {
-        dialogStates.push({ el: dialog, display: dialog.style.display });
-        dialog.classList.remove("open");
-        dialog.style.display = "none";
-    });
-    if (overlayWasOpen) {
-        overlay.classList.remove("open");
-        overlay.style.display = "none";
-    }
-
-    const zoomToolbar = document.getElementById("zoom-toolbar");
-    const zoomWasVisible = zoomToolbar && !zoomToolbar.classList.contains("hidden");
-    if (zoomWasVisible) {
-        zoomToolbar.classList.add("hidden");
-    }
-
-    // --- Force code blocks to wrap for PDF capture ---
-    const codeBlocks = previewContent ? previewContent.querySelectorAll("pre, pre code") : [];
-    const codeBlockStates = [];
-    codeBlocks.forEach(function (el) {
-        codeBlockStates.push({
-            el: el,
-            whiteSpace: el.style.whiteSpace,
-            wordWrap: el.style.wordWrap,
-            overflowWrap: el.style.overflowWrap,
-            overflow: el.style.overflow,
-            maxHeight: el.style.maxHeight,
-            width: el.style.width,
-            minWidth: el.style.minWidth,
-        });
-        el.style.whiteSpace = "pre-wrap";
-        el.style.wordWrap = "break-word";
-        el.style.overflowWrap = "break-word";
-        el.style.overflow = "visible";
-        el.style.maxHeight = "none";
-        if (el.tagName === "CODE") {
-            el.style.width = "100%";
-            el.style.minWidth = "0";
-        }
-    });
-
-    // --- Restore everything ---
-    const restoreAll = () => {
-        if (previewContent && previousStyles) {
-            previewContent.style.transform = previousStyles.transform;
-            previewContent.style.transformOrigin = previousStyles.transformOrigin;
-            previewContent.style.width = previousStyles.width;
-        }
-        dialogStates.forEach(function (state) {
-            state.el.style.display = state.display;
-            state.el.classList.add("open");
-        });
-        if (overlayWasOpen) {
-            overlay.style.display = "";
-            overlay.classList.add("open");
-        }
-        if (zoomWasVisible) {
-            zoomToolbar.classList.remove("hidden");
-        }
-        codeBlockStates.forEach(function (state) {
-            state.el.style.whiteSpace = state.whiteSpace;
-            state.el.style.wordWrap = state.wordWrap;
-            state.el.style.overflowWrap = state.overflowWrap;
-            state.el.style.overflow = state.overflow;
-            state.el.style.maxHeight = state.maxHeight;
-            state.el.style.width = state.width;
-            state.el.style.minWidth = state.minWidth;
-        });
-    };
-
-    html2pdf()
-        .set(opt)
-        .from(preview)
-        .save()
-        .then(() => {
-            restoreAll();
-            updateStatus("Exported PDF");
-            closeAllMenus();
-        })
-        .catch((err) => {
-            restoreAll();
-            console.error("PDF export failed", err);
-            updateStatus("PDF export error");
-            closeAllMenus();
-        });
-}
-
 // ========================================
 // UNDO/REDO
 // ========================================
@@ -1412,43 +1274,130 @@ function redo() {
 // FIND & REPLACE
 // ========================================
 
-/**
- * Toggle find/replace bar visibility
- * @param {boolean} openReplace - Whether to open with replace field focused
- */
-function toggleFindReplace(openReplace) {
-  const bar = document.getElementById("find-replace-bar");
-  const replaceRow = document.getElementById("replace-row");
-  const isVisible = bar.classList.contains("open");
-  const isReplaceVisible = replaceRow && replaceRow.style.display !== "none";
+function syncFindReplaceToggleButton(isCompact) {
+  const toggleBtn = document.getElementById("fr-compact-toggle");
+  if (!toggleBtn) return;
 
-  // Open if currently closed, or if switching between Find and Replace modes
-  if (!isVisible || (openReplace && !isReplaceVisible) || (!openReplace && isReplaceVisible)) {
-    // Open logic
+  toggleBtn.setAttribute("aria-pressed", isCompact ? "true" : "false");
+  toggleBtn.setAttribute(
+    "title",
+    isCompact ? "Show replace" : "Hide replace",
+  );
+  toggleBtn.setAttribute(
+    "aria-label",
+    isCompact ? "Show replace" : "Hide replace",
+  );
+
+  if (toggleBtn._chevronIcon) {
+    toggleBtn._chevronIcon.setDirection(isCompact ? "down" : "up");
+  }
+}
+
+/**
+ * Toggle find/replace compact mode
+ */
+function setFindReplaceCompactMode(isCompact, persist = true) {
+  const bar = document.getElementById("find-replace-bar");
+  if (!bar) return;
+
+  bar.classList.toggle("compact", isCompact);
+  syncFindReplaceToggleButton(isCompact);
+
+  if (persist) {
+    localStorage.setItem("markdown-findreplace-compact", isCompact ? "1" : "0");
+  }
+}
+
+function toggleFindReplaceCompactMode() {
+  const bar = document.getElementById("find-replace-bar");
+  const toggleBtn = document.getElementById("fr-compact-toggle");
+  if (!bar) return;
+
+  if (toggleBtn && toggleBtn._chevronIcon) {
+    toggleBtn._chevronIcon.animateBounce();
+  }
+
+  const shouldCompact = !bar.classList.contains("compact");
+  setFindReplaceCompactMode(shouldCompact, true);
+  toggleFindReplaceState.isReplaceMode = !shouldCompact;
+}
+
+/**
+ * Update find/replace position (top/bottom)
+ */
+function setFindReplacePosition(useBottom, persist = true) {
+  const bar = document.getElementById("find-replace-bar");
+  if (!bar) return;
+  bar.classList.toggle("position-bottom", useBottom);
+  if (persist) {
+    localStorage.setItem("markdown-findreplace-position", useBottom ? "bottom" : "top");
+  }
+}
+
+/**
+ * Toggle find/replace position top/bottom
+ */
+function toggleFindReplacePosition() {
+  const bar = document.getElementById("find-replace-bar");
+  if (!bar) return;
+  const isBottom = bar.classList.contains("position-bottom");
+  setFindReplacePosition(!isBottom, true);
+}
+
+/**
+ * Initialize find/replace position and compact mode from storage
+ */
+function initFindReplacePosition() {
+  const storedPos = localStorage.getItem("markdown-findreplace-position");
+  if (storedPos === "bottom") {
+    setFindReplacePosition(true, false);
+  }
+
+  const storedCompact = localStorage.getItem("markdown-findreplace-compact");
+  const isCompact = storedCompact === "1";
+  setFindReplaceCompactMode(isCompact, false);
+  toggleFindReplaceState.isReplaceMode = !isCompact;
+}
+
+/**
+ * Set find or replace mode (shows/hides replace row)
+ * @param {boolean} showReplace
+ */
+function setFindReplaceMode(showReplace) {
+  toggleFindReplaceState.isReplaceMode = !!showReplace;
+  setFindReplaceCompactMode(!showReplace, false);
+}
+
+function focusFindReplaceInput(showReplace) {
+  const targetId = showReplace ? "replace-input" : "find-input";
+  const input = document.getElementById(targetId);
+  if (input) input.focus();
+}
+
+
+
+function toggleFindReplace(showReplace = toggleFindReplaceState.isReplaceMode) {
+  const bar = document.getElementById("find-replace-bar");
+  if (!bar) return;
+
+  const shouldShowReplace = !!showReplace;
+  const isVisible = bar.classList.contains("open");
+  const isSwitchingModes =
+    isVisible &&
+    toggleFindReplaceState.isReplaceMode !== shouldShowReplace;
+
+  if (!isVisible || isSwitchingModes) {
     bar.style.display = "block";
-    // Force reflow
     void bar.offsetWidth;
     bar.classList.add("open");
-
-    // Ensure centered position and accessibility attributes
     bar.setAttribute("aria-hidden", "false");
     bar.setAttribute("aria-controls", "editor");
 
-    // Show or hide replace row
-    if (replaceRow) {
-      replaceRow.style.display = openReplace ? "" : "none";
-    }
-
-    if (openReplace) {
-      const replaceInput = document.getElementById("replace-input");
-      if (replaceInput) replaceInput.focus();
-    } else {
-      document.getElementById("find-input").focus();
-    }
+    setFindReplaceMode(shouldShowReplace);
+    focusFindReplaceInput(shouldShowReplace);
     updateMatches(document.getElementById("find-input").value || "");
     closeAllMenus();
   } else {
-    // If it's open and in the same mode, toggle it closed
     closeFindReplace();
   }
 }
@@ -1478,52 +1427,15 @@ function closeFindReplace() {
   setTimeout(cleanup, 250);
 }
 
-/**
- * Set find/replace bar position
- * @param {boolean} useBottom - Whether to pin the bar to the bottom
- * @param {boolean} persist - Whether to persist preference
- */
-function setFindReplacePosition(useBottom, persist) {
-  const bar = document.getElementById("find-replace-bar");
-  if (!bar) return;
-  bar.classList.toggle("position-bottom", useBottom);
-  const topRadio = document.getElementById("fr-position-top");
-  const bottomRadio = document.getElementById("fr-position-bottom");
-  if (topRadio) topRadio.checked = !useBottom;
-  if (bottomRadio) bottomRadio.checked = !!useBottom;
-  if (typeof updateMenuCheck === "function") {
-    updateMenuCheck("menu-bar-position-top", !useBottom, !!persist);
-    updateMenuCheck("menu-bar-position-bottom", !!useBottom, !!persist);
-  }
-}
 
-/**
- * Toggle find/replace bar position between top and bottom
- */
-function toggleFindReplacePosition() {
-  const bar = document.getElementById("find-replace-bar");
-  if (!bar) return;
-  const isBottom = bar.classList.contains("position-bottom");
-  setFindReplacePosition(!isBottom, true);
-}
-
-/**
- * Initialize persisted find/replace bar position
- */
-function initFindReplacePosition() {
-  try {
-    const unified = localStorage.getItem("markdown-bar-position") || "top";
-    setFindReplacePosition(unified === "bottom", false);
-  } catch (e) {}
-}
 
 /**
  * Update matches for current query
  * @param {string} query - Search query
  */
 function updateMatches(query) {
-  findState.matches = [];
-  findState.currentIndex = -1;
+  toggleFindReplaceState.matches = [];
+  toggleFindReplaceState.currentIndex = -1;
   const cs =
     document.getElementById("case-sensitive") &&
     document.getElementById("case-sensitive").checked;
@@ -1550,7 +1462,10 @@ function updateMatches(query) {
     }
     let m;
     while ((m = re.exec(text)) !== null) {
-      findState.matches.push({ start: m.index, end: m.index + m[0].length });
+      toggleFindReplaceState.matches.push({
+        start: m.index,
+        end: m.index + m[0].length,
+      });
       if (m.index === re.lastIndex) re.lastIndex++; // avoid infinite loop on zero-length matches
     }
     updateMatchCount();
@@ -1569,7 +1484,10 @@ function updateMatches(query) {
   while (true) {
     const idx = hay.indexOf(needle, startIndex);
     if (idx === -1) break;
-    findState.matches.push({ start: idx, end: idx + query.length });
+    toggleFindReplaceState.matches.push({
+      start: idx,
+      end: idx + query.length,
+    });
     startIndex = idx + query.length;
   }
   updateMatchCount();
@@ -1694,8 +1612,8 @@ function highlightTextNode(node, regex) {
  * @param {number} index - Index of match to highlight
  */
 function highlightMatch(index) {
-  if (index < 0 || index >= findState.matches.length) return;
-  const m = findState.matches[index];
+  if (index < 0 || index >= toggleFindReplaceState.matches.length) return;
+  const m = toggleFindReplaceState.matches[index];
   editor.selectionStart = m.start;
   editor.selectionEnd = m.end;
   editor.focus();
@@ -1707,9 +1625,11 @@ function highlightMatch(index) {
  */
 function updateMatchCount() {
   const el = document.getElementById("match-count");
-  const total = findState.matches.length;
+  const total = toggleFindReplaceState.matches.length;
   const current =
-    findState.currentIndex >= 0 && total > 0 ? findState.currentIndex + 1 : 0;
+    toggleFindReplaceState.currentIndex >= 0 && total > 0
+      ? toggleFindReplaceState.currentIndex + 1
+      : 0;
   if (el) el.textContent = `${current} / ${total}`;
 }
 
@@ -1718,11 +1638,11 @@ function updateMatchCount() {
  */
 function findNext() {
   const q = document.getElementById("find-input").value;
-  if (q !== findState.lastQuery) {
-    findState.lastQuery = q;
+  if (q !== toggleFindReplaceState.lastQuery) {
+    toggleFindReplaceState.lastQuery = q;
     updateMatches(q);
   }
-  if (findState.matches.length === 0) return;
+  if (toggleFindReplaceState.matches.length === 0) return;
 
   // Save history
   addToFindHistory(q);
@@ -1730,18 +1650,18 @@ function findNext() {
   const wrap =
     document.getElementById("wrap-around") &&
     document.getElementById("wrap-around").checked;
-  let nextIndex = findState.currentIndex + 1;
+  let nextIndex = toggleFindReplaceState.currentIndex + 1;
 
-  if (nextIndex >= findState.matches.length) {
+  if (nextIndex >= toggleFindReplaceState.matches.length) {
     if (wrap) {
       nextIndex = 0;
     } else {
-      nextIndex = findState.matches.length - 1; // Stay at last match
+      nextIndex = toggleFindReplaceState.matches.length - 1; // Stay at last match
     }
   }
 
-  findState.currentIndex = nextIndex;
-  highlightMatch(findState.currentIndex);
+  toggleFindReplaceState.currentIndex = nextIndex;
+  highlightMatch(toggleFindReplaceState.currentIndex);
   highlightMatches();
 }
 
@@ -1750,27 +1670,27 @@ function findNext() {
  */
 function findPrev() {
   const q = document.getElementById("find-input").value;
-  if (q !== findState.lastQuery) {
-    findState.lastQuery = q;
+  if (q !== toggleFindReplaceState.lastQuery) {
+    toggleFindReplaceState.lastQuery = q;
     updateMatches(q);
   }
-  if (findState.matches.length === 0) return;
+  if (toggleFindReplaceState.matches.length === 0) return;
 
   const wrap =
     document.getElementById("wrap-around") &&
     document.getElementById("wrap-around").checked;
-  let nextIndex = findState.currentIndex - 1;
+  let nextIndex = toggleFindReplaceState.currentIndex - 1;
 
   if (nextIndex < 0) {
     if (wrap) {
-      nextIndex = findState.matches.length - 1;
+      nextIndex = toggleFindReplaceState.matches.length - 1;
     } else {
       nextIndex = 0; // Stay at first match
     }
   }
 
-  findState.currentIndex = nextIndex;
-  highlightMatch(findState.currentIndex);
+  toggleFindReplaceState.currentIndex = nextIndex;
+  highlightMatch(toggleFindReplaceState.currentIndex);
   highlightMatches();
 }
 
@@ -1999,6 +1919,12 @@ function setupFindReplaceHistory() {
   );
 }
 
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text ?? "";
+  return div.innerHTML;
+}
+
 function setupHistoryInput(inputId, dropdownId, getHistoryFn, onSelect) {
   const input = document.getElementById(inputId);
   const dropdown = document.getElementById(dropdownId);
@@ -2099,11 +2025,6 @@ function handleKeyboardShortcuts(e) {
 
   if (e.ctrlKey || e.metaKey) {
     const key = e.key.toLowerCase();
-    if (e.shiftKey && key === "f") {
-      e.preventDefault();
-      toggleFindReplacePosition();
-      return;
-    }
     switch (e.key.toLowerCase()) {
       case "n":
         e.preventDefault();
@@ -2381,53 +2302,11 @@ window.initAnimatedIcons = function () {
   const toggleBtn = document.getElementById("fr-compact-toggle");
   if (toggleBtn) {
     const chevron = createChevronIcon(toggleBtn);
-    // We need to sync with initial state.
-    // Check local storage or existing class
-    const bar = document.getElementById("find-replace-bar");
-    const isCompact = bar ? bar.classList.contains("compact") : false;
-
-    // Compact mode -> We see 1 row. Button should Expand. Icon: ChevronDown.
-    // Expanded mode -> We see 2 rows. Button should Collapse. Icon: ChevronUp.
-    if (isCompact) {
-      chevron.setDirection("down");
-    } else {
-      chevron.setDirection("up");
-    }
-
-    // Add click listener to animate
-    // Note: The actual toggling logic is in index.html's event listener.
-    // We can add another listener here just for animation/icon update.
-    toggleBtn.addEventListener("click", () => {
-      // The state toggles after this click.
-      // Current state (before toggle logic runs or concurrent):
-      const willBeCompact = !document
-        .getElementById("find-replace-bar")
-        .classList.contains("compact");
-      // Wait, logic in HTML toggles it.
-      // If we run `click`, we don't know if we run before or after the other listener.
-      // Safer to check state *after* a microtask or rely on button aria-pressed if updated?
-      // The HTML logic toggles class immediately.
-
-      // Let's assume we want to animate the *action*.
-      // If currently Down (Compact) -> Click -> Animate Down Bounce -> Switch to Up.
-      // If currently Up (Full) -> Click -> Animate Up Bounce -> Switch to Down.
-
-      chevron.animateBounce();
-
-      // Switch direction after short delay or immediately?
-      // Animation is 600ms.
-      // Let's swap direction halfway?
-      setTimeout(() => {
-        const nowCompact = document
-          .getElementById("find-replace-bar")
-          .classList.contains("compact");
-        if (nowCompact) {
-          chevron.setDirection("down"); // Now compact, show down (expand)
-        } else {
-          chevron.setDirection("up"); // Now expanded, show up (collapse)
-        }
-      }, 300);
-    });
+    toggleBtn._chevronIcon = chevron;
+    syncFindReplaceToggleButton(
+      document.getElementById("find-replace-bar")?.classList.contains("compact"),
+    );
+    toggleBtn.addEventListener("click", toggleFindReplaceCompactMode);
   }
 };
 
@@ -2446,7 +2325,6 @@ function closeAllMenus() {
 }
 
 /**
- * Show link or image insertion dialog
  * Show link or image insertion dialog
  * @param {string} type - 'link' or 'image'
  */
@@ -2693,35 +2571,10 @@ function showGoToDialog() {
 }
 
 /**
- * Show custom alert dialog
- * @param {string} message - Message to display
- * @param {Function} callback - Optional callback after close
- */
-function customAlert(message, callback) {
-  const alertBox = document.getElementById("custom-alert");
-  const overlay = document.getElementById("popup-overlay");
-  const msgEl = document.getElementById("custom-alert-message");
-  const okBtn = document.getElementById("custom-alert-ok");
-
-  msgEl.textContent = message;
-  showOverlay();
-  openDialogElement(alertBox);
-
-  const closeAlert = () => {
-    hideOverlay();
-    closeDialogElement(alertBox);
-    okBtn.onclick = null;
-    if (callback) callback();
-  };
-  okBtn.onclick = closeAlert;
-}
-
-/**
  * Show About dialog
  */
 function showAboutDialog() {
   const dialog = document.getElementById("about-dialog");
-  const overlay = document.getElementById("popup-overlay");
   const closeBtn = document.getElementById("about-close");
   const buildNumberEl = document.getElementById("about-build-number");
 
@@ -2756,24 +2609,6 @@ function showAbout() {
   window.open(
     "https://github.com/anhoa2007-coder/lancer-notes/releases/",
     "_blank",
-  );
-}
-
-/**
- * Show edit menu (placeholder)
- */
-function showEditMenu() {
-  customAlert(
-    "Edit menu - Use Ctrl+Z/Ctrl+Y for undo/redo, or the toolbar buttons.",
-  );
-}
-
-/**
- * Show view menu (placeholder)
- */
-function showViewMenu() {
-  customAlert(
-    "View menu - Use the view toggle buttons to switch between Editor Only, Split View, and Preview Only.",
   );
 }
 
@@ -2916,9 +2751,6 @@ function toggleStatusBar() {
  * Toggle word wrap
  */
 function toggleWordWrap() {
-  const editor = document.getElementById("editor");
-  const menuBtn = document.getElementById("menu-view-wordwrap");
-
   if (editor) {
     if (editor.classList.contains("no-wrap")) {
       editor.classList.remove("no-wrap");
@@ -2957,9 +2789,6 @@ function initScrollSync() {
   } else {
     isScrollSyncEnabled = true;
   }
-
-  const editor = document.getElementById("editor");
-  const preview = document.getElementById("preview");
 
   if (!editor || !preview) return;
 
@@ -3292,7 +3121,7 @@ function selectAll() {
 }
 
 // ========================================
-// ANIMATION UTILS
+// MENU STATE UTILS
 // ========================================
 
 /**
@@ -3427,20 +3256,9 @@ function updateThemeMenuUI(mode) {
   }
 }
 
-function toggleDarkMode() {
-  // Legacy support or alias: just toggle between light/dark, ignoring system
-  const current = localStorage.getItem("markdown-theme");
-  if (current === "dark") {
-    setTheme("light");
-  } else {
-    setTheme("dark");
-  }
-}
-
 // Expose to window
 window.setTheme = setTheme;
 window.initTheme = initTheme;
-window.toggleDarkMode = toggleDarkMode;
 
 // ========================================
 // FILE LOADED INDICATOR
@@ -3448,5 +3266,3 @@ window.toggleDarkMode = toggleDarkMode;
 // This marker indicates the file loaded successfully
 window.MAIN_MD_FUNCTION_LOADED = true;
 console.log("✓ function.js loaded successfully");
-// Flag to indicate successful loading
-window.MAIN_MD_FUNCTION_LOADED = true;

@@ -956,77 +956,6 @@ input[type="radio"] {
     margin-bottom: 0;
 }
 
-/* Image Info Badge */
-.md-img-info-wrap {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    max-width: 100%;
-}
-
-.md-img-info-wrap img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-.md-img-info-badge {
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-    background: var(--color-accent-primary);
-    color: #fff;
-    font-size: 13px;
-    font-family: inherit;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    z-index: 2;
-    border: 2px solid var(--color-bg-secondary);
-    transition: background var(--transition-fast);
-}
-
-.md-img-info-badge:hover {
-    background: var(--color-accent-hover);
-}
-
-.md-img-info-popup {
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(10px);
-    transition:
-        opacity var(--transition-fast) ease-out,
-        transform var(--transition-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275),
-        visibility var(--transition-fast);
-    position: absolute;
-    bottom: 34px;
-    right: 0;
-    min-width: 200px;
-    max-width: 300px;
-    background: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-    border: 1px solid var(--color-border-secondary);
-    border-radius: var(--radius-md);
-    padding: 8px 12px;
-    box-shadow: var(--shadow-md);
-    z-index: 10;
-    font-size: 13px;
-    line-height: 1.4;
-    text-align: left;
-    white-space: normal;
-}
-
-.md-img-info-popup.open {
-    visibility: visible;
-    opacity: 1;
-    transform: translateY(0);
-}
-
 /* Table styles (basic support) */
 .preview-content table {
     border-collapse: collapse;
@@ -1671,6 +1600,14 @@ input[type="radio"] {
    PRINT STYLES
    ============================================ */
 @media print {
+
+    html,
+    body,
+    .preview-content,
+    .preview-content * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
 
     /* Hide UI elements */
     .menu-bar,
