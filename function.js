@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6441
+// Build 6500
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
@@ -52,29 +52,60 @@ function parseMarkdown(markdown) {
       // This prevents accidental code blocks when aligning text
       window.md.disable("code");
 
-      // CUSTOM RENDERER: Inject source line numbers into headers
-      // This is crucial for accurate scroll sync
-      const defaultRender =
-        window.md.renderer.rules.heading_open ||
-        function (tokens, idx, options, env, self) {
-          return self.renderToken(tokens, idx, options);
-        };
+      // CUSTOM RENDERER: inject source line numbers into block elements.
+      // This improves anchor density for scroll sync beyond headings.
+      const anchorTokenTypes = [
+        "heading_open",
+        "paragraph_open",
+        "blockquote_open",
+        "bullet_list_open",
+        "ordered_list_open",
+        "list_item_open",
+        "table_open",
+        "hr",
+      ];
 
-      window.md.renderer.rules.heading_open = function (
-        tokens,
-        idx,
-        options,
-        env,
-        self,
-      ) {
-        const token = tokens[idx];
-        if (token.map && token.level === 0) {
-          // Top-level relative to current block, not header level (h1/h2)
-          // token.map[0] is the start line (0-indexed)
-          token.attrSet("data-source-line", token.map[0]);
-        }
-        return defaultRender(tokens, idx, options, env, self);
+      const addSourceLineAttribute = function (token) {
+        if (!token || !token.map || !Number.isInteger(token.map[0])) return;
+        token.attrSet("data-source-line", token.map[0]);
       };
+
+      anchorTokenTypes.forEach((tokenType) => {
+        const defaultRender =
+          window.md.renderer.rules[tokenType] ||
+          function (tokens, idx, options, env, self) {
+            return self.renderToken(tokens, idx, options);
+          };
+
+        window.md.renderer.rules[tokenType] = function (
+          tokens,
+          idx,
+          options,
+          env,
+          self,
+        ) {
+          addSourceLineAttribute(tokens[idx]);
+          return defaultRender(tokens, idx, options, env, self);
+        };
+      });
+
+      // Fence and code_block are rendered by dedicated rules.
+      // Wrap those existing rules to add source-line anchors too.
+      ["fence", "code_block"].forEach((tokenType) => {
+        const defaultRender = window.md.renderer.rules[tokenType];
+        if (typeof defaultRender !== "function") return;
+
+        window.md.renderer.rules[tokenType] = function (
+          tokens,
+          idx,
+          options,
+          env,
+          self,
+        ) {
+          addSourceLineAttribute(tokens[idx]);
+          return defaultRender(tokens, idx, options, env, self);
+        };
+      });
     }
 
     const rawHtml = window.md.render(markdown);
@@ -98,6 +129,8 @@ function parseMarkdown(markdown) {
 // ========================================
 const HELLO_PLACEHOLDER_TEXT = "# Hello, World!";
 const HELLO_PLACEHOLDER_KEY = "markdown-hello-shown";
+let _statusMessageTimeoutId = null;
+let _statusTransientMessage = "";
 
 function initHelloPlaceholder() {
   if (!editor) return;
@@ -188,6 +221,7 @@ function updateStatusBar() {
   document.getElementById("char-count").textContent =
     `Characters: ${charCount}`;
   document.getElementById("line-count").textContent = `Lines: ${lineCount}`;
+  updateSelectionStatus();
 }
 
 /**
@@ -195,10 +229,58 @@ function updateStatusBar() {
  * @param {string} message - Message to display
  */
 function updateStatus(message) {
-  document.getElementById("status-left").textContent = message;
-  setTimeout(() => {
-    document.getElementById("status-left").textContent = "Ready";
+  const normalizedMessage =
+    typeof message === "string" ? message.trim() : String(message || "").trim();
+
+  if (!normalizedMessage) {
+    _statusTransientMessage = "";
+    if (_statusMessageTimeoutId) {
+      clearTimeout(_statusMessageTimeoutId);
+      _statusMessageTimeoutId = null;
+    }
+    renderStatusLeft();
+    return;
+  }
+
+  _statusTransientMessage = normalizedMessage;
+  renderStatusLeft();
+
+  if (_statusMessageTimeoutId) clearTimeout(_statusMessageTimeoutId);
+  _statusMessageTimeoutId = setTimeout(() => {
+    _statusTransientMessage = "";
+    _statusMessageTimeoutId = null;
+    renderStatusLeft();
   }, 3000);
+}
+
+function getIdleStatusText() {
+  if (!editor) return "Ready";
+
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  if (!Number.isInteger(start) || !Number.isInteger(end) || start === end) {
+    return "Ready";
+  }
+
+  const selectionStart = Math.min(start, end);
+  const selectionEnd = Math.max(start, end);
+  const selectedText = editor.value.substring(selectionStart, selectionEnd);
+  const charCount = selectedText.length;
+  const lineCount = selectedText.split("\n").length;
+
+  if (lineCount > 1) return `Selection: ${lineCount}L ${charCount}C`;
+  return `Selection: ${charCount}C`;
+}
+
+function renderStatusLeft() {
+  const statusLeft = document.getElementById("status-left");
+  if (!statusLeft) return;
+  statusLeft.textContent = _statusTransientMessage || getIdleStatusText();
+}
+
+function updateSelectionStatus() {
+  if (_statusTransientMessage) return;
+  renderStatusLeft();
 }
 
 // ========================================
@@ -278,7 +360,7 @@ function insertHeading(level) {
   // Update toolbar icon
   const icon = document.getElementById("current-heading-icon");
   if (icon) {
-    icon.textContent = "format_h" + level;
+    icon.className = "fi fi-br-h" + level + " icon-18";
   }
 }
 
@@ -2899,46 +2981,95 @@ function toggleScrollSync() {
 function buildScrollMap() {
   const editor = document.getElementById("editor");
   const preview = document.getElementById("preview");
-  if (!editor || !preview || !window.md) return;
+  if (!editor || !preview) return;
 
   scrollMap = [];
 
-  // Parse markdown to get tokens with line mapping
-  // We use the same parser instance as rendering to ensure consistency
-  const tokens = window.md.parse(editor.value, {});
+  const lineCount = editor.value.split("\n").length;
 
   // Always add Start (Line 0 -> Top of Preview)
   scrollMap.push({ editorLine: 0, previewTop: 0 });
 
-  // Find all headers that have a source line mapping
-  // We look for 'heading_open' tokens which we modified to include in HTML
-  // But here we just need the token's map
-  tokens.forEach((token) => {
-    if (token.type === "heading_open" && token.map) {
-      const line = token.map[0];
-      // Find the corresponding element in preview
-      // We use the data attribute we injected during render
-      const element = preview.querySelector(`[data-source-line="${line}"]`);
-      if (element) {
-        // We found a match!
-        scrollMap.push({
-          editorLine: line,
-          previewTop: element.offsetTop,
-        });
-      }
-    }
-  });
+  // Consume all rendered anchors to support headings, paragraphs, lists,
+  // blockquotes, and code blocks.
+  const anchors = Array.from(preview.querySelectorAll("[data-source-line]"))
+    .map((el) => {
+      const line = Number.parseInt(el.getAttribute("data-source-line"), 10);
+      if (!Number.isFinite(line)) return null;
+      return { editorLine: line, previewTop: el.offsetTop };
+    })
+    .filter(Boolean)
+    .sort((a, b) =>
+      a.editorLine !== b.editorLine
+        ? a.editorLine - b.editorLine
+        : a.previewTop - b.previewTop,
+    );
+
+  let previousLine = -1;
+  for (const anchor of anchors) {
+    if (anchor.editorLine === previousLine) continue;
+    if (anchor.editorLine <= 0 || anchor.editorLine >= lineCount) continue;
+    scrollMap.push(anchor);
+    previousLine = anchor.editorLine;
+  }
 
   // Always add End (Last Line -> Bottom of Preview)
-  // Use actual line count from editor value
-  const lineCount = editor.value.split("\n").length;
   scrollMap.push({
     editorLine: lineCount,
     previewTop: preview.scrollHeight,
   });
 
-  // Sort map just in case (though token order usually implies line order)
+  // Sort map and enforce non-decreasing preview positions.
   scrollMap.sort((a, b) => a.editorLine - b.editorLine);
+  for (let i = 1; i < scrollMap.length; i++) {
+    if (scrollMap[i].previewTop < scrollMap[i - 1].previewTop) {
+      scrollMap[i].previewTop = scrollMap[i - 1].previewTop;
+    }
+  }
+}
+
+function findSegmentIndexByEditorLine(line) {
+  const lastSegmentIndex = scrollMap.length - 2;
+  let low = 0;
+  let high = lastSegmentIndex;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const startLine = scrollMap[mid].editorLine;
+    const endLine = scrollMap[mid + 1].editorLine;
+
+    if (line < startLine) {
+      high = mid - 1;
+    } else if (line >= endLine) {
+      low = mid + 1;
+    } else {
+      return mid;
+    }
+  }
+
+  return Math.max(0, Math.min(lastSegmentIndex, low));
+}
+
+function findSegmentIndexByPreviewTop(top) {
+  const lastSegmentIndex = scrollMap.length - 2;
+  let low = 0;
+  let high = lastSegmentIndex;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const startTop = scrollMap[mid].previewTop;
+    const endTop = scrollMap[mid + 1].previewTop;
+
+    if (top < startTop) {
+      high = mid - 1;
+    } else if (top >= endTop) {
+      low = mid + 1;
+    } else {
+      return mid;
+    }
+  }
+
+  return Math.max(0, Math.min(lastSegmentIndex, low));
 }
 
 // Sync Preview based on Editor position
@@ -2959,27 +3090,9 @@ function syncPreview() {
   const editorScrollTop = editor.scrollTop;
   const currentLine = editorScrollTop / lineHeight;
 
-  // Find section in map
-  let startNode = scrollMap[0];
-  let endNode = scrollMap[1];
-  let found = false;
-
-  for (let i = 0; i < scrollMap.length - 1; i++) {
-    if (
-      currentLine >= scrollMap[i].editorLine &&
-      currentLine < scrollMap[i + 1].editorLine
-    ) {
-      startNode = scrollMap[i];
-      endNode = scrollMap[i + 1];
-      found = true;
-      break;
-    }
-  }
-
-  if (!found) {
-    startNode = scrollMap[scrollMap.length - 2];
-    endNode = scrollMap[scrollMap.length - 1];
-  }
+  const segmentIndex = findSegmentIndexByEditorLine(currentLine);
+  const startNode = scrollMap[segmentIndex];
+  const endNode = scrollMap[segmentIndex + 1];
 
   // Calculate percentage within section
   const lineSpan = endNode.editorLine - startNode.editorLine;
@@ -3007,27 +3120,9 @@ function syncEditor() {
   const previewContainer = document.getElementById("preview");
   const currentScrollTop = previewContainer.scrollTop;
 
-  // Find section in map
-  let startNode = scrollMap[0];
-  let endNode = scrollMap[1];
-  let found = false;
-
-  for (let i = 0; i < scrollMap.length - 1; i++) {
-    if (
-      currentScrollTop >= scrollMap[i].previewTop &&
-      currentScrollTop < scrollMap[i + 1].previewTop
-    ) {
-      startNode = scrollMap[i];
-      endNode = scrollMap[i + 1];
-      found = true;
-      break;
-    }
-  }
-
-  if (!found) {
-    startNode = scrollMap[scrollMap.length - 2];
-    endNode = scrollMap[scrollMap.length - 1];
-  }
+  const segmentIndex = findSegmentIndexByPreviewTop(currentScrollTop);
+  const startNode = scrollMap[segmentIndex];
+  const endNode = scrollMap[segmentIndex + 1];
 
   // Calculate percentage
   const pixelSpan = endNode.previewTop - startNode.previewTop;
