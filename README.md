@@ -8,7 +8,7 @@ Only used markdown-it, highlight.js, DOMPurify and Morphdom.
 ### Get started
 Visit https://lancer-notes.neocities.org/ for the editor and use it now.
 - _**Basic features:**_
-  - All the basic Commonmark markdown, with additional table and strikethough support.
+  - All the basic Commonmark features, with additional table and strikethough support.
   - Spilt mode between Editor and Preview
   - Find & Replace with regex support
   - Automatically detecting syntax highlighting, supported up to 192 languages.
