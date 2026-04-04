@@ -63,6 +63,16 @@
                 <button type="button" class="menu-dropdown-item" id="menu-file-save-as" role="menuitem">
                     Save As...
                 </button>
+                <div class="menu-dropdown-item-group" role="none">
+                    <button type="button" class="menu-dropdown-item" id="menu-file-recent-group" aria-haspopup="true"
+                        aria-expanded="false" style="justify-content: space-between">
+                        <span>Recent Files</span>
+                        <span class="material-symbols-rounded icon-18">chevron_right</span>
+                    </button>
+                    <div class="menu-submenu" role="menu" aria-label="Recent Files" id="menu-recent-files-list">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
                 <div class="menu-divider"></div>
                 <button type="button" class="menu-dropdown-item" id="menu-file-print" role="menuitem">
                     Print
@@ -608,13 +618,13 @@
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.3.4
+                    Version 1.3.5
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6441
+                    Build 6500
                 </div>
 
                 <div style="
@@ -655,7 +665,7 @@
         let undoStack = [""];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6441";
+        let BUILD_NUMBER = "6500";
         let _editorInitialized = false;
         let _domContentInitialized = false;
         let trapTab = true;
@@ -925,6 +935,13 @@
             });
 
             // Menu actions
+            document
+                .getElementById("menu-file")
+                .addEventListener("click", function (e) {
+                    if (typeof renderRecentFilesMenu === "function") {
+                        renderRecentFilesMenu();
+                    }
+                });
             document
                 .getElementById("menu-file-new")
                 .addEventListener("click", function (e) {
@@ -1347,6 +1364,20 @@
                     }
                 }
             });
+
+            // Mouse wheel zoom (Ctrl+Scroll)
+            document.addEventListener("wheel", function (e) {
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    if (e.deltaY < 0) {
+                        zoomSlider.value = Math.min(parseInt(zoomSlider.max), parseInt(zoomSlider.value) + 10);
+                    } else if (e.deltaY > 0) {
+                        zoomSlider.value = Math.max(parseInt(zoomSlider.min), parseInt(zoomSlider.value) - 10);
+                    }
+                    updateZoom();
+                    if (zoomToolbar && zoomToolbar.classList.contains("hidden")) toggleZoomToolbar();
+                }
+            }, { passive: false });
 
             // Apply saved zoom on load
             updateZoom();

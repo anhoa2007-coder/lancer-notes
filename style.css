@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MARKDOWN EDITOR STYLES - Build 6418
+   MARKDOWN EDITOR STYLES - Build 6500
    ========================================================================== */
 
 /* ============================================
@@ -798,6 +798,7 @@ input[type="radio"] {
     background-color: var(--color-bg-secondary);
     color: var(--color-text-primary);
     min-width: 0;
+    transition: padding-top 0.2s ease;
 }
 
 .editor-textarea.no-wrap {
@@ -818,6 +819,7 @@ input[type="radio"] {
     /* scale back to the regular 16px default instead of a smaller 14px */
     font-size: 14px;
     line-height: 1.5;
+    transition: padding-top 0.2s ease;
 }
 
 /* Markdown Styles in Preview */
@@ -1038,6 +1040,18 @@ input[type="radio"] {
     transition:
         opacity 0.1s ease-out,
         transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Push content down when find-replace bar is open at top */
+.fr-open-top .editor-textarea,
+.fr-open-top .preview-content {
+    padding-top: calc(var(--space-xl) + 56px);
+    transition: padding-top 0.2s ease;
+}
+
+.fr-open-top.fr-full .editor-textarea,
+.fr-open-top.fr-full .preview-content {
+    padding-top: calc(var(--space-xl) + 96px);
 }
 
 .find-replace-bar .fr-row {
@@ -1919,6 +1933,40 @@ input[type="radio"] {
 .preview-content {
     transform-origin: top left;
     transition: transform 0.1s ease-out;
+}
+
+/* ============================================
+   RECENT FILES MENU
+   ============================================ */
+.recent-file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.recent-file-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: var(--space-md);
+}
+
+.recent-file-time {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.recent-file-clear {
+    color: var(--color-danger) !important;
+}
+
+.recent-file-empty {
+    color: var(--color-text-muted);
+    pointer-events: none;
+    font-style: italic;
 }
 
 /* ============================================
