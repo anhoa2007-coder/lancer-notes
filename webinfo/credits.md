@@ -6,3 +6,4 @@
 - [Morphdom](https://www.npmjs.com/package/morphdom) for preventing unused garbage collection.
 - [Scroll Sync (for React)](https://github.com/okonet/react-scroll-sync) for scroll syncing support. However this one is heavily modified.
 - [HTML2JS](https://www.npmjs.com/package/html2js) for PDF export.
+- Designer for customizing the new theme (as it use new, better-made design system)
