@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MARKDOWN EDITOR STYLES - Build 6500
+   MARKDOWN EDITOR STYLES - Build 6510
    ========================================================================== */
 
 /* ============================================
@@ -1966,7 +1966,8 @@ input[type="radio"] {
 .recent-file-empty {
     color: var(--color-text-muted);
     pointer-events: none;
-    font-style: italic;
+    font-style: normal;
+    font-weight: normal;
 }
 
 /* ============================================
