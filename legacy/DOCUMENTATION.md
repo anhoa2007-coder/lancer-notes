@@ -1,4 +1,4 @@
-# Markdown Editor (1.3.2) Documentation
+# Markdown Editor (1.3.6) Documentation
 
 ## Overview
 A lightweight markdown editor with real-time preview, syntax highlighting, and security features. Built with vanilla JavaScript and modern browser APIs.
@@ -15,7 +15,7 @@ A lightweight markdown editor with real-time preview, syntax highlighting, and s
 
 ### Toolbar Actions
 - Text formatting (bold, italic, strikethrough)
-- Headers (h1-h3)
+- Headers (h1-h6)
 - Lists (bullet and numbered)
 - Code blocks
 - Links and images
@@ -144,7 +144,7 @@ function setViewMode(mode) {
 ## Version Information
 
 ### Current Version
-- Version: 1.3.2
+- Version: 1.3.6
 - Status: Active maintenance
 - End-of-support notice for v1.x series
 
