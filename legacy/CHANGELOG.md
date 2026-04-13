@@ -1,5 +1,16 @@
 # Changelog
-## NOTE: This is old build, replaced by new Lancer Notes, directly replacing the old app.
+## v1.4.0 (2026-04-13)
+
+### Legacy UI Refresh
+- Added dropdown support for the top-bar `File`, `Edit`, `View`, and `Help` menus
+- Removed redundant toolbar buttons now covered by the top-bar menus
+- Added a dedicated `shortcuts.html` help page linked from the Help menu
+- Updated the in-app About dialog and version label to `1.4.0`
+
+### Technical Changes
+- Added menu open/close behavior with outside-click and `Esc` dismissal
+- Made view-mode and security actions safe to use without the removed toolbar controls
+
 ## v1.3.2 (2025-10-26)
 
 ### Major Improvements
