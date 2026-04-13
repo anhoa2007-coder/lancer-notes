@@ -30,17 +30,71 @@
             align-items: center;
             gap: 20px;
             font-size: 14px;
+            position: relative;
+            z-index: 20;
         }
 
         .menu-item {
+            position: relative;
+        }
+
+        .menu-button {
             cursor: pointer;
             padding: 4px 8px;
             border-radius: 3px;
             transition: background-color 0.2s;
+            background: transparent;
+            border: none;
+            color: inherit;
+            font: inherit;
         }
 
-        .menu-item:hover {
+        .menu-button:hover,
+        .menu-button:focus,
+        .menu-item.open .menu-button {
             background-color: #404040;
+            outline: none;
+        }
+
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            min-width: 190px;
+            padding: 6px 0;
+            background-color: #f8f8f8;
+            color: #222;
+            border: 1px solid #bdbdbd;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+        }
+
+        .menu-item.open .menu-dropdown {
+            display: block;
+        }
+
+        .menu-dropdown button {
+            width: 100%;
+            padding: 8px 14px;
+            border: none;
+            background: transparent;
+            color: inherit;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .menu-dropdown button:hover,
+        .menu-dropdown button:focus {
+            background-color: #dcecff;
+            outline: none;
+        }
+
+        .menu-separator {
+            height: 1px;
+            margin: 6px 0;
+            background-color: #d5d5d5;
         }
 
         /* Toolbar */
@@ -301,28 +355,54 @@
 </head>
 <body>
     <div class="menu-bar">
-        <div class="menu-item" onclick="showAbout()">File</div>
-        <div class="menu-item" onclick="showEditMenu()">Edit</div>
-        <div class="menu-item" onclick="showViewMenu()">View</div>
-        <div class="menu-item" onclick="showHelp()">Help</div>
+        <div class="menu-item" data-menu="file">
+            <button class="menu-button" type="button" aria-haspopup="true" aria-expanded="false">File</button>
+            <div class="menu-dropdown" role="menu" aria-label="File menu">
+                <button type="button" role="menuitem" onclick="runMenuAction(newFile)">New</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(openFile)">Open...</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(saveFile)">Save</button>
+                <div class="menu-separator" role="separator"></div>
+                <button type="button" role="menuitem" onclick="runMenuAction(printDocument)">Print</button>
+                <div class="menu-separator" role="separator"></div>
+                <button type="button" role="menuitem" onclick="runMenuAction(showAbout)">About</button>
+            </div>
+        </div>
+        <div class="menu-item" data-menu="edit">
+            <button class="menu-button" type="button" aria-haspopup="true" aria-expanded="false">Edit</button>
+            <div class="menu-dropdown" role="menu" aria-label="Edit menu">
+                <button type="button" role="menuitem" onclick="runMenuAction(undo)">Undo</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(redo)">Redo</button>
+                <div class="menu-separator" role="separator"></div>
+                <button type="button" role="menuitem" onclick="runMenuAction(showFindReplace)">Find / Replace</button>
+                <div class="menu-separator" role="separator"></div>
+                <button type="button" role="menuitem" onclick="runMenuAction(selectAllText)">Select All</button>
+            </div>
+        </div>
+        <div class="menu-item" data-menu="view">
+            <button class="menu-button" type="button" aria-haspopup="true" aria-expanded="false">View</button>
+            <div class="menu-dropdown" role="menu" aria-label="View menu">
+                <button type="button" role="menuitem" onclick="runMenuAction(() => setViewMode('split'))">Split View</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(() => setViewMode('editor'))">Editor Only</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(() => setViewMode('preview'))">Preview Only</button>
+                <div class="menu-separator" role="separator"></div>
+                <button type="button" role="menuitem" onclick="runMenuAction(toggleSecurity)">Toggle Security</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(runSmokeTests)">Run Smoke Tests</button>
+            </div>
+        </div>
+        <div class="menu-item" data-menu="help">
+            <button class="menu-button" type="button" aria-haspopup="true" aria-expanded="false">Help</button>
+            <div class="menu-dropdown" role="menu" aria-label="Help menu">
+                <button type="button" role="menuitem" onclick="runMenuAction(showHelp)">Markdown Help</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(openShortcutsPage)">Editing Shortcuts</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(showViewMenu)">View Modes</button>
+                <div class="menu-separator" role="separator"></div>
+                <button type="button" role="menuitem" onclick="runMenuAction(checkForUpdates)">Check for Updates</button>
+                <button type="button" role="menuitem" onclick="runMenuAction(showAbout)">About</button>
+            </div>
+        </div>
     </div>
 
     <div class="toolbar">
-        <div class="toolbar-group">
-            <button class="toolbar-btn" onclick="newFile()" title="New File"><span class="material-symbols-outlined">note_add</span> New</button>
-            <button class="toolbar-btn" onclick="openFile()" title="Open File"><span class="material-symbols-outlined">folder_open</span> Open</button>
-            <button class="toolbar-btn" onclick="saveFile()" title="Save File"><span class="material-symbols-outlined">save</span> Save</button>
-        </div>
-        
-        <div class="toolbar-group">
-            <button class="toolbar-btn icon-only" onclick="undo()" title="Undo"><span class="material-symbols-outlined">undo</span></button>
-            <button class="toolbar-btn icon-only" onclick="redo()" title="Redo"><span class="material-symbols-outlined">redo</span></button>
-        </div>
-
-        <div class="toolbar-group">
-            <button class="toolbar-btn" onclick="showFindReplace()" title="Find and Replace"><span class="material-symbols-outlined">find_replace</span> Find</button>
-        </div>
-        
         <div class="toolbar-group">
             <button class="toolbar-btn icon-only" onclick="insertMarkdown('**', '**')" title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
             <button class="toolbar-btn icon-only" onclick="insertMarkdown('*', '*')" title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
@@ -346,27 +426,6 @@
             <button class="toolbar-btn" onclick="insertLink()" title="Insert Link"><span class="material-symbols-outlined">link</span> Link</button>
             <button class="toolbar-btn" onclick="insertImage()" title="Insert Image"><span class="material-symbols-outlined">image</span> Image</button>
             <button class="toolbar-btn" onclick="insertTable()" title="Insert Table"><span class="material-symbols-outlined">table_chart</span> Table</button>
-        </div>
-        
-        <div class="toolbar-group">
-            <div class="view-toggle">
-                <button onclick="setViewMode('split')" class="active" id="split-btn">Split</button>
-                <button onclick="setViewMode('editor')" id="editor-btn">Editor</button>
-                <button onclick="setViewMode('preview')" id="preview-btn">Preview</button>
-            </div>
-        </div>
-        <div class="toolbar-group">
-            <button class="toolbar-btn" onclick="toggleSecurity()" id="security-btn" title="Toggle XSS Protection">
-                <span class="material-symbols-outlined">security</span>
-                <span id="security-status">Security: On</span>
-            </button>
-        </div>
-        <div class="toolbar-group">
-            <button class="toolbar-btn" onclick="checkForUpdates()" title="Check for Updates">
-                <span class="material-symbols-outlined">system_update</span>
-                <span id="version-label">v1.3.2</span>
-            </button>
-            <button class="toolbar-btn" onclick="runSmokeTests()" title="Run parser smoke tests">Tests</button>
         </div>
     </div>
 
@@ -434,7 +493,7 @@ Happy writing!"></textarea>
     let redoStack = [];
     let currentViewMode = 'split';
     let securityEnabled = true; // XSS protection state
-    const CURRENT_VERSION = '1.3.2';
+    const CURRENT_VERSION = '1.4.0';
     const GITHUB_REPO = 'ObjectPresents/lancer-notes';
 
     // Initialize the editor
@@ -553,15 +612,16 @@ Happy writing!"></textarea>
         const btn = document.getElementById('security-btn');
         const status = document.getElementById('security-status');
         
-        if (securityEnabled) {
-            btn.style.backgroundColor = '';
-            status.textContent = 'Security: On';
-        } else {
-            btn.style.backgroundColor = '#ff6b6b';
-            status.textContent = 'Security: Off';
+        if (btn) {
+            btn.style.backgroundColor = securityEnabled ? '' : '#ff6b6b';
+        }
+
+        if (status) {
+            status.textContent = securityEnabled ? 'Security: On' : 'Security: Off';
         }
         
         updatePreview(); // Refresh preview with new security settings
+        updateStatus(`Security: ${securityEnabled ? 'On' : 'Off'}`);
     }
 
     // Alias for backward compatibility
@@ -923,14 +983,20 @@ Happy writing!"></textarea>
         switch(mode) {
             case 'editor':
                 container.classList.add('editor-only', 'single-pane');
-                document.getElementById('editor-btn').classList.add('active');
+                if (document.getElementById('editor-btn')) {
+                    document.getElementById('editor-btn').classList.add('active');
+                }
                 break;
             case 'preview':
                 container.classList.add('preview-only', 'single-pane');
-                document.getElementById('preview-btn').classList.add('active');
+                if (document.getElementById('preview-btn')) {
+                    document.getElementById('preview-btn').classList.add('active');
+                }
                 break;
             default:
-                document.getElementById('split-btn').classList.add('active');
+                if (document.getElementById('split-btn')) {
+                    document.getElementById('split-btn').classList.add('active');
+                }
                 break;
         }
     }
@@ -975,13 +1041,70 @@ Happy writing!"></textarea>
         }, 3000);
     }
 
+    function closeMenus() {
+        document.querySelectorAll('.menu-item.open').forEach(item => {
+            item.classList.remove('open');
+            const button = item.querySelector('.menu-button');
+            if (button) {
+                button.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    function toggleMenu(menuItem) {
+        const shouldOpen = !menuItem.classList.contains('open');
+        closeMenus();
+        if (shouldOpen) {
+            menuItem.classList.add('open');
+            const button = menuItem.querySelector('.menu-button');
+            if (button) {
+                button.setAttribute('aria-expanded', 'true');
+            }
+        }
+    }
+
+    function runMenuAction(action) {
+        closeMenus();
+        if (typeof action === 'function') {
+            action();
+        }
+    }
+
+    function setupMenus() {
+        document.querySelectorAll('.menu-item').forEach(menuItem => {
+            const button = menuItem.querySelector('.menu-button');
+            if (!button) return;
+
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleMenu(menuItem);
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.menu-bar')) {
+                closeMenus();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMenus();
+            }
+        });
+    }
+
     // Menu functions (placeholder implementations)
     function showAbout() {
-        alert('Markdown Editor v1.3.2\nA WordPad-like markdown editor with real-time preview.\n\n⚠️ IMPORTANT NOTICE:\nv1.x series will be reaching end of support soon. Please prepare to migrate to v2.x for continued updates and support.\n\nChangelogs:\nv1.3.2: Major improvements\n- Replaced parser with markdown-it for better CommonMark support\n- Added syntax highlighting for code blocks (highlight.js)\n- Added local vendoring support (vendor-libs.ps1)\n- Added support for escaped characters (\\*)\nv1.3.1: Security update - Fixed Cross-Site Scripting (XSS) vulnerabilities\nv1.3: Final maintenance release - Added Find and Replace functionality\nv1.2: Fix table format not working\nv1.1: Changed to new icons');
+        alert('Markdown Editor v1.4.0\nA WordPad-like markdown editor with real-time preview.\n\n⚠️ IMPORTANT NOTICE:\nv1.x series will be reaching end of support soon. Please prepare to migrate to v2.x for continued updates and support.\n\nChangelogs:\nv1.4.0: Legacy UI refresh\n- Added dropdown support for the File, Edit, View, and Help top-bar menus\n- Removed redundant toolbar buttons now covered by the top-bar menus\n- Added a dedicated shortcuts reference page from the Help menu\nv1.3.2: Major improvements\n- Replaced parser with markdown-it for better CommonMark support\n- Added syntax highlighting for code blocks (highlight.js)\n- Added local vendoring support (vendor-libs.ps1)\n- Added support for escaped characters (\\*)\nv1.3.1: Security update - Fixed Cross-Site Scripting (XSS) vulnerabilities\nv1.3: Final maintenance release - Added Find and Replace functionality\nv1.2: Fix table format not working\nv1.1: Changed to new icons');
+    }
+
+    function openShortcutsPage() {
+        window.open('shortcuts.html', '_blank', 'noopener');
     }
 
     function showEditMenu() {
-        alert('Edit menu - Use Ctrl+Z/Ctrl+Y for undo/redo, or the toolbar buttons.');
+        openShortcutsPage();
     }
 
     function showViewMenu() {
@@ -990,6 +1113,17 @@ Happy writing!"></textarea>
 
     function showHelp() {
         alert('Help:\n• Use ** for bold text\n• Use * for italic text\n• Use # for headers\n• Use - or * for lists\n• Use [text](url) for links\n• Use ![alt](url) for images');
+    }
+
+    function selectAllText() {
+        editor.focus();
+        editor.select();
+        updateStatus('Selected all text');
+    }
+
+    function printDocument() {
+        window.print();
+        updateStatus('Print dialog opened');
     }
 
     // Find and Replace functionality
@@ -1104,6 +1238,7 @@ Happy writing!"></textarea>
     window.addEventListener('load', () => {
         initMarkdownIt();
         initEditor();
+        setupMenus();
         // Populate version label safely (fallback to CURRENT_VERSION)
         try {
             const versionLabel = document.getElementById('version-label');

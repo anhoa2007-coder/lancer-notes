@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Editor Shortcuts</title>
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px 32px;
+            line-height: 1.5;
+            color: #222;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
+        h2 {
+            margin-top: 28px;
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin: 0 0 12px;
+        }
+
+        .summary {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        .summary li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f3f3f3;
+        }
+
+        .keys {
+            white-space: nowrap;
+        }
+
+        kbd {
+            display: inline-block;
+            padding: 2px 8px;
+            margin-right: 4px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            background-color: #f7f7f7;
+            font: 600 0.9rem/1 Consolas, "Courier New", monospace;
+        }
+
+        .notes {
+            margin-top: 24px;
+        }
+
+        .notes ul {
+            padding-left: 20px;
+        }
+
+        .footer {
+            margin-top: 28px;
+            padding-top: 16px;
+            border-top: 1px solid #ddd;
+        }
+
+        a {
+            color: #0b57d0;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 0 14px 24px;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                margin-bottom: 12px;
+                border: 1px solid #ccc;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            tr td:last-child {
+                border-bottom: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Legacy Editor Shortcuts</h1>
+    <p>This page lists the keyboard shortcuts and quick actions available in the legacy markdown editor.</p>
+    <p>It uses the same simple style direction as the vendor downloader page so it stays lightweight and consistent.</p>
+
+    <ul class="summary">
+        <li>`Ctrl` on Windows and Linux maps to `Cmd` on macOS in the editor shortcut logic.</li>
+        <li>The top bar now contains most app-level actions like file, edit, view, and help commands.</li>
+        <li>The toolbar is mainly for markdown insertion and formatting helpers.</li>
+    </ul>
+
+    <h2>Keyboard Shortcuts</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Shortcut</th>
+                <th>Action</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="keys"><kbd>Ctrl</kbd><kbd>N</kbd></td>
+                <td>New file</td>
+                <td>Clears the editor after confirmation if content would be lost.</td>
+            </tr>
+            <tr>
+                <td class="keys"><kbd>Ctrl</kbd><kbd>O</kbd></td>
+                <td>Open file</td>
+                <td>Opens the browser file picker for markdown or text files.</td>
+            </tr>
+            <tr>
+                <td class="keys"><kbd>Ctrl</kbd><kbd>S</kbd></td>
+                <td>Save file</td>
+                <td>Downloads the current document using the active filename when available.</td>
+            </tr>
+            <tr>
+                <td class="keys"><kbd>Ctrl</kbd><kbd>Z</kbd></td>
+                <td>Undo</td>
+                <td>Moves backward through the local undo history.</td>
+            </tr>
+            <tr>
+                <td class="keys"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Z</kbd></td>
+                <td>Redo</td>
+                <td>Reapplies the most recently undone change.</td>
+            </tr>
+            <tr>
+                <td class="keys"><kbd>Ctrl</kbd><kbd>B</kbd></td>
+                <td>Bold selection</td>
+                <td>Wraps the selected text in `**` markers.</td>
+            </tr>
+            <tr>
+                <td class="keys"><kbd>Ctrl</kbd><kbd>I</kbd></td>
+                <td>Italic selection</td>
+                <td>Wraps the selected text in `*` markers.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Toolbar Actions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Control Group</th>
+                <th>Action</th>
+                <th>Best Use</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Bold / Italic / Strike / Code</td>
+                <td>Inline formatting</td>
+                <td>Applies quick emphasis and inline code without typing markers manually.</td>
+            </tr>
+            <tr>
+                <td>H1 / H2 / H3</td>
+                <td>Heading insertion</td>
+                <td>Adds heading markers at the start of the current line.</td>
+            </tr>
+            <tr>
+                <td>List / Numbered List / Quote</td>
+                <td>Block structure helpers</td>
+                <td>Useful for drafting notes and outlines quickly.</td>
+            </tr>
+            <tr>
+                <td>Link / Image / Table</td>
+                <td>Template insertion</td>
+                <td>Creates markdown snippets for common content types.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Menu Guide</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Menu</th>
+                <th>Contents</th>
+                <th>Use</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>File</td>
+                <td>New, Open, Save, Print, About</td>
+                <td>Document-level actions and version details.</td>
+            </tr>
+            <tr>
+                <td>Edit</td>
+                <td>Undo, Redo, Find / Replace, Select All</td>
+                <td>Editing and revision commands.</td>
+            </tr>
+            <tr>
+                <td>View</td>
+                <td>Split, Editor Only, Preview Only, Security, Smoke Tests</td>
+                <td>Layout and maintenance actions.</td>
+            </tr>
+            <tr>
+                <td>Help</td>
+                <td>Markdown Help, Shortcuts, View Help, Updates, About</td>
+                <td>Reference and support actions.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="notes">
+        <h2>Notes</h2>
+        <ul>
+            <li>The editor only implements the shortcuts listed above directly in JavaScript.</li>
+            <li>`Esc` closes an open top-bar dropdown menu.</li>
+            <li>Some features still use prompt dialogs because this is the legacy editor line.</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>Legacy line reference page for version 1.4.0.</p>
+        <p><a href="legacy_markdown_editor.html">Back to editor</a></p>
+    </div>
+</body>
+</html>
