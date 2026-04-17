@@ -1,7 +1,7 @@
 # Lancer Notes
 A Markdown notes app that's heavily forked from orginial [Lancer Fan Club](https://web.archive.org/web/20250414090354/http://lancerfanclub.neocities.org/) forum by ObjectPresents (now lost and decerpated).\
 With markdown and text editing support\
-And easy to use UI, you can use it like other text editors.
+And easy to use UI, you can use it like other basic text editors.
 ## Importantly...
 It's lightweight, used around 40-65MB of usage, and low depdenacies.\
 Only used markdown-it, highlight.js, DOMPurify and Morphdom.
