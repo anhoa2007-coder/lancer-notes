@@ -1507,38 +1507,11 @@ function toggleFindReplaceCompactMode() {
 	toggleFindReplaceState.isReplaceMode = !shouldCompact;
 }
 
-/**
- * Update find/replace position (top/bottom)
- */
-function setFindReplacePosition(useBottom, persist = true) {
-	const bar = document.getElementById("find-replace-bar");
-	if (!bar) return;
-	bar.classList.toggle("position-bottom", useBottom);
-	updateFindReplaceContentOffset();
-	if (persist) {
-		localStorage.setItem("markdown-findreplace-position", useBottom ? "bottom" : "top");
-	}
-}
 
 /**
- * Toggle find/replace position top/bottom
- */
-function toggleFindReplacePosition() {
-	const bar = document.getElementById("find-replace-bar");
-	if (!bar) return;
-	const isBottom = bar.classList.contains("position-bottom");
-	setFindReplacePosition(!isBottom, true);
-}
-
-/**
- * Initialize find/replace position and compact mode from storage
+ * Initialize find/replace compact mode from storage
  */
 function initFindReplacePosition() {
-	const storedPos = localStorage.getItem("markdown-findreplace-position");
-	if (storedPos === "bottom") {
-		setFindReplacePosition(true, false);
-	}
-
 	const storedCompact = localStorage.getItem("markdown-findreplace-compact");
 	const isCompact = storedCompact === "1";
 	setFindReplaceCompactMode(isCompact, false);
@@ -1561,7 +1534,7 @@ function focusFindReplaceInput(showReplace) {
 }
 
 /**
- * Update padding on editor/preview when find-replace is open at top
+ * Update padding on editor/preview when find-replace is open
  */
 function updateFindReplaceContentOffset() {
 	const bar = document.getElementById("find-replace-bar");
@@ -1569,11 +1542,10 @@ function updateFindReplaceContentOffset() {
 	if (!bar || !container) return;
 
 	const isOpen = bar.classList.contains("open");
-	const isTop = !bar.classList.contains("position-bottom");
 	const isCompact = bar.classList.contains("compact");
 
-	container.classList.toggle("fr-open-top", isOpen && isTop);
-	container.classList.toggle("fr-full", isOpen && isTop && !isCompact);
+	container.classList.toggle("fr-open-top", isOpen);
+	container.classList.toggle("fr-full", isOpen && !isCompact);
 }
 
 function toggleFindReplace(showReplace = toggleFindReplaceState.isReplaceMode) {
@@ -2565,6 +2537,8 @@ function showLinkImageDialog(type) {
 	const textInput = document.getElementById("dialog-text");
 	const okBtn = document.getElementById("dialog-ok");
 	const cancelBtn = document.getElementById("dialog-cancel");
+	const resolutionRow = document.getElementById("dialog-resolution-row");
+	const resolutionBtns = resolutionRow.querySelectorAll(".resolution-btn");
 
 	title.textContent = type === "link" ? "Insert Link" : "Insert Image";
 	textLabel.textContent = type === "link" ? "Text" : "Alt Text";
@@ -2574,6 +2548,25 @@ function showLinkImageDialog(type) {
 		editor.selectionEnd,
 	);
 
+	// Show/hide resolution row based on type
+	resolutionRow.style.display = type === "image" ? "block" : "none";
+
+	// Reset resolution to 1x
+	let selectedResolution = 1;
+	resolutionBtns.forEach((btn) => {
+		btn.classList.toggle("active", btn.dataset.res === "1");
+	});
+
+	// Resolution button click handlers
+	const handleResClick = (e) => {
+		const btn = e.currentTarget;
+		selectedResolution = parseInt(btn.dataset.res, 10);
+		resolutionBtns.forEach((b) => b.classList.remove("active"));
+		btn.classList.add("active");
+	};
+
+	resolutionBtns.forEach((btn) => btn.addEventListener("click", handleResClick));
+
 	showOverlay();
 	openDialogElement(dialog);
 	urlInput.focus();
@@ -2582,10 +2575,16 @@ function showLinkImageDialog(type) {
 		const url = urlInput.value;
 		const text = textInput.value;
 		if (url) {
-			const markdown =
-				type === "link"
-					? `[${text || url}](${url})`
-					: `![${text || "Image"}](${url})`;
+			let markdown;
+			if (type === "link") {
+				markdown = `[${text || url}](${url})`;
+			} else if (selectedResolution > 1) {
+				// Use HTML img tag with width/height divided by scale for super resolution
+				const alt = text || "Image";
+				markdown = `<img src="${url}" alt="${alt}" width="auto" style="zoom: ${(100 / selectedResolution).toFixed(2).replace(/\.?0+$/, '')}%;" />`;
+			} else {
+				markdown = `![${text || "Image"}](${url})`;
+			}
 			insertMarkdown(markdown, "");
 		}
 		closeDialog();
@@ -2600,6 +2599,7 @@ function showLinkImageDialog(type) {
 		closeDialogElement(dialog);
 		okBtn.onclick = null;
 		cancelBtn.onclick = null;
+		resolutionBtns.forEach((btn) => btn.removeEventListener("click", handleResClick));
 		editor.focus();
 	};
 

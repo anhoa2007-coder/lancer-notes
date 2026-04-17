@@ -52,13 +52,13 @@
             File
             <div class="menu-dropdown" role="menu" aria-label="File menu">
                 <button type="button" class="menu-dropdown-item" id="menu-file-new" role="menuitem">
-                    New
+                    New <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+N</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-file-open" role="menuitem">
-                    Open
+                    Open <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+O</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-file-save" role="menuitem">
-                    Save
+                    Save <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+S</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-file-save-as" role="menuitem">
                     Save As...
@@ -88,10 +88,10 @@
             Edit
             <div class="menu-dropdown" role="menu" aria-label="Edit menu">
                 <button type="button" class="menu-dropdown-item" id="menu-edit-undo" role="menuitem">
-                    Undo
+                    Undo <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+Z</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-redo" role="menuitem">
-                    Redo
+                    Redo <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+Y</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-select-all" role="menuitem">
                     Select All
@@ -105,7 +105,7 @@
                     Insert Date/Time
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-find" role="menuitem">
-                    Find/Replace
+                    Find/Replace <span style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+F</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-goto" role="menuitem">
                     Go To Line
@@ -152,23 +152,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="menu-dropdown-item-group" role="none">
-                    <button type="button" class="menu-dropdown-item" id="menu-view-barpos-group" aria-haspopup="true"
-                        aria-expanded="false" style="justify-content: space-between">
-                        <span>Position</span>
-                        <span class="material-symbols-rounded icon-18">chevron_right</span>
-                    </button>
-                    <div class="menu-submenu" role="menu" aria-label="Position">
-                        <button type="button" class="menu-dropdown-item menu-checkable" id="menu-bar-position-top"
-                            role="menuitem">
-                            Top
-                        </button>
-                        <button type="button" class="menu-dropdown-item menu-checkable" id="menu-bar-position-bottom"
-                            role="menuitem">
-                            Bottom
-                        </button>
-                    </div>
-                </div>
+
                 <button type="button" class="menu-dropdown-item" id="menu-view-zoom" role="menuitem">
                     Zoom
                 </button>
@@ -209,18 +193,18 @@
         <div class="toolbar-container" role="toolbar" aria-label="Editor Toolbar">
             <!-- undo/redo group added -->
             <div class="toolbar-group">
-                <button class="toolbar-btn icon-only" id="btn-undo" title="Undo">
+                <button class="toolbar-btn icon-only" id="btn-undo" title="Undo (Ctrl+Z)">
                     <span class="material-symbols-rounded">undo</span>
                 </button>
-                <button class="toolbar-btn icon-only" id="btn-redo" title="Redo">
+                <button class="toolbar-btn icon-only" id="btn-redo" title="Redo (Ctrl+Y)">
                     <span class="material-symbols-rounded">redo</span>
                 </button>
             </div>
             <div class="toolbar-group">
-                <button class="toolbar-btn icon-only" id="btn-bold" title="Bold">
+                <button class="toolbar-btn icon-only" id="btn-bold" title="Bold (Ctrl+B)">
                     <span class="material-symbols-rounded">format_bold</span>
                 </button>
-                <button class="toolbar-btn icon-only" id="btn-italic" title="Italic">
+                <button class="toolbar-btn icon-only" id="btn-italic" title="Italic (Ctrl+I)">
                     <span class="material-symbols-rounded">format_italic</span>
                 </button>
                 <button class="toolbar-btn icon-only" id="btn-code" title="Code">
@@ -523,6 +507,15 @@
             <label for="dialog-text" id="dialog-text-label">Text</label>
             <input id="dialog-text" type="text" />
         </div>
+        <div id="dialog-resolution-row" style="margin-bottom: 15px; display: none">
+            <label for="dialog-resolution">Resolution</label>
+            <div style="display: flex; gap: 6px">
+                <button type="button" class="resolution-btn active" data-res="1">1×</button>
+                <button type="button" class="resolution-btn" data-res="2">2×</button>
+                <button type="button" class="resolution-btn" data-res="3">3×</button>
+                <button type="button" class="resolution-btn" data-res="4">4×</button>
+            </div>
+        </div>
         <div class="dialog-actions">
             <button id="dialog-cancel">Cancel</button>
             <button id="dialog-ok" class="primary">OK</button>
@@ -618,13 +611,13 @@
                             color: var(--color-text-secondary);
                             margin-bottom: 2px;
                         ">
-                    Version 1.3.6
+                    Version 1.3.7
                 </div>
                 <div style="
                             color: var(--color-text-secondary);
                             margin-bottom: 15px;
                         " id="about-build-number">
-                    Build 6500
+                    Build 6514
                 </div>
 
                 <div style="
@@ -665,7 +658,7 @@
         let undoStack = [""];
         let redoStack = [];
         let currentViewMode = "split";
-        let BUILD_NUMBER = "6510";
+        let BUILD_NUMBER = "6514";
         let _editorInitialized = false;
         let _domContentInitialized = false;
         let trapTab = true;
@@ -1174,16 +1167,7 @@
                     setTheme("dark");
                     closeAllMenus();
                 });
-            document
-                .getElementById("menu-bar-position-top")
-                .addEventListener("click", function () {
-                    handleUnifiedBarPositionClick("top");
-                });
-            document
-                .getElementById("menu-bar-position-bottom")
-                .addEventListener("click", function () {
-                    handleUnifiedBarPositionClick("bottom");
-                });
+
             document
                 .getElementById("menu-view-statusbar")
                 .addEventListener("click", function () {
@@ -1213,66 +1197,11 @@
             const zoomCloseBtn = document.getElementById("zoom-close-btn");
             const previewContent = document.getElementById("preview");
             const editorEl = document.getElementById("editor");
-            const unifiedBarPositionKey = "markdown-bar-position";
-
-            function applyZoomToolbarPosition(position, persist = true) {
-                const normalized = position === "bottom" ? "bottom" : "top";
-                zoomToolbar.classList.toggle("is-bottom", normalized === "bottom");
-                if (typeof updateMenuCheck === "function") {
-                    updateMenuCheck("menu-bar-position-top", normalized === "top", persist);
-                    updateMenuCheck("menu-bar-position-bottom", normalized === "bottom", persist);
-                }
-            }
-
-            function handleUnifiedBarPositionClick(position) {
-                if (typeof setUnifiedBarPosition === "function") {
-                    setUnifiedBarPosition(position, true);
-                } else if (typeof setZoomToolbarPosition === "function") {
-                    setZoomToolbarPosition(position);
-                }
-                closeAllMenus();
-            }
-
-            function toggleZoomToolbarPosition() {
-                const isBottom = zoomToolbar.classList.contains("is-bottom");
-                setUnifiedBarPosition(isBottom ? "top" : "bottom", true);
-            }
-
             // Restore persisted zoom level
             const storedZoom = localStorage.getItem("markdown-zoom-level");
             if (storedZoom) {
                 zoomSlider.value = storedZoom;
             }
-
-            function setUnifiedBarPosition(position, persist = true) {
-                const normalized = position === "bottom" ? "bottom" : "top";
-                applyZoomToolbarPosition(normalized, persist);
-                if (typeof setFindReplacePosition === "function") {
-                    setFindReplacePosition(normalized === "bottom", persist);
-                }
-                if (persist) {
-                    localStorage.setItem(unifiedBarPositionKey, normalized);
-                }
-            }
-
-            const storedUnifiedPosition = localStorage.getItem(unifiedBarPositionKey);
-            setUnifiedBarPosition(storedUnifiedPosition || "top", false);
-
-            window.setZoomToolbarPosition = function (position) {
-                setUnifiedBarPosition(position, true);
-            };
-
-            window.toggleZoomToolbarPosition = function () {
-                toggleZoomToolbarPosition();
-            };
-
-            window.getZoomToolbarPosition = function () {
-                return zoomToolbar.classList.contains("is-bottom") ? "bottom" : "top";
-            };
-
-            window.setUnifiedBarPosition = function (position, persist = true) {
-                setUnifiedBarPosition(position, persist);
-            };
 
             function updateZoom() {
                 const value = parseInt(zoomSlider.value);
