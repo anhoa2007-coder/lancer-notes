@@ -12,6 +12,7 @@ Visit https://lancer-notes.neocities.org/ for the editor and use it now.
   - Spilt mode between Editor and Preview
   - Find & Replace with regex support
   - Automatically detecting syntax highlighting with support up to 192 languages.
+  - Super Resolution for blurry image (Chromium support only, 1.4.0 or further)
 - **_If you're confused about the Markdown commands?_**
     - The toolbar, when you try to click the button, it will translate to markdown syntax.
     - If you are still lost, you can try to check [Basic Syntax Guide](https://www.markdownguide.org/basic-syntax/)
