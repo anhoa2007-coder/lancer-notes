@@ -2200,6 +2200,10 @@ function handleKeyboardShortcuts(e) {
 	if (e.ctrlKey || e.metaKey) {
 		const key = e.key.toLowerCase();
 		switch (e.key.toLowerCase()) {
+			case "a":
+				e.preventDefault();
+				selectAll();
+				break;
 			case "n":
 				e.preventDefault();
 				newFile();
@@ -2537,8 +2541,6 @@ function showLinkImageDialog(type) {
 	const textInput = document.getElementById("dialog-text");
 	const okBtn = document.getElementById("dialog-ok");
 	const cancelBtn = document.getElementById("dialog-cancel");
-	const resolutionRow = document.getElementById("dialog-resolution-row");
-	const resolutionBtns = resolutionRow.querySelectorAll(".resolution-btn");
 
 	title.textContent = type === "link" ? "Insert Link" : "Insert Image";
 	textLabel.textContent = type === "link" ? "Text" : "Alt Text";
@@ -2548,25 +2550,6 @@ function showLinkImageDialog(type) {
 		editor.selectionEnd,
 	);
 
-	// Show/hide resolution row based on type
-	resolutionRow.style.display = type === "image" ? "block" : "none";
-
-	// Reset resolution to 1x
-	let selectedResolution = 1;
-	resolutionBtns.forEach((btn) => {
-		btn.classList.toggle("active", btn.dataset.res === "1");
-	});
-
-	// Resolution button click handlers
-	const handleResClick = (e) => {
-		const btn = e.currentTarget;
-		selectedResolution = parseInt(btn.dataset.res, 10);
-		resolutionBtns.forEach((b) => b.classList.remove("active"));
-		btn.classList.add("active");
-	};
-
-	resolutionBtns.forEach((btn) => btn.addEventListener("click", handleResClick));
-
 	showOverlay();
 	openDialogElement(dialog);
 	urlInput.focus();
@@ -2575,16 +2558,10 @@ function showLinkImageDialog(type) {
 		const url = urlInput.value;
 		const text = textInput.value;
 		if (url) {
-			let markdown;
-			if (type === "link") {
-				markdown = `[${text || url}](${url})`;
-			} else if (selectedResolution > 1) {
-				// Use HTML img tag with width/height divided by scale for super resolution
-				const alt = text || "Image";
-				markdown = `<img src="${url}" alt="${alt}" width="auto" style="zoom: ${(100 / selectedResolution).toFixed(2).replace(/\.?0+$/, '')}%;" />`;
-			} else {
-				markdown = `![${text || "Image"}](${url})`;
-			}
+			const markdown =
+				type === "link"
+					? `[${text || url}](${url})`
+					: `![${text || "Image"}](${url})`;
 			insertMarkdown(markdown, "");
 		}
 		closeDialog();
@@ -2599,7 +2576,6 @@ function showLinkImageDialog(type) {
 		closeDialogElement(dialog);
 		okBtn.onclick = null;
 		cancelBtn.onclick = null;
-		resolutionBtns.forEach((btn) => btn.removeEventListener("click", handleResClick));
 		editor.focus();
 	};
 
