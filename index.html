@@ -64,7 +64,8 @@
                         style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+S</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-file-save-as" role="menuitem">
-                    Save As...
+                    Save As... <span
+                        style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">Ctrl+Shift+S</span>
                 </button>
                 <div class="menu-dropdown-item-group" role="none">
                     <button type="button" class="menu-dropdown-item" id="menu-file-recent-group" aria-haspopup="true"
@@ -108,7 +109,8 @@
                 </button>
                 <div class="menu-divider"></div>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-date-time" role="menuitem">
-                    Insert Date/Time
+                    Insert Date/Time <span
+                        style="margin-left: auto; color: var(--color-text-tertiary); font-size: 0.85em;">F5</span>
                 </button>
                 <button type="button" class="menu-dropdown-item" id="menu-edit-find" role="menuitem">
                     Find/Replace <span
@@ -215,10 +217,10 @@
                 <button class="toolbar-btn icon-only" id="btn-italic" title="Italic (Ctrl+I)">
                     <span class="material-symbols-rounded">format_italic</span>
                 </button>
-                <button class="toolbar-btn icon-only" id="btn-code" title="Code">
+                <button class="toolbar-btn icon-only" id="btn-code" title="Inline Code (Ctrl+`)">
                     <span class="material-symbols-rounded">code</span>
                 </button>
-                <button class="toolbar-btn icon-only" id="btn-strikethrough" title="Strikethrough">
+                <button class="toolbar-btn icon-only" id="btn-strikethrough" title="Strikethrough (Ctrl+Shift+X)">
                     <span class="material-symbols-rounded">strikethrough_s</span>
                 </button>
             </div>
@@ -1272,8 +1274,15 @@
                     closeAllMenus();
                 });
 
-            // Keyboard shortcuts for zoom (Ctrl+=/Ctrl+-/Ctrl+0)
+            // Keyboard shortcuts for zoom (Ctrl+=/Ctrl+-/Ctrl+0) and Save As (Ctrl+Shift+S)
             document.addEventListener("keydown", function (e) {
+                if (e.ctrlKey && e.shiftKey && !e.altKey) {
+                    if (e.key === "S" || e.key === "s") {
+                        e.preventDefault();
+                        saveAsFile();
+                        closeAllMenus();
+                    }
+                }
                 if (e.ctrlKey && !e.shiftKey && !e.altKey) {
                     if (e.key === "=" || e.key === "+") {
                         e.preventDefault();
@@ -1315,6 +1324,15 @@
                 if (e.key === "F1") {
                     e.preventDefault();
                     showHelp();
+                    closeAllMenus();
+                }
+            });
+
+            // F5 for Insert Date/Time
+            document.addEventListener("keydown", function(e) {
+                if (e.key === "F5" && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+                    e.preventDefault();
+                    showDateTimeDialog();
                     closeAllMenus();
                 }
             });

@@ -1458,36 +1458,6 @@ input[type="radio"] {
     width: 400px;
 }
 
-/* Resolution Buttons (Image Insert Dialog) */
-.resolution-btn {
-    flex: 1;
-    padding: 6px 0;
-    font-size: 13px;
-    font-weight: 500;
-    border: 1px solid var(--color-border-secondary);
-    background: var(--color-bg-primary);
-    color: var(--color-text-primary);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.resolution-btn:hover {
-    background: var(--color-bg-hover);
-    border-color: var(--color-border-dark);
-}
-
-.resolution-btn.active {
-    background: var(--color-accent-primary);
-    color: #fff;
-    border-color: var(--color-accent-primary);
-}
-
-.resolution-btn.active:hover {
-    background: var(--color-accent-hover);
-}
-
-
 /* Help & Changelog Popups */
 .fullscreen-popup {
     display: none;

@@ -2213,8 +2213,10 @@ function handleKeyboardShortcuts(e) {
 				openFile();
 				break;
 			case "s":
-				e.preventDefault();
-				saveFile();
+				if (!e.shiftKey) {
+					e.preventDefault();
+					saveFile();
+				}
 				break;
 			case "z":
 				e.preventDefault();
@@ -2235,6 +2237,16 @@ function handleKeyboardShortcuts(e) {
 			case "i":
 				e.preventDefault();
 				insertMarkdown("*", "*");
+				break;
+			case "x":
+				if (e.shiftKey) {
+					e.preventDefault();
+					insertMarkdown("~~", "~~");
+				}
+				break;
+			case "`":
+				e.preventDefault();
+				insertMarkdown("`", "`");
 				break;
 			case "f":
 				e.preventDefault();
