@@ -1,7 +1,7 @@
 // ========================================
 // MARKDOWN EDITOR - CORE FUNCTIONS
 // function.js
-// Build 6803
+// Build 6500
 // ========================================
 // This file contains all core markdown processing,
 // formatting, and utility functions for the editor.
