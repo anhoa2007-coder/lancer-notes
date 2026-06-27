@@ -1,18 +1,20 @@
 # Rename this file to vendor-libs.ps1 to use it
-# PowerShell script to download vendor libraries for the markdown editor
+## PowerShell script to download vendor libraries for the markdown editor
 
 Write-Host "Creating vendor directory..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Path "vendor" -Force | Out-Null
 
 # Library URLs
+```js
 $libs = @{
     "markdown-it" = "https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"
     "dompurify" = "https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"
     "highlight-js" = "https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/common.min.js"
     "highlight-css" = "https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/default.min.css"
 }
-
+```
 # Download each library
+```js
 foreach ($lib in $libs.GetEnumerator()) {
     $fileName = switch ($lib.Key) {
         "markdown-it" { "markdown-it.min.js" }
@@ -29,6 +31,8 @@ foreach ($lib in $libs.GetEnumerator()) {
         Write-Host "Error downloading $($lib.Key): $_" -ForegroundColor Red
     }
 }
+```
 
 Write-Host "`nDone! Libraries downloaded to vendor/ folder." -ForegroundColor Cyan
 Write-Host "You can now reload legacy_markdown_editor.html to use the local vendor files." -ForegroundColor Cyan
+
