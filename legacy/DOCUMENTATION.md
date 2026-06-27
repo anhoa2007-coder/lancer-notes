@@ -9,7 +9,6 @@ A lightweight markdown editor with real-time preview, syntax highlighting, and s
 - Real-time markdown preview
 - Code syntax highlighting
 - Table support
-- Security (XSS protection)
 - Local file vendoring
 - Backslash character escaping
 
@@ -17,7 +16,7 @@ A lightweight markdown editor with real-time preview, syntax highlighting, and s
 - Text formatting (bold, italic, strikethrough)
 - Headers (h1-h6)
 - Lists (bullet and numbered)
-- Code blocks
+- Code
 - Links and images
 - Tables
 - View modes (split/editor/preview)
@@ -162,7 +161,7 @@ function setViewMode(mode) {
 | Ctrl+O | Open file |
 | Ctrl+S | Save file |
 | Ctrl+Z | Undo |
-| Ctrl+Shift+Z | Redo |
+| Ctrl+Y | Redo |
 | Ctrl+B | Bold |
 | Ctrl+I | Italic |
 
