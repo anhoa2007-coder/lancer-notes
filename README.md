@@ -8,8 +8,8 @@ Only used markdown-it, highlight.js, DOMPurify and Morphdom.
 ### Get started
 Visit https://lancer-notes.neocities.org/ for the editor and use it now.
 - _**Basic features:**_
-  - All the basic Commonmark features, with additional table and strikethough support.
-  - Spilt mode between Editor and Preview
+  - All the basic Markdown features, with additional table and strikethough support.
+  - Spilt mode between syntax mode and preview mode
   - Find & Replace with regex support
   - Automatically detecting syntax highlighting with support up to 192 languages.
 - **_If you're confused about the Markdown commands?_**
