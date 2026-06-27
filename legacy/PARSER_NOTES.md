@@ -1,6 +1,6 @@
 PARSER NOTES
 ============
-
+## Legacy Infomation
 This project previously used a small custom Markdown parser (regex-based) inside `legacy_markdown_editor.html`. The custom parser was replaced with `markdown-it` (client-side) and `DOMPurify` for sanitization. The goal: improve CommonMark compliance, robust table/code handling, and reduce maintenance burden.
 Files changed
  `legacy_markdown_editor.html` — now prefers local vendor copies (./vendor/) when present, otherwise uses CDN; initializes a `markdown-it` instance at load time, uses `DOMPurify` for sanitization when security is enabled, and integrates `highlight.js` for code-block syntax highlighting when available.
@@ -8,11 +8,11 @@ Files changed
 ----------------------
 1. Parsing
 
-6. Syntax highlighting
+2. Syntax highlighting
    - The editor integrates `highlight.js` for fenced code block highlighting when the library is available (CDN or local vendor).
    - The markdown-it instance is configured to use `hljs` if present; otherwise code blocks fall back to showing escaped code.
 
-7. Vendoring (local copies)
+3. Vendoring (local copies)
    - Two options are provided to download vendor files:
      1. Browser method: Use `vendor-download.html` to download the files through your browser
      2. PowerShell method: Rename `vendor-libs.txt` to `vendor-libs.ps1` and run it in PowerShell
