@@ -15,3 +15,5 @@ Visit https://lancer-notes.neocities.org/ for the editor and use it now.
 - **_If you're confused about the Markdown commands?_**
     - The toolbar, when you try to click the button, it will translate to markdown syntax.
     - If you are still lost, you can try to check [Basic Syntax Guide](https://www.markdownguide.org/basic-syntax/)
+- **_How you build it yourself?_**
+    - You don't. It's already built-in everything. Please run it on a browser or host it.
